@@ -601,6 +601,7 @@
     <div class="endgame-sub" id="startSub"></div>
     <div class="endgame-actions">
       <button class="btn-play-now" id="startBegin">Begin</button>
+      <button class="btn-change-diff" id="startClose">Close</button>
     </div>
   </div>
 </div>
@@ -825,7 +826,9 @@ const TOTAL = GRID * GRID;
 const WIN_LEN = 5;
 const HUMAN = 'X';
 const BOT = 'O';
-let humanIsBlack = true; // flipped each new game by coin toss
+let humanIsBlack = true;
+// Alternate colors per difficulty; human starts as black for each difficulty
+const nextIsBlack = { easy: true, medium: true, hard: true };
 const DIRS = [[0,1],[1,0],[1,1],[1,-1]];
 
 let board = Array(TOTAL).fill(null);
@@ -849,7 +852,6 @@ const boardEl = document.getElementById('board');
 const statusEl = document.getElementById('status');
 const winsEl = document.getElementById('wins');
 const lossesEl = document.getElementById('losses');
-const drawsEl = document.getElementById('draws');
 
 // Star point positions for a 19×19 board (0-indexed)
 const STAR_POINTS = new Set([
@@ -1076,7 +1078,7 @@ function botMove() {
 
 function disableBoard() { boardEl.querySelectorAll('.cell').forEach(c => c.classList.add('disabled')); }
 function enableBoard() { boardEl.querySelectorAll('.cell').forEach(c => c.classList.remove('disabled')); }
-function updateScoreboard() { winsEl.textContent=scores.wins; lossesEl.textContent=scores.losses; drawsEl.textContent=scores.draws; }
+function updateScoreboard() { winsEl.textContent=scores.wins; lossesEl.textContent=scores.losses; }
 
 // ====== UNDO ======
 const undoBtn = document.getElementById('undoBtn');
@@ -1118,8 +1120,8 @@ function newGame() {
     if (stone) stone.remove();
   });
 
-  // Coin toss — randomise who plays black (first mover)
-  humanIsBlack = Math.random() < 0.5;
+  // Set color for this game (flip happens only when Begin is confirmed)
+  humanIsBlack = nextIsBlack[difficulty];
   disableBoard();
   statusEl.textContent = '';
   statusEl.className = 'status';
@@ -1159,8 +1161,9 @@ function closeEndgame() { endgameOverlay.classList.remove('open'); }
 document.getElementById('playNow').addEventListener('click', () => { closeEndgame(); newGame(); });
 document.getElementById('changeDiff').addEventListener('click', () => { closeEndgame(); });
 
-// Begin button on start prompt
+// Begin button — commit this game's color and flip for next time
 document.getElementById('startBegin').addEventListener('click', () => {
+  nextIsBlack[difficulty] = !nextIsBlack[difficulty]; // flip for next game
   document.getElementById('startOverlay').classList.remove('open');
   if (humanIsBlack) {
     enableBoard();
@@ -1169,6 +1172,13 @@ document.getElementById('startBegin').addEventListener('click', () => {
     statusEl.textContent = 'Opponent is thinking…';
     setTimeout(() => { botMove(); enableBoard(); statusEl.textContent = 'You play ⚪ — your move'; }, 800);
   }
+});
+
+// Close button — dismiss prompt without starting; color is not consumed
+document.getElementById('startClose').addEventListener('click', () => {
+  document.getElementById('startOverlay').classList.remove('open');
+  statusEl.textContent = 'Change difficulty or press New Game';
+  statusEl.className = 'status';
 });
 
 // ====== SETTINGS ======
