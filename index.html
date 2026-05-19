@@ -579,7 +579,6 @@
   <div class="scoreboard">
     <span class="score-wins">Wins: <span id="wins">0</span></span>
     <span class="score-losses">Losses: <span id="losses">0</span></span>
-    <span class="score-draws">Draws: <span id="draws">0</span></span>
   </div>
 
   <div class="status" id="status">Place your stone</div>
@@ -591,6 +590,18 @@
     <button class="btn-undo" id="undoBtn" disabled>↩ Undo</button>
     <button class="btn-stats" id="openStats">Stats</button>
     <button class="btn-reset" id="resetScore">Reset</button>
+  </div>
+</div>
+
+<!-- ====== START PROMPT ====== -->
+<div class="endgame-overlay" id="startOverlay">
+  <div class="endgame">
+    <div class="endgame-icon" id="startIcon"></div>
+    <div class="endgame-result" id="startColor"></div>
+    <div class="endgame-sub" id="startSub"></div>
+    <div class="endgame-actions">
+      <button class="btn-play-now" id="startBegin">Begin</button>
+    </div>
   </div>
 </div>
 
@@ -805,6 +816,7 @@ document.getElementById('splashPlay').addEventListener('click', () => {
   splash.classList.add('hidden');
   initAudio();
   if (audioPrefs.music) playMusic();
+  newGame();
 });
 
 // ====== GAME ======
@@ -1108,15 +1120,16 @@ function newGame() {
 
   // Coin toss — randomise who plays black (first mover)
   humanIsBlack = Math.random() < 0.5;
-  if (humanIsBlack) {
-    statusEl.textContent = 'You play ⚫ Black — your move';
-    statusEl.className = 'status';
-  } else {
-    statusEl.textContent = 'You play ⚪ White — opponent goes first';
-    statusEl.className = 'status';
-    disableBoard();
-    setTimeout(() => { botMove(); enableBoard(); }, 800);
-  }
+  disableBoard();
+  statusEl.textContent = '';
+  statusEl.className = 'status';
+
+  // Show start prompt
+  const startOverlay = document.getElementById('startOverlay');
+  document.getElementById('startIcon').textContent = humanIsBlack ? '⚫' : '⚪';
+  document.getElementById('startColor').textContent = humanIsBlack ? 'You play Black' : 'You play White';
+  document.getElementById('startSub').textContent = humanIsBlack ? 'First move is yours' : 'Opponent opens';
+  startOverlay.classList.add('open');
 }
 
 // ====== ENDGAME ======
@@ -1146,6 +1159,18 @@ function closeEndgame() { endgameOverlay.classList.remove('open'); }
 document.getElementById('playNow').addEventListener('click', () => { closeEndgame(); newGame(); });
 document.getElementById('changeDiff').addEventListener('click', () => { closeEndgame(); });
 
+// Begin button on start prompt
+document.getElementById('startBegin').addEventListener('click', () => {
+  document.getElementById('startOverlay').classList.remove('open');
+  if (humanIsBlack) {
+    enableBoard();
+    statusEl.textContent = 'You play ⚫ — your move';
+  } else {
+    statusEl.textContent = 'Opponent is thinking…';
+    setTimeout(() => { botMove(); enableBoard(); statusEl.textContent = 'You play ⚪ — your move'; }, 800);
+  }
+});
+
 // ====== SETTINGS ======
 const settingsOverlay = document.getElementById('settingsOverlay');
 document.getElementById('openSettings').addEventListener('click', () => settingsOverlay.classList.add('open'));
@@ -1171,7 +1196,6 @@ function openStats() {
     ['Games Played', d => lifetime[d].w+lifetime[d].l+lifetime[d].d, () => tot.w+tot.l+tot.d],
     ['Wins',         d => lifetime[d].w,  () => tot.w],
     ['Losses',       d => lifetime[d].l,  () => tot.l],
-    ['Draws',        d => lifetime[d].d,  () => tot.d],
     ['Win %',        d => pct(lifetime[d].w, lifetime[d].w+lifetime[d].l+lifetime[d].d), () => pct(tot.w, tot.w+tot.l+tot.d)],
     ['Avg Moves to Win', d => avgMoves(lifetime[d]), () => avgMoves(tot)],
   ];
