@@ -502,33 +502,7 @@
   .endgame-result.win { color: #2c2c2c; }
   .endgame-result.lose { color: #c23b22; }
   .endgame-result.draw { color: #8b6914; }
-  .endgame-sub { font-size: 0.8rem; color: #8b7355; margin-bottom: 18px; }
-  .countdown-ring {
-    position: relative;
-    width: 56px;
-    height: 56px;
-    margin: 0 auto 14px;
-  }
-  .countdown-ring svg { transform: rotate(-90deg); width: 56px; height: 56px; }
-  .countdown-ring circle { fill: none; stroke-width: 3; }
-  .countdown-ring .bg { stroke: #e0d8cc; }
-  .countdown-ring .fg {
-    stroke: #8b6914;
-    stroke-linecap: round;
-    stroke-dasharray: 176;
-    stroke-dashoffset: 0;
-    transition: stroke-dashoffset 1s linear;
-  }
-  .countdown-num {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.2rem;
-    font-weight: 700;
-    color: #2c2c2c;
-  }
+  .endgame-sub { font-size: 0.8rem; color: #8b7355; margin-bottom: 22px; }
   .endgame-actions { display: flex; gap: 10px; justify-content: center; }
   .btn-play-now {
     padding: 9px 24px;
@@ -603,10 +577,6 @@
     <div class="endgame-icon" id="endgameIcon"></div>
     <div class="endgame-result" id="endgameResult"></div>
     <div class="endgame-sub" id="endgameSub"></div>
-    <div class="countdown-ring">
-      <svg viewBox="0 0 64 64"><circle class="bg" cx="32" cy="32" r="28"/><circle class="fg" id="countdownFg" cx="32" cy="32" r="28"/></svg>
-      <div class="countdown-num" id="countdownNum">3</div>
-    </div>
     <div class="endgame-actions">
       <button class="btn-play-now" id="playNow">Play Now</button>
       <button class="btn-change-diff" id="changeDiff">Change Difficulty</button>
@@ -878,6 +848,11 @@ function findWin(pos, player) {
 
 document.querySelectorAll('.difficulty button').forEach(btn => {
   btn.addEventListener('click', () => {
+    if (btn.classList.contains('active')) return;
+    const gameInProgress = !gameOver && board.some(v => v !== null);
+    if (gameInProgress) {
+      if (!confirm('Forfeit this game and start a new one?')) return;
+    }
     document.querySelector('.difficulty .active').classList.remove('active');
     btn.classList.add('active');
     difficulty = btn.dataset.diff;
@@ -892,8 +867,9 @@ document.getElementById('resetScore').addEventListener('click', () => {
 });
 
 let lastMove = -1;
-let undoUsed = false;
 let moveHistory = [];
+const MAX_UNDOS = 1;
+let undosRemaining = MAX_UNDOS;
 
 function handleClick(i) {
   if (board[i] || gameOver) return;
@@ -905,7 +881,7 @@ function handleClick(i) {
   setTimeout(() => {
     botMove();
     if (!gameOver) enableBoard();
-    if (!undoUsed) document.getElementById('undoBtn').disabled = false;
+    if (undosRemaining > 0) updateUndoButton();
   }, delay);
 }
 
@@ -1019,8 +995,15 @@ function enableBoard() { boardEl.querySelectorAll('.cell').forEach(c => c.classL
 function updateScoreboard() { winsEl.textContent=scores.wins; lossesEl.textContent=scores.losses; drawsEl.textContent=scores.draws; }
 
 // ====== UNDO ======
+const undoBtn = document.getElementById('undoBtn');
+
+function updateUndoButton() {
+  undoBtn.textContent = `↩ Undo (${undosRemaining})`;
+  undoBtn.disabled = undosRemaining === 0;
+}
+
 function handleUndo() {
-  if (undoUsed || moveHistory.length < 2) return;
+  if (undosRemaining === 0 || moveHistory.length < 2) return;
   const botIdx   = moveHistory.pop();
   const humanIdx = moveHistory.pop();
   board[botIdx]   = null;
@@ -1030,20 +1013,21 @@ function handleUndo() {
     if (stone) stone.remove();
     boardEl.children[i].classList.remove('black-cell', 'white-cell', 'win-cell');
   });
-  undoUsed = true;
-  document.getElementById('undoBtn').disabled = true;
+  undosRemaining--;
+  updateUndoButton();
   if (gameOver) { gameOver = false; closeEndgame(); }
   statusEl.textContent = 'Stone taken back — choose wisely';
   statusEl.className = 'status';
   enableBoard();
 }
-document.getElementById('undoBtn').addEventListener('click', handleUndo);
+undoBtn.addEventListener('click', handleUndo);
 
 function newGame() {
   board = Array(TOTAL).fill(null);
   gameOver = false; lastMove = -1;
-  undoUsed = false; moveHistory = [];
-  document.getElementById('undoBtn').disabled = true;
+  moveHistory = []; undosRemaining = MAX_UNDOS;
+  updateUndoButton();
+  undoBtn.disabled = true;
   statusEl.textContent = 'Place your stone';
   statusEl.className = 'status';
   boardEl.querySelectorAll('.cell').forEach(c => {
@@ -1059,10 +1043,6 @@ const endgameOverlay = document.getElementById('endgameOverlay');
 const endgameIcon = document.getElementById('endgameIcon');
 const endgameResult = document.getElementById('endgameResult');
 const endgameSub = document.getElementById('endgameSub');
-const countdownFg = document.getElementById('countdownFg');
-const countdownNum = document.getElementById('countdownNum');
-let countdownTimer = null;
-const CIRCUMFERENCE = 2 * Math.PI * 28;
 
 function showEndgame(result) {
   if (result === 'win') {
@@ -1077,26 +1057,10 @@ function showEndgame(result) {
   }
   endgameSub.textContent = `${difficulty.charAt(0).toUpperCase()+difficulty.slice(1)}`;
 
-  countdownFg.style.transition = 'none';
-  countdownFg.style.strokeDasharray = CIRCUMFERENCE;
-  countdownFg.style.strokeDashoffset = '0';
   endgameOverlay.classList.add('open');
-
-  let remaining = 3;
-  countdownNum.textContent = remaining;
-  requestAnimationFrame(() => { requestAnimationFrame(() => {
-    countdownFg.style.transition = `stroke-dashoffset 3s linear`;
-    countdownFg.style.strokeDashoffset = CIRCUMFERENCE.toFixed(1);
-  }); });
-
-  countdownTimer = setInterval(() => {
-    remaining--;
-    if (remaining > 0) countdownNum.textContent = remaining;
-    else { countdownNum.textContent = ''; clearInterval(countdownTimer); countdownTimer = null; closeEndgame(); newGame(); }
-  }, 1000);
 }
 
-function closeEndgame() { if (countdownTimer) { clearInterval(countdownTimer); countdownTimer = null; } endgameOverlay.classList.remove('open'); }
+function closeEndgame() { endgameOverlay.classList.remove('open'); }
 
 document.getElementById('playNow').addEventListener('click', () => { closeEndgame(); newGame(); });
 document.getElementById('changeDiff').addEventListener('click', () => { closeEndgame(); newGame(); window.scrollTo({top:0,behavior:'smooth'}); });
