@@ -216,9 +216,9 @@
   /* ============ BOARD ============ */
   .board {
     display: grid;
-    grid-template-columns: repeat(15, 1fr);
-    grid-template-rows: repeat(15, 1fr);
-    width: min(380px, 92vw);
+    grid-template-columns: repeat(19, 1fr);
+    grid-template-rows: repeat(19, 1fr);
+    width: min(400px, 94vw);
     aspect-ratio: 1;
     flex-shrink: 0;
     margin-bottom: 10px;
@@ -234,15 +234,48 @@
     justify-content: center;
     cursor: pointer;
     position: relative;
-    border-right: 1px solid #1a1a1a44;
-    border-bottom: 1px solid #1a1a1a44;
     background: transparent;
     transition: background 0.1s;
   }
-  .cell:nth-child(15n) { border-right: none; } /* last column */
-  .cell:nth-child(n+211) { border-bottom: none; } /* last row (15*14+1=211) */
-  .cell:hover:not(.disabled) { background: #00000008; }
+  .cell:hover:not(.disabled) { background: #00000010; border-radius: 50%; }
   .cell.disabled { cursor: default; pointer-events: none; }
+  /* Grid lines drawn through intersection centers */
+  .cell::before {
+    content: '';
+    position: absolute;
+    left: 0; right: 0;
+    top: calc(50% - 0.5px);
+    height: 1px;
+    background: #1a1a1a55;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .cell::after {
+    content: '';
+    position: absolute;
+    top: 0; bottom: 0;
+    left: calc(50% - 0.5px);
+    width: 1px;
+    background: #1a1a1a55;
+    pointer-events: none;
+    z-index: 0;
+  }
+  /* Clip lines at board edges */
+  .cell.edge-left::before  { left: 50%; }
+  .cell.edge-right::before { right: 50%; }
+  .cell.edge-top::after    { top: 50%; }
+  .cell.edge-bottom::after { bottom: 50%; }
+  /* Star points (hoshi) */
+  .star-point {
+    position: absolute;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: #1a1a1a99;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 1;
+  }
 
   /* Stones */
   .stone {
@@ -250,6 +283,8 @@
     height: 82%;
     border-radius: 50%;
     animation: stonePlace 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+    position: relative;
+    z-index: 2;
   }
   @keyframes stonePlace {
     0% { transform: translateY(-8px) scale(0.7); opacity: 0; }
@@ -291,6 +326,8 @@
   .btn-new { background: #2c2c2c; color: #f5f0e8; border-color: #2c2c2c; }
   .btn-new:hover { background: #444; }
   .btn-stats:hover, .btn-reset:hover { border-color: #2c2c2c; color: #2c2c2c; }
+  .btn-undo:not(:disabled):hover { border-color: #8b6914; color: #8b6914; }
+  .btn-undo:disabled { opacity: 0.3; cursor: default; pointer-events: none; }
 
   /* ============ MODALS ============ */
   .modal-overlay {
@@ -554,6 +591,7 @@
 
   <div class="actions">
     <button class="btn-new" id="newGame">New Game</button>
+    <button class="btn-undo" id="undoBtn" disabled>↩ Undo</button>
     <button class="btn-stats" id="openStats">Stats</button>
     <button class="btn-reset" id="resetScore">Reset</button>
   </div>
@@ -765,7 +803,7 @@ document.getElementById('splashPlay').addEventListener('click', () => {
 });
 
 // ====== GAME ======
-const GRID = 15;
+const GRID = 19;
 const TOTAL = GRID * GRID;
 const WIN_LEN = 5;
 const HUMAN = 'X';
@@ -790,10 +828,21 @@ const lossesEl = document.getElementById('losses');
 const drawsEl = document.getElementById('draws');
 
 for (let i = 0; i < TOTAL; i++) {
+  const [r, c] = rc(i);
+  const classes = ['cell'];
+  if (r === 0)        classes.push('edge-top');
+  if (r === GRID - 1) classes.push('edge-bottom');
+  if (c === 0)        classes.push('edge-left');
+  if (c === GRID - 1) classes.push('edge-right');
   const cell = document.createElement('div');
-  cell.className = 'cell';
+  cell.className = classes.join(' ');
   cell.dataset.index = i;
   cell.addEventListener('click', () => handleClick(i));
+  if (STAR_POINTS.has(i)) {
+    const star = document.createElement('div');
+    star.className = 'star-point';
+    cell.appendChild(star);
+  }
   boardEl.appendChild(cell);
 }
 
@@ -836,6 +885,15 @@ document.getElementById('resetScore').addEventListener('click', () => {
 });
 
 let lastMove = -1;
+let undoUsed = false;
+let moveHistory = [];
+
+// Star point positions for a 19×19 board (0-indexed)
+const STAR_POINTS = new Set([
+  3*19+3,  3*19+9,  3*19+15,
+  9*19+3,  9*19+9,  9*19+15,
+  15*19+3, 15*19+9, 15*19+15
+]);
 
 function handleClick(i) {
   if (board[i] || gameOver) return;
@@ -844,12 +902,17 @@ function handleClick(i) {
   disableBoard();
   statusEl.textContent = 'Opponent is thinking\u2026';
   const delay = 1000 + Math.random() * 2000;
-  setTimeout(() => { botMove(); enableBoard(); }, delay);
+  setTimeout(() => {
+    botMove();
+    if (!gameOver) enableBoard();
+    if (!undoUsed) document.getElementById('undoBtn').disabled = false;
+  }, delay);
 }
 
 function makeMove(i, player) {
   board[i] = player;
   lastMove = i;
+  moveHistory.push(i);
   const cell = boardEl.children[i];
   const stone = document.createElement('div');
   stone.className = 'stone ' + (player === HUMAN ? 'black' : 'white');
@@ -911,7 +974,7 @@ function evalCell(i) {
   const [r, c] = rc(i);
   let bs = 0, hs = 0;
   for (const [dr, dc] of DIRS) { bs += scoreLine(r,c,dr,dc,BOT); hs += scoreLine(r,c,dr,dc,HUMAN); }
-  return bs * 1.1 + hs + Math.max(0, 14 - Math.abs(r-7) - Math.abs(c-7));
+  return bs * 1.1 + hs + Math.max(0, 18 - Math.abs(r-9) - Math.abs(c-9));
 }
 
 function getTopMoves(n) {
@@ -955,12 +1018,40 @@ function disableBoard() { boardEl.querySelectorAll('.cell').forEach(c => c.class
 function enableBoard() { boardEl.querySelectorAll('.cell').forEach(c => c.classList.remove('disabled')); }
 function updateScoreboard() { winsEl.textContent=scores.wins; lossesEl.textContent=scores.losses; drawsEl.textContent=scores.draws; }
 
+// ====== UNDO ======
+function handleUndo() {
+  if (undoUsed || moveHistory.length < 2) return;
+  const botIdx   = moveHistory.pop();
+  const humanIdx = moveHistory.pop();
+  board[botIdx]   = null;
+  board[humanIdx] = null;
+  [botIdx, humanIdx].forEach(i => {
+    const stone = boardEl.children[i].querySelector('.stone');
+    if (stone) stone.remove();
+    boardEl.children[i].classList.remove('black-cell', 'white-cell', 'win-cell');
+  });
+  undoUsed = true;
+  document.getElementById('undoBtn').disabled = true;
+  if (gameOver) { gameOver = false; closeEndgame(); }
+  statusEl.textContent = 'Stone taken back — choose wisely';
+  statusEl.className = 'status';
+  enableBoard();
+}
+document.getElementById('undoBtn').addEventListener('click', handleUndo);
+
 function newGame() {
   board = Array(TOTAL).fill(null);
   gameOver = false; lastMove = -1;
+  undoUsed = false; moveHistory = [];
+  document.getElementById('undoBtn').disabled = true;
   statusEl.textContent = 'Place your stone';
   statusEl.className = 'status';
-  boardEl.querySelectorAll('.cell').forEach(c => { c.className = 'cell'; c.innerHTML = ''; });
+  boardEl.querySelectorAll('.cell').forEach(c => {
+    // Preserve edge classes and star points, remove only stones and state classes
+    c.classList.remove('disabled', 'black-cell', 'white-cell', 'win-cell');
+    const stone = c.querySelector('.stone');
+    if (stone) stone.remove();
+  });
 }
 
 // ====== ENDGAME ======
