@@ -345,7 +345,7 @@
     background: #f5f0e8;
     border-radius: 8px;
     padding: 24px;
-    width: min(340px, 88vw);
+    width: min(380px, 94vw);
     max-height: 80dvh;
     overflow-y: auto;
     position: relative;
@@ -373,28 +373,37 @@
   }
   .modal-close:hover { color: #2c2c2c; }
 
-  .stats-section { margin-bottom: 14px; }
-  .stats-section h3 {
-    font-size: 0.85rem;
+  /* Stats table */
+  .stats-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 4px;
+  }
+  .stats-table th {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #8b6914;
+    text-align: center;
+    padding: 0 2px 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .stats-table th:first-child { text-align: left; visibility: hidden; }
+  .stats-table td {
+    text-align: center;
+    padding: 8px 2px;
+    border-top: 1px solid #e0d8cc;
+    font-size: 0.82rem;
     font-weight: 600;
-    margin-bottom: 6px;
+    color: #2c2c2c;
+  }
+  .stats-table td:first-child {
+    text-align: left;
     color: #8b7355;
-    text-transform: capitalize;
+    font-weight: 400;
+    font-size: 0.78rem;
   }
-  .stats-row {
-    display: flex;
-    justify-content: space-between;
-    padding: 5px 0;
-    font-size: 0.85rem;
-    border-bottom: 1px solid #e0d8cc;
-  }
-  .stats-row:last-child { border-bottom: none; }
-  .stats-row .label { color: #8b7355; }
-  .stats-row .value { font-weight: 600; }
-  .stats-row .value.w { color: #2c2c2c; }
-  .stats-row .value.l { color: #c23b22; }
-  .stats-row .value.d { color: #8b6914; }
-  .stats-row .value.t { color: #2c2c2c; }
+  .stats-table .col-total { color: #8b6914; }
   .stats-actions {
     display: flex;
     gap: 10px;
@@ -414,6 +423,20 @@
   .btn-stats-reset { border-color: #c23b2244; color: #c23b22; }
   .btn-stats-reset:hover { background: #c23b2211; }
   .btn-stats-close { background: #2c2c2c; color: #f5f0e8; border-color: #2c2c2c; }
+
+  /* Confirm modal */
+  .confirm-msg { font-size: 0.85rem; color: #8b7355; margin: 0 0 20px; line-height: 1.5; text-align: center; }
+  .confirm-actions { display: flex; gap: 10px; justify-content: center; }
+  .btn-confirm-cancel {
+    padding: 9px 20px; border: 1.5px solid #c8bda8; border-radius: 4px;
+    background: transparent; color: #555;
+    font-family: 'Noto Serif', serif; font-size: 0.85rem; cursor: pointer;
+  }
+  .btn-confirm-cancel:hover { border-color: #2c2c2c; color: #2c2c2c; }
+  .btn-confirm-ok {
+    padding: 9px 20px; border: none; border-radius: 4px;
+    color: #f5f0e8; font-family: 'Noto Serif', serif; font-size: 0.85rem; cursor: pointer;
+  }
 
   /* Settings */
   .setting-row {
@@ -580,6 +603,18 @@
     <div class="endgame-actions">
       <button class="btn-play-now" id="playNow">Play Now</button>
       <button class="btn-change-diff" id="changeDiff">Change Difficulty</button>
+    </div>
+  </div>
+</div>
+
+<!-- ====== CONFIRM ====== -->
+<div class="modal-overlay" id="confirmOverlay">
+  <div class="modal">
+    <h2 id="confirmTitle"></h2>
+    <p class="confirm-msg" id="confirmMessage"></p>
+    <div class="confirm-actions">
+      <button class="btn-confirm-cancel" id="confirmCancel">Cancel</button>
+      <button class="btn-confirm-ok" id="confirmOk">Confirm</button>
     </div>
   </div>
 </div>
@@ -786,8 +821,14 @@ let difficulty = 'medium';
 let scores = { wins: 0, losses: 0, draws: 0 };
 
 const STATS_KEY = 'ttt_lifetime_stats';
-function defaultStats() { return { easy:{w:0,l:0,d:0}, medium:{w:0,l:0,d:0}, hard:{w:0,l:0,d:0} }; }
-function loadLifetime() { try { return JSON.parse(localStorage.getItem(STATS_KEY)) || defaultStats(); } catch { return defaultStats(); } }
+function defaultStats() { return { easy:{w:0,l:0,d:0,mw:0}, medium:{w:0,l:0,d:0,mw:0}, hard:{w:0,l:0,d:0,mw:0} }; }
+function loadLifetime() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(STATS_KEY)) || defaultStats();
+    for (const d of ['easy','medium','hard']) { if (saved[d].mw === undefined) saved[d].mw = 0; }
+    return saved;
+  } catch { return defaultStats(); }
+}
 function saveLifetime() { localStorage.setItem(STATS_KEY, JSON.stringify(lifetime)); }
 let lifetime = loadLifetime();
 
@@ -846,17 +887,46 @@ function findWin(pos, player) {
   return null;
 }
 
+// ====== CONFIRM MODAL ======
+let pendingConfirmAction = null;
+const confirmOverlay = document.getElementById('confirmOverlay');
+
+function showConfirm(title, message, okLabel, onConfirm, danger = false) {
+  document.getElementById('confirmTitle').textContent = title;
+  document.getElementById('confirmMessage').textContent = message;
+  const okBtn = document.getElementById('confirmOk');
+  okBtn.textContent = okLabel;
+  okBtn.style.background = danger ? '#c23b22' : '#2c2c2c';
+  pendingConfirmAction = onConfirm;
+  confirmOverlay.classList.add('open');
+}
+document.getElementById('confirmOk').addEventListener('click', () => {
+  confirmOverlay.classList.remove('open');
+  if (pendingConfirmAction) { pendingConfirmAction(); pendingConfirmAction = null; }
+});
+document.getElementById('confirmCancel').addEventListener('click', () => {
+  confirmOverlay.classList.remove('open');
+  pendingConfirmAction = null;
+});
+confirmOverlay.addEventListener('click', e => {
+  if (e.target === confirmOverlay) { confirmOverlay.classList.remove('open'); pendingConfirmAction = null; }
+});
+
 document.querySelectorAll('.difficulty button').forEach(btn => {
   btn.addEventListener('click', () => {
     if (btn.classList.contains('active')) return;
+    const applyChange = () => {
+      document.querySelector('.difficulty .active').classList.remove('active');
+      btn.classList.add('active');
+      difficulty = btn.dataset.diff;
+      newGame();
+    };
     const gameInProgress = !gameOver && board.some(v => v !== null);
     if (gameInProgress) {
-      if (!confirm('Forfeit this game and start a new one?')) return;
+      showConfirm('Forfeit Game?', 'Your progress will be lost. Start fresh at the new difficulty?', 'Forfeit', applyChange, true);
+    } else {
+      applyChange();
     }
-    document.querySelector('.difficulty .active').classList.remove('active');
-    btn.classList.add('active');
-    difficulty = btn.dataset.diff;
-    newGame();
   });
 });
 document.getElementById('newGame').addEventListener('click', newGame);
@@ -906,7 +976,7 @@ function checkEnd(pos, player) {
     if (player === HUMAN) {
       statusEl.textContent = 'Victory!';
       statusEl.className = 'status win';
-      scores.wins++; lifetime[difficulty].w++;
+      scores.wins++; lifetime[difficulty].w++; lifetime[difficulty].mw += moveHistory.length;
     } else {
       statusEl.textContent = 'Defeat';
       statusEl.className = 'status lose';
@@ -1077,18 +1147,38 @@ document.getElementById('toggleSfx').addEventListener('change', function() { aud
 // ====== STATS ======
 const modalOverlay = document.getElementById('modalOverlay');
 const statsContent = document.getElementById('statsContent');
+
+function pct(w, total) { return total === 0 ? '—' : Math.round(w / total * 100) + '%'; }
+function avgMoves(s) { return s.w === 0 ? '—' : Math.round(s.mw / s.w); }
+
 function openStats() {
-  statsContent.innerHTML = '';
-  for (const diff of ['easy','medium','hard']) {
-    const s = lifetime[diff], total = s.w+s.l+s.d;
-    const sec = document.createElement('div'); sec.className = 'stats-section';
-    sec.innerHTML = `<h3>${diff}</h3>
-      <div class="stats-row"><span class="label">Wins</span><span class="value w">${s.w}</span></div>
-      <div class="stats-row"><span class="label">Losses</span><span class="value l">${s.l}</span></div>
-      <div class="stats-row"><span class="label">Draws</span><span class="value d">${s.d}</span></div>
-      <div class="stats-row"><span class="label">Total</span><span class="value t">${total}</span></div>`;
-    statsContent.appendChild(sec);
-  }
+  const diffs = ['easy', 'medium', 'hard'];
+  const tot = { w:0, l:0, d:0, mw:0 };
+  for (const d of diffs) { tot.w+=lifetime[d].w; tot.l+=lifetime[d].l; tot.d+=lifetime[d].d; tot.mw+=lifetime[d].mw; }
+
+  const rows = [
+    ['Games Played', d => lifetime[d].w+lifetime[d].l+lifetime[d].d, () => tot.w+tot.l+tot.d],
+    ['Wins',         d => lifetime[d].w,  () => tot.w],
+    ['Losses',       d => lifetime[d].l,  () => tot.l],
+    ['Draws',        d => lifetime[d].d,  () => tot.d],
+    ['Win %',        d => pct(lifetime[d].w, lifetime[d].w+lifetime[d].l+lifetime[d].d), () => pct(tot.w, tot.w+tot.l+tot.d)],
+    ['Avg Moves to Win', d => avgMoves(lifetime[d]), () => avgMoves(tot)],
+  ];
+
+  statsContent.innerHTML = `
+    <table class="stats-table">
+      <thead><tr>
+        <th>—</th><th>Easy</th><th>Med</th><th>Hard</th><th class="col-total">All</th>
+      </tr></thead>
+      <tbody>${rows.map(([label, valFn, totFn]) => `
+        <tr>
+          <td>${label}</td>
+          ${diffs.map(d => `<td>${valFn(d)}</td>`).join('')}
+          <td class="col-total">${totFn()}</td>
+        </tr>`).join('')}
+      </tbody>
+    </table>`;
+
   modalOverlay.classList.add('open');
 }
 function closeStats() { modalOverlay.classList.remove('open'); }
@@ -1096,7 +1186,11 @@ document.getElementById('openStats').addEventListener('click', openStats);
 document.getElementById('modalClose').addEventListener('click', closeStats);
 document.getElementById('statsClose').addEventListener('click', closeStats);
 modalOverlay.addEventListener('click', e => { if (e.target === modalOverlay) closeStats(); });
-document.getElementById('statsReset').addEventListener('click', () => { if(confirm('Reset all lifetime stats?')){ lifetime=defaultStats(); saveLifetime(); openStats(); } });
+document.getElementById('statsReset').addEventListener('click', () => {
+  showConfirm('Reset Stats?', 'All lifetime stats will be permanently deleted.', 'Reset', () => {
+    lifetime = defaultStats(); saveLifetime(); openStats();
+  }, true);
+});
 </script>
 </body>
 </html>
