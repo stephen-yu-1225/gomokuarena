@@ -601,8 +601,8 @@
     <div class="endgame-result" id="endgameResult"></div>
     <div class="endgame-sub" id="endgameSub"></div>
     <div class="endgame-actions">
-      <button class="btn-play-now" id="playNow">Play Now</button>
-      <button class="btn-change-diff" id="changeDiff">Change Difficulty</button>
+      <button class="btn-play-now" id="playNow">Play Again</button>
+      <button class="btn-change-diff" id="changeDiff">Close</button>
     </div>
   </div>
 </div>
@@ -813,6 +813,7 @@ const TOTAL = GRID * GRID;
 const WIN_LEN = 5;
 const HUMAN = 'X';
 const BOT = 'O';
+let humanIsBlack = true; // flipped each new game by coin toss
 const DIRS = [[0,1],[1,0],[1,1],[1,-1]];
 
 let board = Array(TOTAL).fill(null);
@@ -961,7 +962,8 @@ function makeMove(i, player) {
   moveHistory.push(i);
   const cell = boardEl.children[i];
   const stone = document.createElement('div');
-  stone.className = 'stone ' + (player === HUMAN ? 'black' : 'white');
+  const isBlack = (player === HUMAN) === humanIsBlack;
+  stone.className = 'stone ' + (isBlack ? 'black' : 'white');
   cell.appendChild(stone);
   cell.classList.add(player === HUMAN ? 'black-cell' : 'white-cell');
   playSound('stone');
@@ -1057,7 +1059,7 @@ function botMove() {
   else if (difficulty === 'medium') w = [0.85, 0.10, 0.05];
   else w = [0.95, 0.04, 0.01];
   makeMove(pickWeighted(top, w), BOT);
-  if (!gameOver) { statusEl.textContent = 'Place your stone'; statusEl.className = 'status'; }
+  if (!gameOver) { statusEl.textContent = humanIsBlack ? 'You play ⚫ — your move' : 'You play ⚪ — your move'; statusEl.className = 'status'; }
 }
 
 function disableBoard() { boardEl.querySelectorAll('.cell').forEach(c => c.classList.add('disabled')); }
@@ -1098,14 +1100,23 @@ function newGame() {
   moveHistory = []; undosRemaining = MAX_UNDOS;
   updateUndoButton();
   undoBtn.disabled = true;
-  statusEl.textContent = 'Place your stone';
-  statusEl.className = 'status';
   boardEl.querySelectorAll('.cell').forEach(c => {
-    // Preserve edge classes and star points, remove only stones and state classes
     c.classList.remove('disabled', 'black-cell', 'white-cell', 'win-cell');
     const stone = c.querySelector('.stone');
     if (stone) stone.remove();
   });
+
+  // Coin toss — randomise who plays black (first mover)
+  humanIsBlack = Math.random() < 0.5;
+  if (humanIsBlack) {
+    statusEl.textContent = 'You play ⚫ Black — your move';
+    statusEl.className = 'status';
+  } else {
+    statusEl.textContent = 'You play ⚪ White — opponent goes first';
+    statusEl.className = 'status';
+    disableBoard();
+    setTimeout(() => { botMove(); enableBoard(); }, 800);
+  }
 }
 
 // ====== ENDGAME ======
@@ -1133,7 +1144,7 @@ function showEndgame(result) {
 function closeEndgame() { endgameOverlay.classList.remove('open'); }
 
 document.getElementById('playNow').addEventListener('click', () => { closeEndgame(); newGame(); });
-document.getElementById('changeDiff').addEventListener('click', () => { closeEndgame(); newGame(); window.scrollTo({top:0,behavior:'smooth'}); });
+document.getElementById('changeDiff').addEventListener('click', () => { closeEndgame(); });
 
 // ====== SETTINGS ======
 const settingsOverlay = document.getElementById('settingsOverlay');
