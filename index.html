@@ -827,6 +827,13 @@ const winsEl = document.getElementById('wins');
 const lossesEl = document.getElementById('losses');
 const drawsEl = document.getElementById('draws');
 
+// Star point positions for a 19×19 board (0-indexed)
+const STAR_POINTS = new Set([
+  3*19+3,  3*19+9,  3*19+15,
+  9*19+3,  9*19+9,  9*19+15,
+  15*19+3, 15*19+9, 15*19+15
+]);
+
 for (let i = 0; i < TOTAL; i++) {
   const [r, c] = rc(i);
   const classes = ['cell'];
@@ -887,13 +894,6 @@ document.getElementById('resetScore').addEventListener('click', () => {
 let lastMove = -1;
 let undoUsed = false;
 let moveHistory = [];
-
-// Star point positions for a 19×19 board (0-indexed)
-const STAR_POINTS = new Set([
-  3*19+3,  3*19+9,  3*19+15,
-  9*19+3,  9*19+9,  9*19+15,
-  15*19+3, 15*19+9, 15*19+15
-]);
 
 function handleClick(i) {
   if (board[i] || gameOver) return;
