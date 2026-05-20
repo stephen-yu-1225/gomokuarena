@@ -182,22 +182,6 @@
     text-align: center;
   }
   .game-title-wrap { text-align: center; }
-  .header-seal {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 26px;
-    height: 26px;
-    border: 1.5px solid #c0392b;
-    border-radius: 3px;
-    transform: rotate(-6deg);
-    font-family: 'Noto Serif SC', serif;
-    font-size: 0.7rem;
-    font-weight: 700;
-    color: #c0392b;
-    flex-shrink: 0;
-    margin-right: 8px;
-  }
 
   .btn-settings {
     position: absolute;
@@ -376,9 +360,22 @@
   .actions button:active { transform: scale(0.97); }
   .btn-new { background: #2c2c2c; color: #f5f0e8; border-color: #2c2c2c; }
   .btn-new:hover { background: #444; }
-  .btn-stats:hover, .btn-reset:hover { border-color: #2c2c2c; color: #2c2c2c; }
+  .btn-stats:hover { border-color: #2c2c2c; color: #2c2c2c; }
   .btn-undo:not(:disabled):hover { border-color: #8b6914; color: #8b6914; }
   .btn-undo:disabled { opacity: 0.3; cursor: default; pointer-events: none; }
+  .difficulty-start-btn {
+    padding: 5px 14px;
+    border: 1.5px solid #c8bda8;
+    border-radius: 4px;
+    background: transparent;
+    color: #8b7355;
+    font-family: 'Noto Serif', serif;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .difficulty-start-btn.active { border-color: #2c2c2c; color: #2c2c2c; background: #2c2c2c0a; }
+  .difficulty-start-btn:hover { border-color: #2c2c2c; }
 
   /* ============ MODALS ============ */
   .modal-overlay {
@@ -615,19 +612,16 @@
 <!-- ====== GAME ====== -->
 <div id="game">
   <div class="game-header">
-    <div class="game-title-wrap" style="display:flex;align-items:center;justify-content:center;">
-      <div class="header-seal">棋</div>
-      <div>
-        <div class="game-title-cn">Gomoku Arena</div>
-        <div class="game-title-en">五子棋</div>
-      </div>
+    <div class="game-title-wrap">
+      <div class="game-title-cn">Gomoku Arena</div>
+      <div class="game-title-en">五子棋</div>
     </div>
     <button class="btn-settings" id="openSettings" title="Settings">&#9881;&#65039;</button>
   </div>
 
   <div class="difficulty">
-    <button data-diff="easy">Easy</button>
-    <button data-diff="medium" class="active">Medium</button>
+    <button data-diff="easy" class="active">Easy</button>
+    <button data-diff="medium">Medium</button>
     <button data-diff="hard">Hard</button>
   </div>
 
@@ -644,18 +638,23 @@
     <button class="btn-new" id="newGame">New Game</button>
     <button class="btn-undo" id="undoBtn" disabled>↩ Undo</button>
     <button class="btn-stats" id="openStats">Stats</button>
-    <button class="btn-reset" id="resetScore">Reset</button>
   </div>
 </div>
 
 <!-- ====== START PROMPT ====== -->
 <div class="endgame-overlay" id="startOverlay">
   <div class="endgame">
+    <div class="endgame-sub" style="letter-spacing:4px;text-transform:uppercase;margin-bottom:16px;">Enter the Arena</div>
+    <div style="display:flex;gap:6px;justify-content:center;margin-bottom:18px;">
+      <button class="difficulty-start-btn" data-diff="easy">Easy</button>
+      <button class="difficulty-start-btn" data-diff="medium">Medium</button>
+      <button class="difficulty-start-btn" data-diff="hard">Hard</button>
+    </div>
     <div class="endgame-icon" id="startIcon"></div>
     <div class="endgame-result" id="startColor"></div>
     <div class="endgame-sub" id="startSub"></div>
     <div class="endgame-actions">
-      <button class="btn-play-now" id="startBegin">Begin</button>
+      <button class="btn-play-now" id="startBegin">Enter</button>
       <button class="btn-change-diff" id="startClose">Close</button>
     </div>
   </div>
@@ -667,9 +666,12 @@
     <div class="endgame-icon" id="endgameIcon"></div>
     <div class="endgame-result" id="endgameResult"></div>
     <div class="endgame-sub" id="endgameSub"></div>
-    <div class="endgame-actions">
+    <div class="endgame-actions" style="flex-direction:column;gap:8px;">
       <button class="btn-play-now" id="playNow">Play Again</button>
-      <button class="btn-change-diff" id="changeDiff">Close</button>
+      <div style="display:flex;gap:8px;justify-content:center;">
+        <button class="btn-change-diff" id="endgameStats">Stats</button>
+        <button class="btn-change-diff" id="changeDiff">Close</button>
+      </div>
     </div>
   </div>
 </div>
@@ -888,7 +890,7 @@ const DIRS = [[0,1],[1,0],[1,1],[1,-1]];
 
 let board = Array(TOTAL).fill(null);
 let gameOver = false;
-let difficulty = 'medium';
+let difficulty = 'easy';
 let scores = { wins: 0, losses: 0, draws: 0 };
 
 const STATS_KEY = 'ttt_lifetime_stats';
@@ -902,6 +904,27 @@ function loadLifetime() {
 }
 function saveLifetime() { localStorage.setItem(STATS_KEY, JSON.stringify(lifetime)); }
 let lifetime = loadLifetime();
+
+// ====== ABANDONED GAME DETECTION ======
+const GAME_STATE_KEY = 'gomoku_active_game';
+function saveActiveGame() {
+  localStorage.setItem(GAME_STATE_KEY, JSON.stringify({ difficulty }));
+}
+function clearActiveGame() {
+  localStorage.removeItem(GAME_STATE_KEY);
+}
+function checkAbandonedGame() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(GAME_STATE_KEY));
+    if (saved && saved.difficulty && lifetime[saved.difficulty]) {
+      lifetime[saved.difficulty].l++;
+      scores.losses++;
+      saveLifetime();
+      clearActiveGame();
+    }
+  } catch { clearActiveGame(); }
+}
+checkAbandonedGame();
 
 const boardEl = document.getElementById('board');
 const statusEl = document.getElementById('status');
@@ -982,6 +1005,14 @@ confirmOverlay.addEventListener('click', e => {
   if (e.target === confirmOverlay) { confirmOverlay.classList.remove('open'); pendingConfirmAction = null; }
 });
 
+function recordForfeit() {
+  scores.losses++;
+  lifetime[difficulty].l++;
+  saveLifetime();
+  clearActiveGame();
+  updateScoreboard();
+}
+
 document.querySelectorAll('.difficulty button').forEach(btn => {
   btn.addEventListener('click', () => {
     if (btn.classList.contains('active')) return;
@@ -993,17 +1024,20 @@ document.querySelectorAll('.difficulty button').forEach(btn => {
     };
     const gameInProgress = !gameOver && board.some(v => v !== null);
     if (gameInProgress) {
-      showConfirm('Forfeit Game?', 'Your progress will be lost. Start fresh at the new difficulty?', 'Forfeit', applyChange, true);
+      showConfirm('Forfeit Game?', 'This counts as a loss. Switch to ' + btn.dataset.diff + '?', 'Forfeit', () => { recordForfeit(); applyChange(); }, true);
     } else {
       applyChange();
     }
   });
 });
-document.getElementById('newGame').addEventListener('click', newGame);
-document.getElementById('resetScore').addEventListener('click', () => {
-  scores = { wins: 0, losses: 0, draws: 0 };
-  updateScoreboard();
-  newGame();
+
+document.getElementById('newGame').addEventListener('click', () => {
+  const gameInProgress = !gameOver && board.some(v => v !== null);
+  if (gameInProgress) {
+    showConfirm('Forfeit Game?', 'This counts as a loss. Start a new game?', 'Forfeit', () => { recordForfeit(); newGame(); }, true);
+  } else {
+    newGame();
+  }
 });
 
 let lastMove = -1;
@@ -1037,6 +1071,7 @@ function makeMove(i, player) {
   cell.classList.add(player === HUMAN ? 'black-cell' : 'white-cell');
   playSound('stone');
   checkEnd(i, player);
+  if (!gameOver) saveActiveGame();
 }
 
 function checkEnd(pos, player) {
@@ -1053,7 +1088,7 @@ function checkEnd(pos, player) {
       statusEl.className = 'status lose';
       scores.losses++; lifetime[difficulty].l++;
     }
-    saveLifetime(); updateScoreboard(); disableBoard();
+    saveLifetime(); clearActiveGame(); updateScoreboard(); disableBoard();
     setTimeout(() => showEndgame(player === HUMAN ? 'win' : 'lose'), 600);
     return;
   }
@@ -1062,7 +1097,7 @@ function checkEnd(pos, player) {
     statusEl.textContent = 'Draw';
     statusEl.className = 'status draw';
     scores.draws++; lifetime[difficulty].d++;
-    saveLifetime(); updateScoreboard(); disableBoard();
+    saveLifetime(); clearActiveGame(); updateScoreboard(); disableBoard();
     setTimeout(() => showEndgame('draw'), 600);
   }
 }
@@ -1161,7 +1196,7 @@ function botMove() {
   }
 
   makeMove(move, BOT);
-  if (!gameOver) { statusEl.textContent = humanIsBlack ? 'You play ⚫ — your move' : 'You play ⚪ — your move'; statusEl.className = 'status'; }
+  if (!gameOver) { statusEl.textContent = humanIsBlack ? '⚫ — your move' : '⚪ — your move'; statusEl.className = 'status'; }
 }
 
 function disableBoard() { boardEl.querySelectorAll('.cell').forEach(c => c.classList.add('disabled')); }
@@ -1215,10 +1250,13 @@ function newGame() {
   statusEl.className = 'status';
 
   // Show start prompt
+  document.querySelectorAll('.difficulty-start-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.diff === difficulty);
+  });
   const startOverlay = document.getElementById('startOverlay');
   document.getElementById('startIcon').textContent = humanIsBlack ? '⚫' : '⚪';
-  document.getElementById('startColor').textContent = humanIsBlack ? 'You play Black' : 'You play White';
-  document.getElementById('startSub').textContent = humanIsBlack ? 'First move is yours' : 'Opponent opens';
+  document.getElementById('startColor').textContent = humanIsBlack ? 'You are Black' : 'You are White';
+  document.getElementById('startSub').textContent = humanIsBlack ? 'First stone is yours' : 'Opponent opens';
   startOverlay.classList.add('open');
 }
 
@@ -1248,17 +1286,18 @@ function closeEndgame() { endgameOverlay.classList.remove('open'); }
 
 document.getElementById('playNow').addEventListener('click', () => { closeEndgame(); newGame(); });
 document.getElementById('changeDiff').addEventListener('click', () => { closeEndgame(); });
+document.getElementById('endgameStats').addEventListener('click', () => { closeEndgame(); openStats(); });
 
-// Begin button — commit this game's color and flip for next time
+// Enter button — commit this game's color and flip for next time
 document.getElementById('startBegin').addEventListener('click', () => {
   nextIsBlack[difficulty] = !nextIsBlack[difficulty]; // flip for next game
   document.getElementById('startOverlay').classList.remove('open');
   if (humanIsBlack) {
     enableBoard();
-    statusEl.textContent = 'You play ⚫ — your move';
+    statusEl.textContent = '⚫ — your move';
   } else {
     statusEl.textContent = 'Opponent is thinking…';
-    setTimeout(() => { botMove(); enableBoard(); statusEl.textContent = 'You play ⚪ — your move'; }, 800);
+    setTimeout(() => { botMove(); enableBoard(); statusEl.textContent = '⚪ — your move'; }, 800);
   }
 });
 
@@ -1267,6 +1306,23 @@ document.getElementById('startClose').addEventListener('click', () => {
   document.getElementById('startOverlay').classList.remove('open');
   statusEl.textContent = 'Change difficulty or press New Game';
   statusEl.className = 'status';
+});
+
+// Difficulty buttons inside the start overlay
+document.querySelectorAll('.difficulty-start-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.difficulty-start-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    // Keep main difficulty row in sync
+    document.querySelectorAll('.difficulty button').forEach(b => {
+      b.classList.toggle('active', b.dataset.diff === btn.dataset.diff);
+    });
+    difficulty = btn.dataset.diff;
+    humanIsBlack = nextIsBlack[difficulty];
+    document.getElementById('startIcon').textContent = humanIsBlack ? '⚫' : '⚪';
+    document.getElementById('startColor').textContent = humanIsBlack ? 'You are Black' : 'You are White';
+    document.getElementById('startSub').textContent = humanIsBlack ? 'First stone is yours' : 'Opponent opens';
+  });
 });
 
 // ====== SETTINGS ======
@@ -1283,7 +1339,7 @@ const modalOverlay = document.getElementById('modalOverlay');
 const statsContent = document.getElementById('statsContent');
 
 function pct(w, total) { return total === 0 ? '—' : Math.round(w / total * 100) + '%'; }
-function avgMoves(s) { return s.w === 0 ? '—' : Math.round(s.mw / s.w); }
+function avgMoves(s) { return s.w === 0 ? '—' : (s.mw / s.w).toFixed(1); }
 
 function openStats() {
   const diffs = ['easy', 'medium', 'hard'];
