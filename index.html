@@ -1065,14 +1065,47 @@ function pickWeighted(moves, weights) {
   return moves[0];
 }
 
+// Per-difficulty weights for move ranks #1–#10
+const DIFF_WEIGHTS = {
+  easy:   [0.25, 0.20, 0.10, 0.10, 0.10, 0.05, 0.05, 0.05, 0.05, 0.05],
+  medium: [0.50, 0.25, 0.10, 0.05, 0.05, 0.01, 0.01, 0.01, 0.01, 0.01],
+  hard:   [0.70, 0.20, 0.03, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01],
+};
+
+// Returns all empty cells where placing `player` would win immediately
+function findImmediateWins(player) {
+  const wins = [];
+  for (let i = 0; i < TOTAL; i++) {
+    if (board[i] !== null) continue;
+    board[i] = player;
+    if (findWin(i, player)) wins.push(i);
+    board[i] = null;
+  }
+  return wins;
+}
+
 function botMove() {
   if (gameOver) return;
-  const top = getTopMoves(3);
-  let w;
-  if (difficulty === 'easy') w = [0.70, 0.20, 0.10];
-  else if (difficulty === 'medium') w = [0.85, 0.10, 0.05];
-  else w = [0.95, 0.04, 0.01];
-  makeMove(pickWeighted(top, w), BOT);
+  let move;
+
+  // Forced: take an immediate win
+  const botWins = findImmediateWins(BOT);
+  if (botWins.length > 0) {
+    move = botWins[0];
+  } else {
+    // Forced: block any human win — never skip this regardless of difficulty
+    const humanWins = findImmediateWins(HUMAN);
+    if (humanWins.length > 0) {
+      // If multiple threats, pick the one scored highest (also best counter-attack)
+      humanWins.sort((a, b) => evalCell(b) - evalCell(a));
+      move = humanWins[0];
+    } else {
+      // No forced move — use difficulty weights across top 10 candidates
+      move = pickWeighted(getTopMoves(10), DIFF_WEIGHTS[difficulty]);
+    }
+  }
+
+  makeMove(move, BOT);
   if (!gameOver) { statusEl.textContent = humanIsBlack ? 'You play ⚫ — your move' : 'You play ⚪ — your move'; statusEl.className = 'status'; }
 }
 
