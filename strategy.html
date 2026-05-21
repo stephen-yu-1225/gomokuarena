@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gomoku Strategy Guide — Tactics, Patterns & Winning Moves</title>
+<meta name="description" content="Master Gomoku with our strategy guide. Learn opening theory, threat patterns, double-four tactics, and how to think several moves ahead in five-in-a-row.">
+<link rel="canonical" href="https://gomokuarena.com/strategy.html">
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#2c2c2c">
+<link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://gomokuarena.com/strategy.html">
+<meta property="og:title" content="Gomoku Strategy Guide — Tactics, Patterns & Winning Moves">
+<meta property="og:description" content="Learn opening theory, threat patterns, double-four tactics, and advanced Gomoku strategy.">
+<meta property="og:image" content="https://gomokuarena.com/og-image.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Serif:ital,wght@0,400;0,700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Noto Serif', Georgia, serif; background: #f5f0e8; color: #2c2c2c; min-height: 100dvh; }
+  header { background: #2c2c2c; color: #f5f0e8; padding: 18px 24px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  header a { color: #c8a96e; text-decoration: none; font-size: 0.85rem; letter-spacing: 1px; }
+  header a:hover { text-decoration: underline; }
+  .header-title { font-family: 'Noto Serif SC', serif; font-size: 1.15rem; font-weight: 700; letter-spacing: 2px; }
+  .header-sep { color: #666; margin: 0 4px; }
+  main { max-width: 760px; margin: 48px auto; padding: 0 24px 80px; }
+  .breadcrumb { font-size: 0.78rem; color: #999; letter-spacing: 1px; margin-bottom: 32px; }
+  .breadcrumb a { color: #999; text-decoration: none; }
+  .breadcrumb a:hover { color: #666; }
+  h1 { font-family: 'Noto Serif SC', serif; font-size: 2.1rem; font-weight: 900; margin-bottom: 10px; letter-spacing: 1px; line-height: 1.2; }
+  .lede { font-size: 1.05rem; color: #555; line-height: 1.8; margin-bottom: 40px; font-style: italic; }
+  h2 { font-size: 1.15rem; font-weight: 700; margin: 40px 0 12px; letter-spacing: 0.5px; padding-bottom: 6px; border-bottom: 1px solid #e0d8cc; }
+  h3 { font-size: 1rem; font-weight: 700; margin: 28px 0 8px; color: #2c2c2c; }
+  p { line-height: 1.85; margin-bottom: 14px; color: #3a3a3a; }
+  .tip-box { background: #fdf6e3; border-left: 3px solid #c8a96e; padding: 14px 20px; margin: 20px 0; font-size: 0.92rem; line-height: 1.7; color: #5a4a2a; }
+  .tip-box strong { color: #8b5e1e; }
+  .warning-box { background: #fdf0f0; border-left: 3px solid #c44; padding: 14px 20px; margin: 20px 0; font-size: 0.92rem; line-height: 1.7; color: #5a2a2a; }
+  .pattern-grid {
+    display: inline-flex;
+    flex-direction: column;
+    gap: 0;
+    background: #d4a96a;
+    border: 2px solid #2c2c2c;
+    padding: 10px;
+    margin: 8px 16px 8px 0;
+    vertical-align: top;
+  }
+  .pattern-row { display: flex; }
+  .pcell {
+    width: 24px; height: 24px;
+    display: flex; align-items: center; justify-content: center;
+    position: relative;
+  }
+  .pcell::before { content:''; position:absolute; top:50%; left:0; right:0; height:1px; background:#2c2c2c; opacity:0.5; }
+  .pcell::after  { content:''; position:absolute; left:50%; top:0; bottom:0; width:1px; background:#2c2c2c; opacity:0.5; }
+  .ps { width:18px; height:18px; border-radius:50%; position:relative; z-index:2; box-shadow:1px 1px 2px rgba(0,0,0,0.3); }
+  .ps.b { background: radial-gradient(circle at 35% 35%, #666, #1a1a14); }
+  .ps.w { background: radial-gradient(circle at 35% 35%, #fff, #d8d4c8); border:1px solid #aaa; }
+  .ps.x { background: rgba(200,169,110,0.5); border: 2px dashed #c8a96e; }
+  .diagrams { display: flex; flex-wrap: wrap; align-items: flex-start; margin: 20px 0; }
+  .diagram-label { font-size: 0.8rem; color: #888; font-style: italic; margin-top: 4px; text-align: center; }
+  .level-badge { display: inline-block; font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase; padding: 2px 8px; border: 1px solid; margin-left: 8px; vertical-align: middle; font-weight: 700; position: relative; top: -2px; }
+  .level-badge.beginner { color: #5a8a5a; border-color: #5a8a5a; }
+  .level-badge.intermediate { color: #8a6a1a; border-color: #8a6a1a; }
+  .level-badge.advanced { color: #8a2a2a; border-color: #8a2a2a; }
+  .nav-links { display: flex; gap: 16px; margin-top: 56px; flex-wrap: wrap; }
+  .nav-link { flex: 1; min-width: 200px; border: 1px solid #d4ccc0; padding: 16px 20px; text-decoration: none; color: #2c2c2c; transition: border-color 0.2s, background 0.2s; }
+  .nav-link:hover { border-color: #2c2c2c; background: #fff; }
+  .nav-link-label { font-size: 0.72rem; letter-spacing: 2px; text-transform: uppercase; color: #999; margin-bottom: 4px; }
+  .nav-link-title { font-weight: 700; font-size: 0.95rem; }
+  .cta { margin: 48px 0 0; text-align: center; }
+  .cta a { display: inline-block; background: #2c2c2c; color: #f5f0e8; text-decoration: none; padding: 14px 36px; font-family: 'Noto Serif SC', serif; font-size: 1rem; letter-spacing: 3px; font-weight: 700; }
+  .cta a:hover { background: #444; }
+  a { color: #8b5e1e; }
+  footer { text-align: center; padding: 24px; color: #aaa; font-size: 0.8rem; border-top: 1px solid #e0d8cc; }
+</style>
+</head>
+<body>
+
+<header>
+  <a href="/" class="header-title">Gomoku Arena</a>
+  <span class="header-sep">·</span>
+  <a href="/how-to-play.html">How to Play</a>
+  <span class="header-sep">·</span>
+  <a href="/strategy.html">Strategy</a>
+  <span class="header-sep">·</span>
+  <a href="/history.html">History</a>
+  <span class="header-sep">·</span>
+  <a href="/about.html">About</a>
+</header>
+
+<main>
+  <div class="breadcrumb"><a href="/">Gomoku Arena</a> › Strategy Guide</div>
+
+  <h1>Gomoku Strategy Guide</h1>
+  <p class="lede">Gomoku rewards those who think in threats, not moves. This guide covers the patterns, principles, and mental models that separate strong players from weak ones.</p>
+
+  <h2>The Core Principle: Force and Response</h2>
+  <p>Every stone you place either creates a threat or defends against one — ideally both. A <em>forcing move</em> demands an immediate response from your opponent; if they don't respond, you win. Chain enough forcing moves together and you dictate the entire flow of the game.</p>
+  <p>Weak players react. Strong players make their opponent react. Your goal is to build positions where your threats multiply faster than your opponent can answer them.</p>
+
+  <div class="tip-box">
+    <strong>The golden rule:</strong> One threat can always be blocked. Two simultaneous threats cannot. Everything in Gomoku strategy flows from this fact.
+  </div>
+
+  <h2>Threat Vocabulary <span class="level-badge beginner">Beginner</span></h2>
+  <p>Before tactics, you need a shared vocabulary for the patterns that matter.</p>
+
+  <h3>Live Three (Open Three)</h3>
+  <p>Three of your stones in a row with both ends open — meaning you could extend to a four on either side next turn. A live three is not an immediate threat, but it forces your opponent to either block or race you. Two live threes simultaneously is a winning position.</p>
+
+  <div class="diagrams">
+    <div>
+      <div class="pattern-grid" id="pg-live3"></div>
+      <div class="diagram-label">Live Three — both ends open</div>
+    </div>
+  </div>
+
+  <h3>Dead Three (Blocked Three)</h3>
+  <p>Three in a row with one or both ends blocked by the opponent or the board edge. A dead three is far less dangerous since extending it may not create a winnable threat.</p>
+
+  <h3>Live Four (Open Four)</h3>
+  <p>Four of your stones in a row with at least one open end — one move from winning. Your opponent must block immediately. A live four with both ends open is called a <em>straight four</em> and cannot be stopped at all.</p>
+
+  <div class="diagrams">
+    <div>
+      <div class="pattern-grid" id="pg-live4"></div>
+      <div class="diagram-label">Straight Four — unblockable</div>
+    </div>
+  </div>
+
+  <h3>Broken Three / Broken Four</h3>
+  <p>Three or four stones nearly in a row with a single gap — for example, ●●_●. If the gap is filled, it becomes a four or five. Broken patterns are harder to see and often overlooked by beginners, making them excellent attack vehicles.</p>
+
+  <h2>Double Threats: The Winning Pattern <span class="level-badge intermediate">Intermediate</span></h2>
+  <p>The key to winning Gomoku is creating <em>double threats</em> — positions where you have two winning moves simultaneously. Your opponent can block one, but you take the other and win.</p>
+
+  <h3>Four-Three (4-3)</h3>
+  <p>You have a live four in one direction and a live three in another. Your opponent must block the four — and while they do, you extend the three into a four on your next move. Now you have a new four, and unless they had something stronger, you win.</p>
+
+  <div class="tip-box">
+    <strong>How to create a 4-3:</strong> Look for positions where a single stone simultaneously extends both a three (making it a four) and creates a new live three in a crossing direction. These convergence points are your attack squares.
+  </div>
+
+  <h3>Four-Four (4-4)</h3>
+  <p>Two simultaneous fours. Your opponent can only block one — the other wins immediately. In freestyle Gomoku, four-four plays are legal and devastating. (In Renju, double-four is forbidden for black.)</p>
+
+  <h3>Three-Three (3-3)</h3>
+  <p>Two simultaneous live threes. Neither is immediately fatal, but they create a branching threat tree your opponent cannot efficiently navigate. Play a 3-3 and you'll almost always reach a 4-3 or 4-4 next. (Also forbidden for black in Renju.)</p>
+
+  <h2>Opening Strategy <span class="level-badge beginner">Beginner</span></h2>
+  <p>The opening phase (roughly the first five to eight moves) is about establishing influence and avoiding early containment. A few guiding principles:</p>
+
+  <h3>Start near the center</h3>
+  <p>The center of the board gives your stones more potential directions to extend. Edge positions limit you to fewer attack angles. Black's first move is almost always the exact center intersection (H8 on a 15×15 board).</p>
+
+  <h3>Keep your stones connected</h3>
+  <p>Isolated stones accomplish little. Build clusters — stones within two or three intersections of each other — so that extending one also strengthens another. Spread too thin and your opponent can contain each cluster separately.</p>
+
+  <h3>Play dual-purpose moves</h3>
+  <p>Every move should do at least two things: extend your own threat and hinder your opponent's development. A stone that only extends one of your own lines and does nothing to limit your opponent is often a wasted turn.</p>
+
+  <h2>Reading Ahead <span class="level-badge intermediate">Intermediate</span></h2>
+  <p>Strong Gomoku players read three to five moves ahead as a minimum. The key is not to calculate every possible sequence, but to identify the <em>forcing lines</em> — the branches where one or both players have no real choice — and follow them.</p>
+
+  <p>When your opponent has a live four, they have forced you to block it. That means their next move is predetermined (the block), so you can look further ahead from that point. Chain several forced moves together and you may be able to see the game's outcome ten moves out.</p>
+
+  <div class="tip-box">
+    <strong>Reading exercise:</strong> After each of your moves, ask: "What must my opponent do?" If the answer is "they have to block here," you've just removed one branch from your decision tree. Only variations without a forced response require broad calculation.
+  </div>
+
+  <h2>Defending Effectively <span class="level-badge intermediate">Intermediate</span></h2>
+  <p>Defense in Gomoku is not simply about blocking threats — it's about blocking them in ways that build your own position. A defensive stone placed on the right intersection can also begin a new attack.</p>
+
+  <h3>Block from the strong side</h3>
+  <p>When blocking a live three, try to place your stone on the end that is closest to the center of the board, or the end that leaves your stone in a strong position to extend in another direction. Not all blocks are equal.</p>
+
+  <h3>Don't over-defend</h3>
+  <p>A common beginner mistake is spending two moves defending against a threat that only required one block. If your opponent has a live three, one block suffices. Spending extra moves "making sure" gifts them free development.</p>
+
+  <h3>Recognize unblockable threats</h3>
+  <p>Some positions cannot be defended. A straight four (open on both ends) wins immediately. A live four paired with another live four cannot both be blocked in one move. Learn to recognize these patterns and avoid letting your opponent reach them — rather than trying to defend once they're created.</p>
+
+  <h2>Positional Concepts <span class="level-badge advanced">Advanced</span></h2>
+
+  <h3>Thickness vs. Extension</h3>
+  <p><em>Thick</em> positions have multiple directions of potential, solid connections, and no easy gaps to exploit. <em>Extended</em> positions reach far across the board but may be thin or disconnected. Thickness tends to dominate in complex middle-game fights; extension helps in open racing positions. The best players balance both.</p>
+
+  <h3>Sente and Gote</h3>
+  <p>Borrowed from Go: <em>sente</em> means making a move that demands a response (keeping the initiative), while <em>gote</em> means losing the initiative by making a move your opponent doesn't have to answer. In Gomoku, you want to chain sente moves — threats that force responses — rather than alternating between attack and defense.</p>
+
+  <h3>The Tempo Count</h3>
+  <p>Count your active threats and your opponent's. If you have two live threes and your opponent has one, you're likely ahead — you can afford to let them build while you create the double threat. If they have a live four and you're still building threes, you're behind and must accelerate or switch to pure containment.</p>
+
+  <h2>Common Tactical Motifs <span class="level-badge advanced">Advanced</span></h2>
+
+  <h3>The Shoulder Hit</h3>
+  <p>Placing a stone diagonally adjacent to an opponent's cluster — not directly blocking, but threatening to extend in a direction they haven't defended. This forces them to respond while you keep building elsewhere.</p>
+
+  <h3>The Squeeze</h3>
+  <p>Playing stones on both sides of an opponent's line to limit its extension potential. A three squeezed on both sides becomes a dead three — still three stones, but no real future.</p>
+
+  <h3>The Ladder</h3>
+  <p>A sequence of forcing moves where you chase your opponent's stones across the board, building your own position as they respond. Common in Go, ladders appear in Gomoku too — look for long chains of forced blocks that leave your opponent's pieces inefficiently scattered.</p>
+
+  <div class="warning-box">
+    <strong>Watch out for:</strong> Tunnel vision. New players often lock onto one attack direction and miss the opponent building something devastating on the other side of the board. Always scan the whole board before committing to a move.
+  </div>
+
+  <h2>Putting It Together: A Simple Framework</h2>
+  <p>Before each move, ask yourself these three questions in order:</p>
+  <p><strong>1. Can I win right now?</strong> Do I have a five, a straight four, or a double-four that wins immediately or cannot be stopped?</p>
+  <p><strong>2. Must I block?</strong> Does my opponent have a five-threat or a live four I must respond to immediately?</p>
+  <p><strong>3. What is my best developing move?</strong> Which stone extends my threats most while also limiting my opponent's options?</p>
+  <p>In most turns, the answer to (1) and (2) is no — which means your decision falls to (3). The strength of your game lives there.</p>
+
+  <div class="cta">
+    <a href="/">Apply These Ideas — Play Now →</a>
+  </div>
+
+  <div class="nav-links">
+    <a href="/how-to-play.html" class="nav-link">
+      <div class="nav-link-label">← Back</div>
+      <div class="nav-link-title">How to Play Gomoku</div>
+    </a>
+    <a href="/history.html" class="nav-link">
+      <div class="nav-link-label">Next →</div>
+      <div class="nav-link-title">History of 五子棋</div>
+    </a>
+  </div>
+</main>
+
+<footer>
+  &copy; 2026 Gomoku Arena &nbsp;·&nbsp; <a href="/privacy.html">Privacy</a> &nbsp;·&nbsp; <a href="/about.html">About</a> &nbsp;·&nbsp; <a href="/contact.html">Contact</a>
+</footer>
+
+<script>
+  function makeGrid(id, rows) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    rows.forEach(row => {
+      const rowEl = document.createElement('div');
+      rowEl.className = 'pattern-row';
+      row.forEach(cell => {
+        const c = document.createElement('div');
+        c.className = 'pcell';
+        if (cell) {
+          const s = document.createElement('div');
+          s.className = 'ps ' + cell;
+          c.appendChild(s);
+        }
+        rowEl.appendChild(c);
+      });
+      el.appendChild(rowEl);
+    });
+  }
+
+  // Live Three: _●●●_
+  makeGrid('pg-live3', [
+    [null,null,null,null,null],
+    [null,'b','b','b',null],
+    [null,null,null,null,null],
+  ]);
+
+  // Straight Four: _●●●●_
+  makeGrid('pg-live4', [
+    [null,null,null,null,null,null],
+    [null,'b','b','b','b',null],
+    [null,null,null,null,null,null],
+  ]);
+</script>
+
+</body>
+</html>

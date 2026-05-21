@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How to Play Gomoku — Rules, Setup & Win Conditions</title>
+<meta name="description" content="Learn how to play Gomoku (五子棋). Understand the rules, board setup, how to place stones, and how to win. A complete beginner's guide to five-in-a-row.">
+<link rel="canonical" href="https://gomokuarena.com/how-to-play.html">
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#2c2c2c">
+<link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://gomokuarena.com/how-to-play.html">
+<meta property="og:title" content="How to Play Gomoku — Rules, Setup & Win Conditions">
+<meta property="og:description" content="A complete beginner's guide to Gomoku. Learn the rules, setup, and how to win.">
+<meta property="og:image" content="https://gomokuarena.com/og-image.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Serif:ital,wght@0,400;0,700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Noto Serif', Georgia, serif; background: #f5f0e8; color: #2c2c2c; min-height: 100dvh; }
+  header { background: #2c2c2c; color: #f5f0e8; padding: 18px 24px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  header a { color: #c8a96e; text-decoration: none; font-size: 0.85rem; letter-spacing: 1px; }
+  header a:hover { text-decoration: underline; }
+  .header-title { font-family: 'Noto Serif SC', serif; font-size: 1.15rem; font-weight: 700; letter-spacing: 2px; }
+  .header-sep { color: #666; margin: 0 4px; }
+  main { max-width: 760px; margin: 48px auto; padding: 0 24px 80px; }
+  .breadcrumb { font-size: 0.78rem; color: #999; letter-spacing: 1px; margin-bottom: 32px; }
+  .breadcrumb a { color: #999; text-decoration: none; }
+  .breadcrumb a:hover { color: #666; }
+  h1 { font-family: 'Noto Serif SC', serif; font-size: 2.1rem; font-weight: 900; margin-bottom: 10px; letter-spacing: 1px; line-height: 1.2; }
+  .lede { font-size: 1.05rem; color: #555; line-height: 1.8; margin-bottom: 40px; font-style: italic; }
+  h2 { font-size: 1.15rem; font-weight: 700; margin: 40px 0 12px; letter-spacing: 0.5px; padding-bottom: 6px; border-bottom: 1px solid #e0d8cc; }
+  h3 { font-size: 1rem; font-weight: 700; margin: 24px 0 8px; }
+  p { line-height: 1.85; margin-bottom: 14px; color: #3a3a3a; }
+  .board-diagram {
+    background: #d4a96a;
+    border: 2px solid #2c2c2c;
+    display: inline-block;
+    padding: 16px;
+    margin: 24px 0;
+    position: relative;
+  }
+  .board-grid {
+    display: grid;
+    grid-template-columns: repeat(9, 28px);
+    grid-template-rows: repeat(9, 28px);
+    position: relative;
+  }
+  .cell {
+    width: 28px;
+    height: 28px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .cell::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: #2c2c2c;
+    opacity: 0.6;
+  }
+  .cell::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: #2c2c2c;
+    opacity: 0.6;
+  }
+  .stone {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    position: relative;
+    z-index: 2;
+    box-shadow: 1px 2px 3px rgba(0,0,0,0.35);
+  }
+  .stone.b { background: radial-gradient(circle at 35% 35%, #666, #1a1a14); }
+  .stone.w { background: radial-gradient(circle at 35% 35%, #fff, #d8d4c8); border: 1px solid #aaa; }
+  .stone.win { outline: 3px solid #c8a96e; outline-offset: 1px; }
+  .rules-box {
+    background: #fff;
+    border: 1px solid #e0d8cc;
+    padding: 24px 28px;
+    margin: 24px 0;
+  }
+  .rules-box ol { padding-left: 20px; }
+  .rules-box li { line-height: 1.8; margin-bottom: 10px; color: #3a3a3a; }
+  .tip-box {
+    background: #fdf6e3;
+    border-left: 3px solid #c8a96e;
+    padding: 14px 20px;
+    margin: 20px 0;
+    font-size: 0.92rem;
+    line-height: 1.7;
+    color: #5a4a2a;
+  }
+  .tip-box strong { color: #8b5e1e; }
+  .nav-links { display: flex; gap: 16px; margin-top: 56px; flex-wrap: wrap; }
+  .nav-link {
+    flex: 1;
+    min-width: 200px;
+    border: 1px solid #d4ccc0;
+    padding: 16px 20px;
+    text-decoration: none;
+    color: #2c2c2c;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .nav-link:hover { border-color: #2c2c2c; background: #fff; }
+  .nav-link-label { font-size: 0.72rem; letter-spacing: 2px; text-transform: uppercase; color: #999; margin-bottom: 4px; }
+  .nav-link-title { font-weight: 700; font-size: 0.95rem; }
+  .cta { margin: 48px 0 0; text-align: center; }
+  .cta a { display: inline-block; background: #2c2c2c; color: #f5f0e8; text-decoration: none; padding: 14px 36px; font-family: 'Noto Serif SC', serif; font-size: 1rem; letter-spacing: 3px; font-weight: 700; }
+  .cta a:hover { background: #444; }
+  a { color: #8b5e1e; }
+  footer { text-align: center; padding: 24px; color: #aaa; font-size: 0.8rem; border-top: 1px solid #e0d8cc; }
+</style>
+</head>
+<body>
+
+<header>
+  <a href="/" class="header-title">Gomoku Arena</a>
+  <span class="header-sep">·</span>
+  <a href="/how-to-play.html">How to Play</a>
+  <span class="header-sep">·</span>
+  <a href="/strategy.html">Strategy</a>
+  <span class="header-sep">·</span>
+  <a href="/history.html">History</a>
+  <span class="header-sep">·</span>
+  <a href="/about.html">About</a>
+</header>
+
+<main>
+  <div class="breadcrumb"><a href="/">Gomoku Arena</a> › How to Play</div>
+
+  <h1>How to Play Gomoku</h1>
+  <p class="lede">Gomoku is one of the oldest and most elegant strategy games in the world. The rules take five minutes to learn — mastering them takes a lifetime. I picked it up at age six at my grandmother's Go board, and I'm still finding new depth in it today.</p>
+
+  <h2>What is Gomoku?</h2>
+  <p>Gomoku (五子棋, literally "five pieces") is a two-player abstract strategy game played on a grid. Each player places stones one at a time, alternating turns. The goal is simple: be the first to form an unbroken line of exactly five stones — horizontally, vertically, or diagonally.</p>
+  <p>It is played on the same board as Go (19×19), though most casual games use a 15×15 grid. No pieces move or are captured — placement alone determines the outcome.</p>
+
+  <h2>What You Need</h2>
+  <p>All you need to play Gomoku is a grid and two sets of stones in contrasting colors — traditionally black and white. A standard Go board works perfectly, as does any printed or drawn 15×15 grid. Of course, you can also <a href="/">play online at Gomoku Arena</a> right now, for free.</p>
+
+  <h2>Setup</h2>
+  <p>Place the board flat between the two players. One player takes black stones, the other takes white. In standard Gomoku, black always goes first. The board starts empty — no pieces are placed before play begins.</p>
+
+  <div class="tip-box">
+    <strong>Convention:</strong> Black moves first in Gomoku, as in Go. This gives black a slight first-mover advantage — which is why professional and tournament Gomoku uses <em>swap rules</em> to balance the game. In casual play, black first is the norm.
+  </div>
+
+  <h2>How to Play</h2>
+  <div class="rules-box">
+    <ol>
+      <li><strong>Black places first.</strong> On your turn, place one stone on any empty intersection of the grid. Stones are placed on intersections, not inside squares.</li>
+      <li><strong>Players alternate turns.</strong> White plays, then black, then white — continuing until the game ends.</li>
+      <li><strong>Once placed, stones don't move.</strong> Unlike chess or checkers, placed stones stay where they are for the rest of the game.</li>
+      <li><strong>The first player to align five stones in a row wins.</strong> The line can run horizontally, vertically, or diagonally. All five stones must be yours, with no gaps.</li>
+      <li><strong>If the board fills with no winner, the game is a draw.</strong> This is rare on a 15×15 board.</li>
+    </ol>
+  </div>
+
+  <h2>What Counts as a Win</h2>
+  <p>Five stones of the same color in an unbroken line — that's a win. The line can point in any of four directions: left-right, up-down, or either diagonal.</p>
+
+  <div style="text-align:center;">
+    <div class="board-diagram">
+      <div class="board-grid" id="winDiagram"></div>
+    </div>
+    <p style="font-size:0.8rem;color:#888;margin-top:8px;font-style:italic;">Black forms five in a row diagonally — a winning line.</p>
+  </div>
+
+  <p>In standard (freestyle) Gomoku, six or more in a row also counts as a win. In the stricter <em>Renju</em> variant played professionally, only exactly five counts — and black faces additional restrictions to balance the first-move advantage.</p>
+
+  <h2>Winning Threats to Know</h2>
+
+  <h3>Open Four</h3>
+  <p>Four stones in a row with both ends open. Your opponent must block one end — but you'll extend the other and win. An open four is essentially an unstoppable win unless your opponent somehow blocks both ends in one move (which is impossible with a single stone).</p>
+
+  <h3>Three-Three (Double Threat)</h3>
+  <p>Two simultaneous open threes — two different directions in which you could form a four next turn. Your opponent can only block one, so you win. Creating double threats is the central skill in Gomoku.</p>
+
+  <h3>Four-Three</h3>
+  <p>One open four and one open three at the same time. The four forces your opponent to respond, and while they're blocking it, you extend your three into a four — and win on the next move.</p>
+
+  <div class="tip-box">
+    <strong>Key principle:</strong> A single threat can always be blocked. Two simultaneous threats cannot. The whole game is about forcing your opponent into positions where they can only respond to one danger while you pursue the other.
+  </div>
+
+  <h2>Common Beginner Mistakes</h2>
+  <p><strong>Playing reactively.</strong> Beginners often only respond to the opponent's threats without building their own. You need to do both simultaneously — block and attack.</p>
+  <p><strong>Ignoring the center.</strong> The center of the board gives you more directions to extend. Edge and corner positions limit your options. In the opening, fight for central ground.</p>
+  <p><strong>Not seeing the whole board.</strong> A threat on one side of the board can force you to move there — leaving the other side undefended. Always consider what your opponent might be building elsewhere.</p>
+  <p><strong>Blocking the wrong four.</strong> When your opponent has multiple threats, choose carefully which to block. Blocking the less dangerous one while the other becomes a five is a quick loss.</p>
+
+  <h2>Variants</h2>
+  <p><strong>Freestyle Gomoku</strong> — Standard rules, no restrictions. First to five (or more) in a row wins. Best for casual play.</p>
+  <p><strong>Renju (連珠)</strong> — The competitive standard. Black must form exactly five (not six or more) and faces restrictions on double-three and double-four plays to offset the first-move advantage. White plays with no restrictions.</p>
+  <p><strong>Caro</strong> — Popular in Vietnam. Like freestyle, but six-in-a-row does not count as a win for either player. Forces more precise play.</p>
+
+  <div class="cta">
+    <a href="/">Play Now at Gomoku Arena →</a>
+  </div>
+
+  <div class="nav-links">
+    <a href="/strategy.html" class="nav-link">
+      <div class="nav-link-label">Next →</div>
+      <div class="nav-link-title">Gomoku Strategy Guide</div>
+    </a>
+    <a href="/history.html" class="nav-link">
+      <div class="nav-link-label">Explore</div>
+      <div class="nav-link-title">History of 五子棋</div>
+    </a>
+  </div>
+</main>
+
+<footer>
+  &copy; 2026 Gomoku Arena &nbsp;·&nbsp; <a href="/privacy.html">Privacy</a> &nbsp;·&nbsp; <a href="/about.html">About</a> &nbsp;·&nbsp; <a href="/contact.html">Contact</a>
+</footer>
+
+<script>
+  // Render win diagram
+  const grid = document.getElementById('winDiagram');
+  const stones = {};
+  // Diagonal win: (1,1) to (5,5) = indices in 9x9 grid
+  const winCells = [10, 20, 30, 40, 50]; // (1,1),(2,2),(3,3),(4,4),(5,5)
+  const blackCells = [10, 20, 30, 40, 50, 3, 14, 35, 46];
+  const whiteCells = [11, 21, 31, 2, 13];
+  for (let i = 0; i < 81; i++) {
+    const cell = document.createElement('div');
+    cell.className = 'cell';
+    if (blackCells.includes(i)) {
+      const s = document.createElement('div');
+      s.className = 'stone b' + (winCells.includes(i) ? ' win' : '');
+      cell.appendChild(s);
+    } else if (whiteCells.includes(i)) {
+      const s = document.createElement('div');
+      s.className = 'stone w';
+      cell.appendChild(s);
+    }
+    grid.appendChild(cell);
+  }
+</script>
+
+</body>
+</html>
