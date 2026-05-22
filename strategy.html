@@ -14,6 +14,14 @@
 <meta property="og:title" content="Gomoku Strategy Guide — Tactics, Patterns & Winning Moves">
 <meta property="og:description" content="Learn opening theory, threat patterns, double-four tactics, and advanced Gomoku strategy.">
 <meta property="og:image" content="https://gomokuarena.com/og-image.png">
+<!-- Google Analytics 4 -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-JZBX2P4TD1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-JZBX2P4TD1');
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Serif:ital,wght@0,400;0,700&display=swap" rel="stylesheet">
 <style>
@@ -79,7 +87,9 @@
 <body>
 
 <header>
-  <a href="/" class="header-title">Gomoku Arena</a>
+  <span class="header-title">Gomoku Arena</span>
+  <span class="header-sep">·</span>
+  <a href="/">Play Gomoku</a>
   <span class="header-sep">·</span>
   <a href="/how-to-play.html">How to Play</a>
   <span class="header-sep">·</span>
@@ -143,11 +153,32 @@
     <strong>How to create a 4-3:</strong> Look for positions where a single stone simultaneously extends both a three (making it a four) and creates a new live three in a crossing direction. These convergence points are your attack squares.
   </div>
 
+  <div class="diagrams">
+    <div>
+      <div class="pattern-grid" id="pg-43"></div>
+      <div class="diagram-label">Four-Three — four horizontal, three vertical, one shared stone</div>
+    </div>
+  </div>
+
   <h3>Four-Four (4-4)</h3>
   <p>Two simultaneous fours. Your opponent can only block one — the other wins immediately. In freestyle Gomoku, four-four plays are legal and devastating. (In Renju, double-four is forbidden for black.)</p>
 
+  <div class="diagrams">
+    <div>
+      <div class="pattern-grid" id="pg-44"></div>
+      <div class="diagram-label">Four-Four — two live fours, cannot be blocked simultaneously</div>
+    </div>
+  </div>
+
   <h3>Three-Three (3-3)</h3>
   <p>Two simultaneous live threes. Neither is immediately fatal, but they create a branching threat tree your opponent cannot efficiently navigate. Play a 3-3 and you'll almost always reach a 4-3 or 4-4 next. (Also forbidden for black in Renju.)</p>
+
+  <div class="diagrams">
+    <div>
+      <div class="pattern-grid" id="pg-33"></div>
+      <div class="diagram-label">Three-Three — two open threes sharing a stone, one block isn't enough</div>
+    </div>
+  </div>
 
   <h2>Opening Strategy <span class="level-badge beginner">Beginner</span></h2>
   <p>The opening phase (roughly the first five to eight moves) is about establishing influence and avoiding early containment. A few guiding principles:</p>
@@ -268,6 +299,32 @@
     [null,null,null,null,null,null],
     [null,'b','b','b','b',null],
     [null,null,null,null,null,null],
+  ]);
+
+  // Four-Three: 4 horizontal + 3 vertical sharing a stone at (2,2)
+  makeGrid('pg-43', [
+    [null,null,'b',null,null,null],
+    [null,null,'b',null,null,null],
+    [null,'b','b','b','b',null],
+    [null,null,null,null,null,null],
+  ]);
+
+  // Four-Four: 4 vertical + 4 horizontal sharing a stone at (3,2)
+  makeGrid('pg-44', [
+    [null,null,'b',null,null,null],
+    [null,null,'b',null,null,null],
+    [null,null,'b',null,null,null],
+    [null,'b','b','b','b',null],
+    [null,null,null,null,null,null],
+  ]);
+
+  // Three-Three: cross of two live threes sharing center stone
+  makeGrid('pg-33', [
+    [null,null,null,null,null],
+    [null,null,'b',null,null],
+    [null,'b','b','b',null],
+    [null,null,'b',null,null],
+    [null,null,null,null,null],
   ]);
 </script>
 

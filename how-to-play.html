@@ -14,6 +14,14 @@
 <meta property="og:title" content="How to Play Gomoku — Rules, Setup & Win Conditions">
 <meta property="og:description" content="A complete beginner's guide to Gomoku. Learn the rules, setup, and how to win.">
 <meta property="og:image" content="https://gomokuarena.com/og-image.png">
+<!-- Google Analytics 4 -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-JZBX2P4TD1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-JZBX2P4TD1');
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Serif:ital,wght@0,400;0,700&display=swap" rel="stylesheet">
 <style>
@@ -104,6 +112,16 @@
     color: #5a4a2a;
   }
   .tip-box strong { color: #8b5e1e; }
+  .pattern-grid { display: inline-flex; flex-direction: column; background: #d4a96a; border: 2px solid #2c2c2c; padding: 10px; margin: 8px 16px 8px 0; vertical-align: top; }
+  .pattern-row { display: flex; }
+  .pcell { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; position: relative; }
+  .pcell::before { content:''; position:absolute; top:50%; left:0; right:0; height:1px; background:#2c2c2c; opacity:0.5; }
+  .pcell::after  { content:''; position:absolute; left:50%; top:0; bottom:0; width:1px; background:#2c2c2c; opacity:0.5; }
+  .ps { width:18px; height:18px; border-radius:50%; position:relative; z-index:2; box-shadow:1px 1px 2px rgba(0,0,0,0.3); }
+  .ps.b { background: radial-gradient(circle at 35% 35%, #666, #1a1a14); }
+  .ps.w { background: radial-gradient(circle at 35% 35%, #fff, #d8d4c8); border:1px solid #aaa; }
+  .diagrams { display: flex; flex-wrap: wrap; align-items: flex-start; margin: 16px 0; }
+  .diagram-label { font-size: 0.8rem; color: #888; font-style: italic; margin-top: 4px; text-align: center; }
   .nav-links { display: flex; gap: 16px; margin-top: 56px; flex-wrap: wrap; }
   .nav-link {
     flex: 1;
@@ -127,7 +145,9 @@
 <body>
 
 <header>
-  <a href="/" class="header-title">Gomoku Arena</a>
+  <span class="header-title">Gomoku Arena</span>
+  <span class="header-sep">·</span>
+  <a href="/">Play Gomoku</a>
   <span class="header-sep">·</span>
   <a href="/how-to-play.html">How to Play</a>
   <span class="header-sep">·</span>
@@ -185,12 +205,30 @@
 
   <h3>Open Four</h3>
   <p>Four stones in a row with both ends open. Your opponent must block one end — but you'll extend the other and win. An open four is essentially an unstoppable win unless your opponent somehow blocks both ends in one move (which is impossible with a single stone).</p>
+  <div class="diagrams">
+    <div>
+      <div class="pattern-grid" id="pg-open4"></div>
+      <div class="diagram-label">Open Four — both ends free, unblockable</div>
+    </div>
+  </div>
 
   <h3>Three-Three (Double Threat)</h3>
   <p>Two simultaneous open threes — two different directions in which you could form a four next turn. Your opponent can only block one, so you win. Creating double threats is the central skill in Gomoku.</p>
+  <div class="diagrams">
+    <div>
+      <div class="pattern-grid" id="pg-33"></div>
+      <div class="diagram-label">Three-Three — two live threes, one stone can't block both</div>
+    </div>
+  </div>
 
   <h3>Four-Three</h3>
   <p>One open four and one open three at the same time. The four forces your opponent to respond, and while they're blocking it, you extend your three into a four — and win on the next move.</p>
+  <div class="diagrams">
+    <div>
+      <div class="pattern-grid" id="pg-43"></div>
+      <div class="diagram-label">Four-Three — the four demands a block; the three wins next</div>
+    </div>
+  </div>
 
   <div class="tip-box">
     <strong>Key principle:</strong> A single threat can always be blocked. Two simultaneous threats cannot. The whole game is about forcing your opponent into positions where they can only respond to one danger while you pursue the other.
@@ -228,6 +266,46 @@
 </footer>
 
 <script>
+  function makeGrid(id, rows) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    rows.forEach(row => {
+      const rowEl = document.createElement('div');
+      rowEl.className = 'pattern-row';
+      row.forEach(cell => {
+        const c = document.createElement('div');
+        c.className = 'pcell';
+        if (cell) { const s = document.createElement('div'); s.className = 'ps ' + cell; c.appendChild(s); }
+        rowEl.appendChild(c);
+      });
+      el.appendChild(rowEl);
+    });
+  }
+
+  // Open Four: _●●●●_
+  makeGrid('pg-open4', [
+    [null,null,null,null,null,null],
+    [null,'b','b','b','b',null],
+    [null,null,null,null,null,null],
+  ]);
+
+  // Three-Three: two live threes sharing a stone (cross shape)
+  makeGrid('pg-33', [
+    [null,null,null,null,null],
+    [null,null,'b',null,null],
+    [null,'b','b','b',null],
+    [null,null,'b',null,null],
+    [null,null,null,null,null],
+  ]);
+
+  // Four-Three: 4 horizontal + 3 vertical sharing a stone
+  makeGrid('pg-43', [
+    [null,null,'b',null,null,null],
+    [null,null,'b',null,null,null],
+    [null,'b','b','b','b',null],
+    [null,null,null,null,null,null],
+  ]);
+
   // Render win diagram
   const grid = document.getElementById('winDiagram');
   const stones = {};

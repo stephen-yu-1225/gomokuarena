@@ -37,6 +37,14 @@
 <link rel="apple-touch-icon" href="/icon-192.png">
 <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
 <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png">
+<!-- Google Analytics 4 -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-JZBX2P4TD1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-JZBX2P4TD1');
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Serif:ital,wght@0,400;0,700&display=swap" rel="stylesheet">
 <style>
@@ -359,6 +367,10 @@
     60% { transform: translateY(1px) scale(1.02); opacity: 1; }
     100% { transform: translateY(0) scale(1); opacity: 1; }
   }
+  @keyframes stoneRestore {
+    0%   { transform: scale(0.3); opacity: 0; }
+    100% { transform: scale(1);   opacity: 1; }
+  }
   .stone.black {
     background: radial-gradient(circle at 35% 30%, #555, #1a1a1a 60%, #000);
     box-shadow: 1px 2px 4px #00000044;
@@ -396,6 +408,16 @@
   .btn-stats:hover { border-color: #2c2c2c; color: #2c2c2c; }
   .btn-undo:not(:disabled):hover { border-color: #8b6914; color: #8b6914; }
   .btn-undo:disabled { opacity: 0.3; cursor: default; pointer-events: none; }
+  .btn-hint:not(:disabled):hover { border-color: #c8a96e; color: #8b6914; }
+  .btn-hint:disabled { opacity: 0.3; cursor: default; pointer-events: none; }
+  @keyframes hintGhostPulse {
+    0%, 100% { opacity: 0.45; transform: scale(1); }
+    50%       { opacity: 0.15; transform: scale(0.88); }
+  }
+  .hint-ghost {
+    animation: hintGhostPulse 0.8s ease-in-out infinite !important;
+    pointer-events: none;
+  }
   .difficulty-start-btn {
     padding: 5px 14px;
     border: 1.5px solid #c8bda8;
@@ -411,6 +433,7 @@
   .difficulty-start-btn:hover { border-color: #2c2c2c; }
 
   /* ============ MODALS ============ */
+  #confirmOverlay { z-index: 110; }
   .modal-overlay {
     display: none;
     position: fixed;
@@ -670,6 +693,7 @@
   <div class="actions">
     <button class="btn-new" id="newGame">New Game</button>
     <button class="btn-undo" id="undoBtn" disabled>↩ Undo</button>
+    <button class="btn-hint" id="hintBtn" disabled>Hint (2)</button>
     <button class="btn-stats" id="openStats">Stats</button>
   </div>
 </div>
@@ -917,8 +941,14 @@ const WIN_LEN = 5;
 const HUMAN = 'X';
 const BOT = 'O';
 let humanIsBlack = true;
-// Alternate colors per difficulty; human starts as black for each difficulty
-const nextIsBlack = { easy: true, medium: true, hard: true };
+// Alternate colors per difficulty; persisted across reloads
+const NEXT_BLACK_KEY = 'gomoku_next_black';
+function loadNextBlack() {
+  try { const s = JSON.parse(localStorage.getItem(NEXT_BLACK_KEY)); if (s && typeof s === 'object') return s; } catch {}
+  return { easy: true, medium: true, hard: true };
+}
+function saveNextBlack() { localStorage.setItem(NEXT_BLACK_KEY, JSON.stringify(nextIsBlack)); }
+const nextIsBlack = loadNextBlack();
 const DIRS = [[0,1],[1,0],[1,1],[1,-1]];
 
 let board = Array(TOTAL).fill(null);
@@ -938,26 +968,78 @@ function loadLifetime() {
 function saveLifetime() { localStorage.setItem(STATS_KEY, JSON.stringify(lifetime)); }
 let lifetime = loadLifetime();
 
-// ====== ABANDONED GAME DETECTION ======
+// ====== GAME STATE PERSISTENCE ======
 const GAME_STATE_KEY = 'gomoku_active_game';
+
 function saveActiveGame() {
-  localStorage.setItem(GAME_STATE_KEY, JSON.stringify({ difficulty }));
+  localStorage.setItem(GAME_STATE_KEY, JSON.stringify({
+    board: board.slice(), difficulty, humanIsBlack,
+    moveHistory: moveHistory.slice(), undosRemaining, hintsRemaining,
+  }));
 }
-function clearActiveGame() {
-  localStorage.removeItem(GAME_STATE_KEY);
-}
-function checkAbandonedGame() {
+function clearActiveGame() { localStorage.removeItem(GAME_STATE_KEY); }
+
+function restoreActiveGame() {
   try {
     const saved = JSON.parse(localStorage.getItem(GAME_STATE_KEY));
-    if (saved && saved.difficulty && lifetime[saved.difficulty]) {
-      lifetime[saved.difficulty].l++;
-      scores.losses++;
-      saveLifetime();
-      clearActiveGame();
-    }
-  } catch { clearActiveGame(); }
+    if (!saved || !Array.isArray(saved.board) || saved.board.length !== TOTAL) { clearActiveGame(); return false; }
+    difficulty     = saved.difficulty || 'easy';
+    humanIsBlack   = !!saved.humanIsBlack;
+    board          = saved.board;
+    moveHistory    = saved.moveHistory || [];
+    undosRemaining = saved.undosRemaining !== undefined ? saved.undosRemaining : MAX_UNDOS;
+    hintsRemaining = saved.hintsRemaining !== undefined ? saved.hintsRemaining : HINT_LIMITS[difficulty];
+    gameOver = false;
+
+    // Sync difficulty buttons
+    document.querySelectorAll('.difficulty button').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.diff === difficulty);
+    });
+
+    // Hide splash, freeze board during replay
+    splash.classList.add('hidden');
+    disableBoard();
+    updateScoreboard();
+    statusEl.textContent = 'Resuming your game…';
+    statusEl.className = 'status';
+
+    // Replay each move with progressive deceleration (quadratic easing)
+    const MIN_STEP = 40;   // ms between stones at start of replay
+    const MAX_STEP = 450;  // ms between stones at end of replay
+    const n = moveHistory.length;
+    let cumDelay = 200;    // brief pause so "Resuming…" is readable before first stone
+
+    moveHistory.forEach((cellIdx, moveIdx) => {
+      setTimeout(() => {
+        const player = ((moveIdx % 2 === 0) === humanIsBlack) ? HUMAN : BOT;
+        const cell = boardEl.children[cellIdx];
+        const s = document.createElement('div');
+        s.className = 'stone ' + (player === HUMAN
+          ? (humanIsBlack ? 'black' : 'white')
+          : (humanIsBlack ? 'white' : 'black'));
+        s.style.animation = 'stoneRestore 0.1s ease-out';
+        cell.appendChild(s);
+        cell.classList.add(player === HUMAN ? 'black-cell' : 'white-cell');
+      }, cumDelay);
+      // t goes 0→1; squaring it makes the slowdown accelerate toward the end
+      const t = (moveIdx + 1) / Math.max(n, 1);
+      cumDelay += MIN_STEP + (MAX_STEP - MIN_STEP) * (t * t);
+    });
+
+    // After replay completes: enable board, greet player
+    setTimeout(() => {
+      updateUndoButton();
+      updateHintButton();
+      enableBoard();
+      statusEl.textContent = 'Welcome back — ' + (humanIsBlack ? '⚫' : '⚪') + ' your move';
+      setTimeout(() => {
+        if (!gameOver) statusEl.textContent = (humanIsBlack ? '⚫' : '⚪') + ' — your move';
+      }, 2500);
+    }, cumDelay + 400);
+
+    return true;
+  } catch { clearActiveGame(); return false; }
 }
-checkAbandonedGame();
 
 const boardEl = document.getElementById('board');
 const statusEl = document.getElementById('status');
@@ -1053,6 +1135,7 @@ document.querySelectorAll('.difficulty button').forEach(btn => {
       document.querySelector('.difficulty .active').classList.remove('active');
       btn.classList.add('active');
       difficulty = btn.dataset.diff;
+      hintsRemaining = HINT_LIMITS[difficulty];
       newGame();
     };
     const gameInProgress = !gameOver && board.some(v => v !== null);
@@ -1078,21 +1161,28 @@ let moveHistory = [];
 const MAX_UNDOS = 1;
 let undosRemaining = MAX_UNDOS;
 
+const HINT_LIMITS = { easy: 2, medium: 1, hard: 0 };
+let hintsRemaining = 2;
+let awaitingPlayerMove = false;
+let hintTimeout = null;
+
 function handleClick(i) {
   if (board[i] || gameOver) return;
   makeMove(i, HUMAN);
   if (gameOver) return;
+  saveActiveGame();
   disableBoard();
   statusEl.textContent = 'Opponent is thinking\u2026';
   const delay = 1000 + Math.random() * 2000;
   setTimeout(() => {
     botMove();
-    if (!gameOver) enableBoard();
+    if (!gameOver) { saveActiveGame(); enableBoard(); }
     if (undosRemaining > 0) updateUndoButton();
   }, delay);
 }
 
 function makeMove(i, player) {
+  clearHintHighlight();
   board[i] = player;
   lastMove = i;
   moveHistory.push(i);
@@ -1104,7 +1194,6 @@ function makeMove(i, player) {
   cell.classList.add(player === HUMAN ? 'black-cell' : 'white-cell');
   playSound('stone');
   checkEnd(i, player);
-  if (!gameOver) saveActiveGame();
 }
 
 function checkEnd(pos, player) {
@@ -1115,11 +1204,15 @@ function checkEnd(pos, player) {
     if (player === HUMAN) {
       statusEl.textContent = 'Victory!';
       statusEl.className = 'status win';
-      scores.wins++; lifetime[difficulty].w++; lifetime[difficulty].mw += moveHistory.length;
+      const humanMoveCount = humanIsBlack ? Math.ceil(moveHistory.length / 2) : Math.floor(moveHistory.length / 2);
+      scores.wins++; lifetime[difficulty].w++; lifetime[difficulty].mw += humanMoveCount;
+      trackEvent('game_completed', { difficulty, outcome: 'win', move_count: humanMoveCount });
     } else {
       statusEl.textContent = 'Defeat';
       statusEl.className = 'status lose';
       scores.losses++; lifetime[difficulty].l++;
+      const humanMoveCount = humanIsBlack ? Math.ceil(moveHistory.length / 2) : Math.floor(moveHistory.length / 2);
+      trackEvent('game_completed', { difficulty, outcome: 'loss', move_count: humanMoveCount });
     }
     saveLifetime(); clearActiveGame(); updateScoreboard(); disableBoard();
     setTimeout(() => showEndgame(player === HUMAN ? 'win' : 'lose'), 600);
@@ -1130,6 +1223,7 @@ function checkEnd(pos, player) {
     statusEl.textContent = 'Draw';
     statusEl.className = 'status draw';
     scores.draws++; lifetime[difficulty].d++;
+    trackEvent('game_completed', { difficulty, outcome: 'draw', move_count: moveHistory.length });
     saveLifetime(); clearActiveGame(); updateScoreboard(); disableBoard();
     setTimeout(() => showEndgame('draw'), 600);
   }
@@ -1232,8 +1326,8 @@ function botMove() {
   if (!gameOver) { statusEl.textContent = humanIsBlack ? '⚫ — your move' : '⚪ — your move'; statusEl.className = 'status'; }
 }
 
-function disableBoard() { boardEl.querySelectorAll('.cell').forEach(c => c.classList.add('disabled')); }
-function enableBoard() { boardEl.querySelectorAll('.cell').forEach(c => c.classList.remove('disabled')); }
+function disableBoard() { boardEl.querySelectorAll('.cell').forEach(c => c.classList.add('disabled')); awaitingPlayerMove = false; updateHintButton(); }
+function enableBoard()  { boardEl.querySelectorAll('.cell').forEach(c => c.classList.remove('disabled')); awaitingPlayerMove = true; updateHintButton(); }
 function updateScoreboard() { winsEl.textContent=scores.wins; lossesEl.textContent=scores.losses; }
 
 // ====== UNDO ======
@@ -1242,6 +1336,51 @@ const undoBtn = document.getElementById('undoBtn');
 function updateUndoButton() {
   undoBtn.textContent = `↩ Undo (${undosRemaining})`;
   undoBtn.disabled = undosRemaining === 0;
+}
+
+const hintBtn = document.getElementById('hintBtn');
+
+function updateHintButton() {
+  const limit = HINT_LIMITS[difficulty];
+  if (limit === 0) {
+    hintBtn.textContent = 'Hint —';
+    hintBtn.disabled = true;
+    return;
+  }
+  hintBtn.textContent = `Hint (${hintsRemaining})`;
+  hintBtn.disabled = !awaitingPlayerMove || hintsRemaining === 0;
+}
+
+function clearHintHighlight() {
+  if (hintTimeout) { clearTimeout(hintTimeout); hintTimeout = null; }
+  boardEl.querySelectorAll('.hint-ghost').forEach(g => g.remove());
+}
+
+function getHintMove() {
+  // 1. Can human win immediately? Play there.
+  const humanWins = findImmediateWins(HUMAN);
+  if (humanWins.length > 0) return humanWins[0];
+  // 2. Bot is about to win? Block it.
+  const botWins = findImmediateWins(BOT);
+  if (botWins.length > 0) return botWins[0];
+  // 3. Best strategic move by heuristic
+  return getTopMoves(1)[0];
+}
+
+function showHint() {
+  if (!awaitingPlayerMove || hintsRemaining === 0 || gameOver) return;
+  const move = getHintMove();
+  if (move === undefined) return;
+  clearHintHighlight();
+  // Inject a semi-transparent ghost stone so the suggestion is unambiguous
+  const isBlack = humanIsBlack;
+  const ghost = document.createElement('div');
+  ghost.className = 'stone ' + (isBlack ? 'black' : 'white') + ' hint-ghost';
+  boardEl.children[move].appendChild(ghost);
+  hintsRemaining--;
+  updateHintButton();
+  trackEvent('hint_used', { difficulty, hints_remaining: hintsRemaining });
+  hintTimeout = setTimeout(clearHintHighlight, 3000);
 }
 
 function handleUndo() {
@@ -1257,12 +1396,19 @@ function handleUndo() {
   });
   undosRemaining--;
   updateUndoButton();
+  trackEvent('undo_used', { difficulty, undos_remaining: undosRemaining });
   if (gameOver) { gameOver = false; closeEndgame(); }
   statusEl.textContent = 'Stone taken back — choose wisely';
   statusEl.className = 'status';
   enableBoard();
 }
 undoBtn.addEventListener('click', handleUndo);
+hintBtn.addEventListener('click', showHint);
+
+// ====== ANALYTICS HELPERS ======
+function trackEvent(name, params) {
+  if (typeof gtag === 'function') gtag('event', name, params);
+}
 
 function newGame() {
   board = Array(TOTAL).fill(null);
@@ -1270,6 +1416,10 @@ function newGame() {
   moveHistory = []; undosRemaining = MAX_UNDOS;
   updateUndoButton();
   undoBtn.disabled = true;
+  clearHintHighlight();
+  hintsRemaining = HINT_LIMITS[difficulty];
+  awaitingPlayerMove = false;
+  updateHintButton();
   boardEl.querySelectorAll('.cell').forEach(c => {
     c.classList.remove('disabled', 'black-cell', 'white-cell', 'win-cell');
     const stone = c.querySelector('.stone');
@@ -1324,7 +1474,9 @@ document.getElementById('endgameStats').addEventListener('click', () => { closeE
 // Enter button — commit this game's color and flip for next time
 document.getElementById('startBegin').addEventListener('click', () => {
   nextIsBlack[difficulty] = !nextIsBlack[difficulty]; // flip for next game
+  saveNextBlack();
   document.getElementById('startOverlay').classList.remove('open');
+  trackEvent('game_started', { difficulty, color: humanIsBlack ? 'black' : 'white' });
   if (humanIsBlack) {
     enableBoard();
     statusEl.textContent = '⚫ — your move';
@@ -1413,22 +1565,24 @@ document.getElementById('statsReset').addEventListener('click', () => {
     lifetime = defaultStats(); saveLifetime(); openStats();
   }, true);
 });
+
+restoreActiveGame();
 </script>
 
 <footer style="margin-top:auto;padding:20px 0 10px;text-align:center;font-size:0.72rem;color:#999;letter-spacing:1px;font-family:'Noto Serif',Georgia,serif;">
-  <a href="/how-to-play.html" style="color:#aaa;text-decoration:none;margin:0 8px;" onmouseover="this.style.color='#666'" onmouseout="this.style.color='#aaa'">How to Play</a>
+  <a href="/how-to-play.html" target="_blank" rel="noopener" style="color:#aaa;text-decoration:none;margin:0 8px;" onmouseover="this.style.color='#666'" onmouseout="this.style.color='#aaa'">How to Play</a>
   <span style="color:#ccc;">·</span>
-  <a href="/strategy.html" style="color:#aaa;text-decoration:none;margin:0 8px;" onmouseover="this.style.color='#666'" onmouseout="this.style.color='#aaa'">Strategy</a>
+  <a href="/strategy.html" target="_blank" rel="noopener" style="color:#aaa;text-decoration:none;margin:0 8px;" onmouseover="this.style.color='#666'" onmouseout="this.style.color='#aaa'">Strategy</a>
   <span style="color:#ccc;">·</span>
-  <a href="/history.html" style="color:#aaa;text-decoration:none;margin:0 8px;" onmouseover="this.style.color='#666'" onmouseout="this.style.color='#aaa'">History</a>
+  <a href="/history.html" target="_blank" rel="noopener" style="color:#aaa;text-decoration:none;margin:0 8px;" onmouseover="this.style.color='#666'" onmouseout="this.style.color='#aaa'">History</a>
   <span style="color:#ccc;">·</span>
-  <a href="/equipment.html" style="color:#aaa;text-decoration:none;margin:0 8px;" onmouseover="this.style.color='#666'" onmouseout="this.style.color='#aaa'">Equipment</a>
+  <a href="/equipment.html" target="_blank" rel="noopener" style="color:#aaa;text-decoration:none;margin:0 8px;" onmouseover="this.style.color='#666'" onmouseout="this.style.color='#aaa'">Equipment</a>
   <span style="color:#ccc;">·</span>
-  <a href="/about.html" style="color:#aaa;text-decoration:none;margin:0 8px;" onmouseover="this.style.color='#666'" onmouseout="this.style.color='#aaa'">About</a>
+  <a href="/about.html" target="_blank" rel="noopener" style="color:#aaa;text-decoration:none;margin:0 8px;" onmouseover="this.style.color='#666'" onmouseout="this.style.color='#aaa'">About</a>
   <span style="color:#ccc;">·</span>
-  <a href="/privacy.html" style="color:#aaa;text-decoration:none;margin:0 8px;" onmouseover="this.style.color='#666'" onmouseout="this.style.color='#aaa'">Privacy</a>
+  <a href="/privacy.html" target="_blank" rel="noopener" style="color:#aaa;text-decoration:none;margin:0 8px;" onmouseover="this.style.color='#666'" onmouseout="this.style.color='#aaa'">Privacy</a>
   <span style="color:#ccc;">·</span>
-  <a href="/contact.html" style="color:#aaa;text-decoration:none;margin:0 8px;" onmouseover="this.style.color='#666'" onmouseout="this.style.color='#aaa'">Contact</a>
+  <a href="/contact.html" target="_blank" rel="noopener" style="color:#aaa;text-decoration:none;margin:0 8px;" onmouseover="this.style.color='#666'" onmouseout="this.style.color='#aaa'">Contact</a>
 </footer>
 
 </body>
