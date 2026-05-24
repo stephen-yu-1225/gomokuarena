@@ -89,7 +89,8 @@
     align-items: center;
     justify-content: center;
     transition: opacity 0.8s, visibility 0.8s;
-    overflow: hidden;
+    overflow-y: auto;
+    padding: 32px 0;
   }
   #splash.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
 
@@ -202,6 +203,174 @@
   }
   .splash-play:hover { background: #2c2c2c; color: #f5f0e8; }
 
+  /* ===== HOME SCREEN CARDS ===== */
+  .splash-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    width: 100%;
+    max-width: 340px;
+    padding: 0 24px;
+    position: relative;
+    z-index: 1;
+    margin-bottom: 18px;
+  }
+  .splash-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 13px 16px;
+    background: rgba(255,255,255,0.75);
+    border: 1.5px solid #d4ccc0;
+    border-radius: 3px;
+    cursor: pointer;
+    text-align: left;
+    transition: border-color 0.2s, background 0.2s;
+    width: 100%;
+    opacity: 0;
+    animation: fadeIn 0.5s ease-out forwards;
+  }
+  .splash-card:nth-child(1) { animation-delay: 1.7s; }
+  .splash-card:nth-child(2) { animation-delay: 1.85s; }
+  .splash-card:nth-child(3) { animation-delay: 2.0s; }
+  .splash-card:nth-child(4) { animation-delay: 2.15s; }
+  .splash-card:not(.splash-card-soon):hover { border-color: #2c2c2c; background: #fff; }
+  .splash-card-soon { cursor: default; }
+  .splash-card-icon {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #2c2c2c;
+    border: 1.5px solid #2c2c2c;
+    width: 30px;
+    height: 30px;
+    min-width: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 2px;
+  }
+  .splash-card-soon .splash-card-icon { border-color: #bbb; color: #bbb; }
+  .splash-card-body { flex: 1; }
+  .splash-card-title {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: #2c2c2c;
+    letter-spacing: 0.5px;
+  }
+  .splash-card-sub {
+    font-family: 'Noto Serif', Georgia, serif;
+    font-size: 0.72rem;
+    color: #999;
+    margin-top: 2px;
+  }
+  .splash-card-soon .splash-card-title { color: #bbb; }
+  .splash-card-soon .splash-card-sub { color: #bbb; }
+  .splash-card-arrow { font-size: 1.1rem; color: #c8bda8; flex-shrink: 0; }
+  .splash-soon-badge {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 0.58rem;
+    letter-spacing: 1.5px;
+    color: #c8a96e;
+    border: 1px solid #c8a96e;
+    padding: 2px 6px;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+  .splash-footer-links {
+    font-family: 'Noto Serif', Georgia, serif;
+    font-size: 0.72rem;
+    color: #bbb;
+    letter-spacing: 1px;
+    position: relative;
+    z-index: 1;
+    opacity: 0;
+    animation: fadeIn 0.5s ease-out 2.35s forwards;
+  }
+  .splash-footer-links a { color: #8b6914; text-decoration: none; }
+  .splash-footer-links a:hover { text-decoration: underline; }
+
+  /* ===== ONLINE SUB-SCREEN ===== */
+  #onlineScreen {
+    position: fixed;
+    inset: 0;
+    z-index: 210;
+    background: #f5f0e8;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow-y: auto;
+    padding: 32px 0;
+    transition: opacity 0.35s ease, visibility 0.35s ease;
+  }
+  #onlineScreen.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+  .online-back {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    background: transparent;
+    border: none;
+    color: #8b6914;
+    font-family: 'Noto Serif', Georgia, serif;
+    font-size: 0.82rem;
+    letter-spacing: 1px;
+    cursor: pointer;
+    padding: 8px;
+    transition: color 0.2s;
+  }
+  .online-back:hover { color: #2c2c2c; }
+  .online-title {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.25rem;
+    font-weight: 900;
+    color: #2c2c2c;
+    letter-spacing: 3px;
+    margin-bottom: 4px;
+    position: relative;
+    z-index: 1;
+  }
+  .online-subtitle {
+    font-family: 'Noto Serif', Georgia, serif;
+    font-size: 0.78rem;
+    color: #aaa;
+    letter-spacing: 2px;
+    margin-bottom: 24px;
+    position: relative;
+    z-index: 1;
+  }
+  .online-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 13px 16px;
+    background: rgba(255,255,255,0.75);
+    border: 1.5px solid #d4ccc0;
+    border-radius: 3px;
+    cursor: default;
+    text-align: left;
+    width: 100%;
+    opacity: 1;
+  }
+
+  /* ===== GAME HEADER HOME BUTTON ===== */
+  .btn-home {
+    position: absolute;
+    left: 0;
+    background: transparent;
+    border: none;
+    color: #c8a96e;
+    font-family: 'Noto Serif', Georgia, serif;
+    font-size: 0.78rem;
+    letter-spacing: 1px;
+    cursor: pointer;
+    padding: 4px 6px;
+    transition: color 0.2s;
+    flex-shrink: 0;
+  }
+  .btn-home:hover { color: #f5f0e8; }
+
   /* ============ GAME ============ */
   #game {
     display: flex;
@@ -305,8 +474,8 @@
   /* ============ BOARD ============ */
   .board {
     display: grid;
-    grid-template-columns: repeat(19, 1fr);
-    grid-template-rows: repeat(19, 1fr);
+    grid-template-columns: repeat(15, 1fr);
+    grid-template-rows: repeat(15, 1fr);
     width: min(400px, 94vw);
     aspect-ratio: 1;
     flex-shrink: 0;
@@ -743,12 +912,81 @@
   <div class="splash-cn">Gomoku Arena</div>
   <div class="splash-en">五子棋</div>
   <div class="splash-line"></div>
-  <button class="splash-play" id="splashPlay">Play</button>
+  <div class="splash-cards">
+    <button class="splash-card" id="cardSinglePlayer">
+      <div class="splash-card-icon">人</div>
+      <div class="splash-card-body">
+        <div class="splash-card-title">Single Player</div>
+        <div class="splash-card-sub">Challenge the AI</div>
+      </div>
+      <div class="splash-card-arrow">›</div>
+    </button>
+    <button class="splash-card" id="cardPassPlay">
+      <div class="splash-card-icon">对</div>
+      <div class="splash-card-body">
+        <div class="splash-card-title">Pass &amp; Play</div>
+        <div class="splash-card-sub">Two players, one device</div>
+      </div>
+      <div class="splash-card-arrow">›</div>
+    </button>
+    <button class="splash-card splash-card-soon" id="cardDaily">
+      <div class="splash-card-icon">日</div>
+      <div class="splash-card-body">
+        <div class="splash-card-title">Daily Challenge</div>
+        <div class="splash-card-sub">One puzzle, every day</div>
+      </div>
+      <div class="splash-soon-badge">SOON</div>
+    </button>
+    <button class="splash-card splash-card-soon" id="cardOnline">
+      <div class="splash-card-icon">网</div>
+      <div class="splash-card-body">
+        <div class="splash-card-title">Online</div>
+        <div class="splash-card-sub">Play with anyone, anywhere</div>
+      </div>
+      <div class="splash-soon-badge">SOON</div>
+    </button>
+  </div>
+  <div class="splash-footer-links">
+    <a href="/how-to-play.html">How to Play</a> &nbsp;·&nbsp;
+    <a href="/strategy.html">Strategy</a> &nbsp;·&nbsp;
+    <a href="/history.html">History</a> &nbsp;·&nbsp;
+    <a href="/equipment.html">Equipment</a> &nbsp;·&nbsp;
+    <a href="/about.html">About</a> &nbsp;·&nbsp;
+    <a href="/contact.html">Contact</a> &nbsp;·&nbsp;
+    <a href="/privacy.html">Privacy</a>
+  </div>
+</div>
+
+<!-- ====== ONLINE SUB-SCREEN ====== -->
+<div id="onlineScreen" class="hidden">
+  <button class="online-back" id="onlineBack">← Back</button>
+  <div class="splash-seal" style="animation:none;opacity:1;margin-bottom:14px;">网</div>
+  <div class="online-title">Play Online</div>
+  <div class="online-subtitle">Coming soon</div>
+  <div class="splash-cards">
+    <div class="online-card splash-card-soon">
+      <div class="splash-card-icon">链</div>
+      <div class="splash-card-body">
+        <div class="splash-card-title">Invite a Friend</div>
+        <div class="splash-card-sub">Create a room, share a link</div>
+      </div>
+      <div class="splash-soon-badge">SOON</div>
+    </div>
+    <div class="online-card splash-card-soon">
+      <div class="splash-card-icon">配</div>
+      <div class="splash-card-body">
+        <div class="splash-card-title">Find a Match</div>
+        <div class="splash-card-sub">Get paired with a random player</div>
+      </div>
+      <div class="splash-soon-badge">SOON</div>
+    </div>
+  </div>
 </div>
 
 <!-- ====== GAME ====== -->
 <div id="game">
   <div class="game-header">
+    <button class="btn-home" id="btnGoHome" title="Home">← Home</button>
     <div class="game-title-wrap">
       <div class="game-title-cn">Gomoku Arena</div>
       <div class="game-title-en">五子棋</div>
@@ -794,10 +1032,6 @@
 <div class="endgame-overlay" id="startOverlay">
   <div class="endgame">
     <div class="endgame-sub" style="letter-spacing:4px;text-transform:uppercase;margin-bottom:16px;">Enter the Arena</div>
-    <div style="display:flex;gap:8px;justify-content:center;margin-bottom:14px;">
-      <button class="mode-btn active" data-mode="vs-ai">Single Player</button>
-      <button class="mode-btn" data-mode="vs-human">Pass &amp; Play</button>
-    </div>
     <div id="startDiffRow" style="display:flex;gap:6px;justify-content:center;margin-bottom:18px;">
       <button class="difficulty-start-btn" data-diff="easy">Easy</button>
       <button class="difficulty-start-btn" data-diff="medium">Medium</button>
@@ -1024,15 +1258,48 @@ const splash = document.getElementById('splash');
   splash.appendChild(el);
 });
 
-document.getElementById('splashPlay').addEventListener('click', () => {
+// ====== HOME SCREEN ======
+function enterMode(mode) {
+  gameMode = mode;
+  applyModeUI();
   splash.classList.add('hidden');
   initAudio();
   if (audioPrefs.music) playMusic();
   newGame();
+}
+
+function goHome() {
+  const gameInProgress = !gameOver && board.some(v => v !== null);
+  // Close any open overlays first
+  document.getElementById('startOverlay').classList.remove('open');
+  closeEndgame();
+  if (gameInProgress && gameMode === 'vs-human') {
+    showConfirm('Leave Game?', 'This game will be abandoned.', 'Leave', () => {
+      clearActiveGame();
+      splash.classList.remove('hidden');
+    });
+  } else if (gameInProgress) {
+    showConfirm('Leave Game?', 'This counts as a loss.', 'Leave', () => {
+      recordForfeit();
+      splash.classList.remove('hidden');
+    });
+  } else {
+    splash.classList.remove('hidden');
+  }
+}
+
+document.getElementById('cardSinglePlayer').addEventListener('click', () => enterMode('vs-ai'));
+document.getElementById('cardPassPlay').addEventListener('click', () => enterMode('vs-human'));
+document.getElementById('cardOnline').addEventListener('click', () => {
+  document.getElementById('onlineScreen').classList.remove('hidden');
 });
+document.getElementById('onlineBack').addEventListener('click', () => {
+  document.getElementById('onlineScreen').classList.add('hidden');
+});
+document.getElementById('btnGoHome').addEventListener('click', goHome);
 
 // ====== GAME ======
-const GRID = 19;
+const GRID = 15;
 const TOTAL = GRID * GRID;
 const WIN_LEN = 5;
 const HUMAN = 'X';
@@ -1158,11 +1425,11 @@ const statusEl = document.getElementById('status');
 const winsEl = document.getElementById('wins');
 const lossesEl = document.getElementById('losses');
 
-// Star point positions for a 19×19 board (0-indexed)
+// Star point positions for a 15×15 board (0-indexed)
 const STAR_POINTS = new Set([
-  3*19+3,  3*19+9,  3*19+15,
-  9*19+3,  9*19+9,  9*19+15,
-  15*19+3, 15*19+9, 15*19+15
+  3*15+3,  3*15+7,  3*15+11,
+  7*15+3,  7*15+7,  7*15+11,
+  11*15+3, 11*15+7, 11*15+11
 ]);
 
 for (let i = 0; i < TOTAL; i++) {
@@ -1768,6 +2035,8 @@ document.querySelectorAll('.difficulty-start-btn').forEach(btn => {
       b.classList.toggle('active', b.dataset.diff === btn.dataset.diff);
     });
     difficulty = btn.dataset.diff;
+    hintsRemaining = HINT_LIMITS[difficulty];
+    updateHintButton();
     humanIsBlack = nextIsBlack[difficulty];
     document.getElementById('startIcon').textContent = humanIsBlack ? '⚫' : '⚪';
     document.getElementById('startColor').textContent = humanIsBlack ? 'You are Black' : 'You are White';
