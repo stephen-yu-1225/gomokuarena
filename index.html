@@ -902,6 +902,240 @@
     cursor: pointer;
   }
   .btn-change-diff:hover { border-color: #2c2c2c; color: #2c2c2c; }
+
+  /* ====== DAILY PUZZLE MODE ====== */
+  body.daily-mode .difficulty,
+  body.daily-mode .scoreboard,
+  body.daily-mode .actions { display: none !important; }
+
+  /* Daily puzzle label + progress row + next button */
+  .daily-puzzle-label {
+    font-size: 0.76rem;
+    color: #8b7355;
+    letter-spacing: 0.5px;
+    margin-top: -2px;
+  }
+  .daily-progress-row {
+    display: flex;
+    gap: 5px;
+    margin-top: 3px;
+  }
+  .progress-sq {
+    width: 13px;
+    height: 13px;
+    border-radius: 2px;
+    background: #e0d8cc;
+    border: 1.5px solid #c8bda8;
+    transition: background 0.3s, border-color 0.3s;
+  }
+  .progress-sq.active  { background: #8b6914; border-color: #8b6914; }
+  .progress-sq.solved  { background: #4a7c59; border-color: #4a7c59; }
+  .progress-sq.close   { background: #c8a96e; border-color: #c8a96e; }
+  .progress-sq.failed  { background: #c23b22; border-color: #c23b22; }
+
+  .daily-next-btn {
+    margin-top: 6px;
+    padding: 7px 20px;
+    background: #2c2c2c;
+    color: #f5f0e8;
+    border: none;
+    border-radius: 4px;
+    font-family: 'Noto Serif', Georgia, serif;
+    font-size: 0.82rem;
+    cursor: pointer;
+    letter-spacing: 0.5px;
+    transition: background 0.2s;
+  }
+  .daily-next-btn:hover { background: #444; }
+  .daily-next-btn.hidden { display: none !important; }
+
+  /* Daily panel (puzzle # / streak / turn / attempt dots) */
+  #dailyPanel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    padding: 8px 0 2px;
+  }
+  #dailyPanel.hidden { display: none !important; }
+
+  .daily-info-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .daily-num {
+    font-family: 'Noto Serif', Georgia, serif;
+    font-size: 0.88rem;
+    color: #8b6914;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .daily-streak-badge {
+    font-size: 0.85rem;
+    color: #c8a96e;
+    min-width: 28px;
+  }
+  .daily-turn-label {
+    font-size: 0.82rem;
+    color: #5c4a2a;
+    letter-spacing: 0.5px;
+  }
+  .daily-attempt-dots {
+    display: flex;
+    gap: 8px;
+    margin-top: 2px;
+  }
+  .attempt-dot {
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: #e0d8cc;
+    border: 1.5px solid #c8bda8;
+    transition: background 0.3s, border-color 0.3s;
+  }
+  .attempt-dot.wrong   { background: #c23b22; border-color: #c23b22; }
+  .attempt-dot.correct { background: #4a7c59; border-color: #4a7c59; }
+
+  /* Daily result panel */
+  #dailyResultPanel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 7px;
+    padding: 14px 20px 18px;
+    background: #f5f0e8;
+    border-top: 1px solid #e0d8cc;
+    text-align: center;
+  }
+  #dailyResultPanel.hidden { display: none !important; }
+  .daily-result-icon { font-size: 1.8rem; line-height: 1; }
+  .daily-result-title {
+    font-family: 'Noto Serif', Georgia, serif;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #2c2c2c;
+    margin: 0;
+  }
+  .daily-result-sub {
+    font-size: 0.82rem;
+    color: #8b7355;
+    max-width: 280px;
+    line-height: 1.5;
+    margin: 0;
+  }
+  .daily-share-text {
+    font-family: 'Noto Serif', Georgia, serif;
+    font-size: 0.82rem;
+    background: #fff;
+    border: 1px solid #e0d8cc;
+    border-radius: 4px;
+    padding: 8px 14px;
+    white-space: pre;
+    color: #2c2c2c;
+    letter-spacing: 0.3px;
+    line-height: 1.6;
+  }
+  .daily-share-btn {
+    padding: 8px 22px;
+    background: #2c2c2c;
+    color: #f5f0e8;
+    border: none;
+    border-radius: 4px;
+    font-family: 'Noto Serif', Georgia, serif;
+    font-size: 0.83rem;
+    cursor: pointer;
+    transition: background 0.2s;
+    letter-spacing: 0.5px;
+  }
+  .daily-share-btn:hover { background: #444; }
+  .daily-share-btn.copied { background: #4a7c59; }
+  .daily-next-label {
+    font-size: 0.75rem;
+    color: #bbb;
+    letter-spacing: 0.5px;
+  }
+
+  /* Stone states for daily guesses */
+  .stone.daily-wrong   { opacity: 0.55; }
+  .stone.daily-correct { box-shadow: 0 0 0 3px #c8a96e, 0 0 14px #c8a96e99; }
+  .stone.daily-reveal  {
+    opacity: 0.75;
+    box-shadow: 0 0 0 3px #c8a96e;
+    animation: revealPulse 1.2s ease-out forwards;
+  }
+  @keyframes revealPulse {
+    0%   { box-shadow: 0 0 0 3px #c8a96e, 0 0 20px #c8a96ecc; }
+    100% { box-shadow: 0 0 0 3px #c8a96e; }
+  }
+
+  /* Rank number overlay on guess stones */
+  .guess-rank-label {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 0.58rem;
+    font-weight: 700;
+    color: rgba(255,255,255,0.92);
+    pointer-events: none;
+    line-height: 1;
+    z-index: 2;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+  }
+
+  /* Review navigation bar inside daily panel */
+  .daily-review-nav {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 2px;
+  }
+  .daily-review-nav.hidden { display: none !important; }
+  .review-nav-btn {
+    padding: 4px 10px;
+    background: #2c2c2c;
+    color: #f5f0e8;
+    border: none;
+    border-radius: 3px;
+    font-family: 'Noto Serif', Georgia, serif;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .review-nav-btn:hover:not(:disabled) { background: #444; }
+  .review-nav-btn:disabled { opacity: 0.35; cursor: default; }
+  .review-nav-label {
+    font-size: 0.78rem;
+    color: #8b7355;
+    min-width: 80px;
+    text-align: center;
+  }
+  .review-done-btn {
+    padding: 4px 12px;
+    background: #c8a96e;
+    color: #2c2c2c;
+    border: none;
+    border-radius: 3px;
+    font-family: 'Noto Serif', Georgia, serif;
+    font-size: 0.75rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .review-done-btn:hover { background: #b8914e; }
+  /* Review Puzzles button in result panel */
+  .daily-review-btn {
+    padding: 7px 18px;
+    background: transparent;
+    color: #8b7355;
+    border: 1px solid #c8bda8;
+    border-radius: 4px;
+    font-family: 'Noto Serif', Georgia, serif;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+  }
+  .daily-review-btn:hover { background: #e0d8cc; color: #2c2c2c; }
 </style>
 </head>
 <body>
@@ -929,13 +1163,13 @@
       </div>
       <div class="splash-card-arrow">›</div>
     </button>
-    <button class="splash-card splash-card-soon" id="cardDaily">
+    <button class="splash-card" id="cardDaily">
       <div class="splash-card-icon">日</div>
       <div class="splash-card-body">
         <div class="splash-card-title">Daily Challenge</div>
-        <div class="splash-card-sub">One puzzle, every day</div>
+        <div class="splash-card-sub" id="dailyCardSub">Five puzzles, every day</div>
       </div>
-      <div class="splash-soon-badge">SOON</div>
+      <div class="splash-card-arrow">›</div>
     </button>
     <button class="splash-card splash-card-soon" id="cardOnline">
       <div class="splash-card-icon">网</div>
@@ -1005,9 +1239,49 @@
     <span class="score-losses">Losses: <span id="losses">0</span></span>
   </div>
 
+  <!-- Daily puzzle info panel -->
+  <div id="dailyPanel" class="hidden">
+    <div class="daily-info-row">
+      <span id="dailyNum" class="daily-num">Daily #1</span>
+      <span id="dailyStreakBadge" class="daily-streak-badge"></span>
+    </div>
+    <div id="dailyPuzzleLabel" class="daily-puzzle-label">Puzzle 1 of 5</div>
+    <div id="dailyTurnLabel" class="daily-turn-label">⚫ Black to play</div>
+    <div class="daily-attempt-dots">
+      <span class="attempt-dot" id="dot0"></span>
+      <span class="attempt-dot" id="dot1"></span>
+      <span class="attempt-dot" id="dot2"></span>
+    </div>
+    <div id="dailyProgressRow" class="daily-progress-row">
+      <span class="progress-sq" data-idx="0"></span>
+      <span class="progress-sq" data-idx="1"></span>
+      <span class="progress-sq" data-idx="2"></span>
+      <span class="progress-sq" data-idx="3"></span>
+      <span class="progress-sq" data-idx="4"></span>
+    </div>
+    <button id="dailyNextBtn" class="daily-next-btn hidden">Next Puzzle →</button>
+    <div id="dailyReviewNav" class="daily-review-nav hidden">
+      <button id="reviewPrevBtn" class="review-nav-btn">← Prev</button>
+      <span id="reviewNavLabel" class="review-nav-label">Puzzle 1 of 5</span>
+      <button id="reviewNextBtn" class="review-nav-btn">Next →</button>
+      <button id="reviewDoneBtn" class="review-done-btn">Done</button>
+    </div>
+  </div>
+
   <div class="status" id="status">Place your stone</div>
 
   <div class="board" id="board"></div>
+
+  <!-- Daily puzzle result panel -->
+  <div id="dailyResultPanel" class="hidden">
+    <div class="daily-result-icon" id="dailyResultIcon">⭐</div>
+    <div class="daily-result-title" id="dailyResultTitle">Solved!</div>
+    <div class="daily-result-sub" id="dailyResultSub"></div>
+    <div class="daily-share-text" id="dailyShareText"></div>
+    <button class="daily-share-btn" id="dailyShareBtn">Copy Result</button>
+    <button class="daily-review-btn" id="dailyReviewBtn">Review Puzzles</button>
+    <div class="daily-next-label" id="dailyNextLabel"></div>
+  </div>
 
   <div class="actions">
     <button class="btn-new" id="newGame">New Game</button>
@@ -1269,6 +1543,12 @@ function enterMode(mode) {
 }
 
 function goHome() {
+  if (gameMode === 'daily') {
+    exitDailyMode();
+    gameMode = 'vs-ai';
+    splash.classList.remove('hidden');
+    return;
+  }
   const gameInProgress = !gameOver && board.some(v => v !== null);
   // Close any open overlays first
   document.getElementById('startOverlay').classList.remove('open');
@@ -1548,6 +1828,7 @@ let awaitingPlayerMove = false;
 let hintTimeout = null;
 
 function handleClick(i) {
+  if (gameMode === 'daily') { if (!board[i]) handleDailyClick(i); return; }
   if (board[i] || gameOver) return;
   if (gameMode === 'vs-human') {
     makeMove(i, currentPlayer);
@@ -2100,7 +2381,699 @@ document.getElementById('statsReset').addEventListener('click', () => {
   }, true);
 });
 
+// ====== DAILY PUZZLE ======
+
+// Seeded PRNG (mulberry32) — deterministic random from an integer seed
+function mulberry32(seed) {
+  return function() {
+    seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+    let t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+
+function getDailyKey() {
+  const d = new Date();
+  return `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
+}
+
+function getPuzzleNumber() {
+  const epoch = new Date('2025-06-01T00:00:00');
+  const today = new Date(); today.setHours(0,0,0,0);
+  epoch.setHours(0,0,0,0);
+  return Math.max(1, Math.floor((today - epoch) / 86400000) + 1);
+}
+
+// Board-local scoring (mirrors scoreLine / evalCell but on any board array)
+function scoreLineOn(b, r, c, dr, dc, player) {
+  let count = 0, openEnds = 0;
+  let fr = r+dr, fc = c+dc;
+  while (inBounds(fr,fc) && b[idx(fr,fc)] === player) { count++; fr+=dr; fc+=dc; }
+  if (inBounds(fr,fc) && b[idx(fr,fc)] === null) openEnds++;
+  let br2 = r-dr, bc2 = c-dc;
+  while (inBounds(br2,bc2) && b[idx(br2,bc2)] === player) { count++; br2-=dr; bc2-=dc; }
+  if (inBounds(br2,bc2) && b[idx(br2,bc2)] === null) openEnds++;
+  if (count >= WIN_LEN-1) return 100000;
+  if (count === WIN_LEN-2 && openEnds === 2) return 10000;
+  if (count === WIN_LEN-2 && openEnds === 1) return 1000;
+  if (count === WIN_LEN-3 && openEnds === 2) return 1000;
+  if (count === WIN_LEN-3 && openEnds === 1) return 100;
+  if (count === WIN_LEN-4 && openEnds === 2) return 100;
+  if (count === WIN_LEN-4 && openEnds === 1) return 10;
+  return count > 0 ? count : 0;
+}
+
+function evalCellOn(b, i, forPl, agPl) {
+  if (b[i] !== null) return -1;
+  const [r,c] = rc(i);
+  let fs = 0, as = 0;
+  for (const [dr,dc] of DIRS) {
+    fs += scoreLineOn(b,r,c,dr,dc,forPl);
+    as += scoreLineOn(b,r,c,dr,dc,agPl);
+  }
+  const center = Math.floor(GRID/2);
+  return fs * 1.1 + as + Math.max(0, (GRID-1) - Math.abs(r-center) - Math.abs(c-center));
+}
+
+function getTopMovesOn(b, n, forPl, agPl) {
+  const center = Math.floor(GRID/2);
+  const cands = new Set();
+  for (let i = 0; i < TOTAL; i++) {
+    if (b[i] === null) continue;
+    const [r,c] = rc(i);
+    for (let dr=-2; dr<=2; dr++) for (let dc=-2; dc<=2; dc++) {
+      const nr=r+dr, nc=c+dc;
+      if (inBounds(nr,nc) && b[idx(nr,nc)] === null) cands.add(idx(nr,nc));
+    }
+  }
+  if (!cands.size) return [{i: idx(center,center), s:0}];
+  const scored = [];
+  for (const i of cands) scored.push({i, s: evalCellOn(b,i,forPl,agPl)});
+  scored.sort((a,bb2) => bb2.s - a.s);
+  return scored.slice(0, n);
+}
+
+function findWinOn(b, pos, player) {
+  const [r0,c0] = rc(pos);
+  for (const [dr,dc] of DIRS) {
+    const cells = [pos];
+    for (let k=1; k<WIN_LEN; k++) {
+      const nr=r0+dr*k, nc=c0+dc*k;
+      if (inBounds(nr,nc) && b[idx(nr,nc)] === player) cells.push(idx(nr,nc));
+      else break;
+    }
+    for (let k=1; k<WIN_LEN; k++) {
+      const nr=r0-dr*k, nc=c0-dc*k;
+      if (inBounds(nr,nc) && b[idx(nr,nc)] === player) cells.push(idx(nr,nc));
+      else break;
+    }
+    if (cells.length >= WIN_LEN) return true;
+  }
+  return false;
+}
+
+// Generate a realistic mid-game position using a seeded RNG
+function generatePuzzleBoard(seed) {
+  const rng = mulberry32(seed);
+  const b = Array(TOTAL).fill(null);
+  const center = Math.floor(GRID/2);
+  b[idx(center, center)] = 'X'; // Black opens in the center
+  const numExtraMoves = 8 + Math.floor(rng() * 9); // 8-16 more moves
+  let turn = 'O';
+
+  for (let m = 0; m < numExtraMoves; m++) {
+    const forPl = turn, agPl = turn === 'X' ? 'O' : 'X';
+    // Check if this move would win (don't place winning moves — puzzle needs to be solvable)
+    const candidates = getTopMovesOn(b, 8, forPl, agPl);
+    // Seeded weighted pick from top candidates (slightly random to create variety)
+    const weights = [0.40, 0.25, 0.15, 0.09, 0.05, 0.03, 0.02, 0.01];
+    let r = rng(), cum = 0, picked = candidates[0];
+    for (let j = 0; j < candidates.length && j < weights.length; j++) {
+      cum += weights[j];
+      if (r < cum) { picked = candidates[j]; break; }
+    }
+    // Skip if this move wins (preserve tension for the puzzle)
+    const testB = b.slice(); testB[picked.i] = forPl;
+    if (findWinOn(testB, picked.i, forPl)) {
+      // Try next best candidate instead
+      const alt = candidates.find(c => {
+        const t = b.slice(); t[c.i] = forPl;
+        return !findWinOn(t, c.i, forPl);
+      });
+      if (!alt) break; // no safe move; stop here
+      b[alt.i] = turn;
+    } else {
+      b[picked.i] = turn;
+    }
+    turn = turn === 'X' ? 'O' : 'X';
+  }
+  return { board: b, turn };
+}
+
+// Rank all candidate moves on the puzzle board for `turn`
+function rankAllPuzzleMoves(b, turn) {
+  const against = turn === 'X' ? 'O' : 'X';
+  const cands = new Set();
+  for (let i=0; i<TOTAL; i++) {
+    if (b[i] === null) continue;
+    const [r,c] = rc(i);
+    for (let dr=-2; dr<=2; dr++) for (let dc=-2; dc<=2; dc++) {
+      const nr=r+dr, nc=c+dc;
+      if (inBounds(nr,nc) && b[idx(nr,nc)] === null) cands.add(idx(nr,nc));
+    }
+  }
+  const scored = [];
+  for (const i of cands) scored.push({i, s: evalCellOn(b,i,turn,against)});
+  scored.sort((a,bb2) => bb2.s - a.s);
+  return scored; // index 0 = best move
+}
+
+// Returns true when a puzzle has a clear, non-trivial best move
+function isGoodPuzzle(board, turn, ranked) {
+  if (ranked.length < 3) return false;
+  const rank1 = ranked[0], rank2 = ranked[1];
+  // Reject if best move is an immediate win — too easy
+  const winTest = board.slice(); winTest[rank1.i] = turn;
+  if (findWinOn(winTest, rank1.i, turn)) return false;
+  // Require a meaningful position
+  if (rank1.s < 500) return false;
+  // Require a clear best move (not interchangeable with rank #2)
+  const gap   = rank1.s - rank2.s;
+  const ratio = rank2.s > 0 ? rank1.s / rank2.s : 99;
+  if (gap < 300 && ratio < 1.4) return false;
+  return true;
+}
+
+// Try up to 15 seeds (prime step 997) to find a quality puzzle; fall back gracefully
+function generateQualityPuzzle(baseSeed) {
+  let best = null, bestQuality = -1;
+  for (let attempt = 0; attempt < 15; attempt++) {
+    const seed   = baseSeed + attempt * 997;
+    const puzzle = generatePuzzleBoard(seed);
+    const ranked = rankAllPuzzleMoves(puzzle.board, puzzle.turn);
+    if (ranked.length < 2) continue;
+    const quality = (ranked[0].s - (ranked[1] ? ranked[1].s : 0)) *
+                    (ranked[0].s / Math.max(ranked[1] ? ranked[1].s : 1, 1));
+    if (isGoodPuzzle(puzzle.board, puzzle.turn, ranked)) {
+      return { board: puzzle.board, turn: puzzle.turn, rankedMoves: ranked };
+    }
+    // Keep track of best non-win fallback
+    const winTest2 = puzzle.board.slice(); winTest2[ranked[0].i] = puzzle.turn;
+    if (!findWinOn(winTest2, ranked[0].i, puzzle.turn) && quality > bestQuality) {
+      bestQuality = quality;
+      best = { board: puzzle.board, turn: puzzle.turn, rankedMoves: ranked };
+    }
+  }
+  if (best) return best;
+  const puzzle = generatePuzzleBoard(baseSeed);
+  return { board: puzzle.board, turn: puzzle.turn, rankedMoves: rankAllPuzzleMoves(puzzle.board, puzzle.turn) };
+}
+
+// Generate a human-readable explanation for the best move
+function describeMove(b, i, turn) {
+  const against = turn === 'X' ? 'O' : 'X';
+  // Check if this is our own immediate win (must come before score check)
+  const ownTest = b.slice(); ownTest[i] = turn;
+  if (findWinOn(ownTest, i, turn)) return "This move completes five in a row — an immediate win!";
+  // Check if it blocks opponent win
+  const t = b.slice(); t[i] = against;
+  if (findWinOn(t, i, against)) return "This blocks the opponent's five in a row — without it, they win immediately!";
+  const s = evalCellOn(b, i, turn, against);
+  if (s >= 10000) return "This creates an open double-four — two winning threats the opponent can't both block.";
+  if (s >= 1000) return "This builds a four-in-a-row with an open end, threatening a win next move.";
+  if (s >= 100) return "This creates multiple threats at once, putting serious pressure on the opponent.";
+  return "This is the strongest strategic move — it builds toward multiple threats while limiting the opponent.";
+}
+
+// ====== DAILY PUZZLE STATE ======
+const DAILY_PUZZLE_COUNT = 5;
+let dailyPuzzles = []; // [{board,turn,rankedMoves,guesses,solved,complete}] × 5
+let dailyPuzzleIndex = 0;
+
+// Current-puzzle aliases — updated by activatePuzzle()
+let dailyBoard = [];
+let dailyTurn = 'X';
+let dailyRankedMoves = [];
+let dailyAttempts = 0;
+let dailyGuesses = [];
+let dailySolved = false;
+let dailyComplete = false;
+let dailyLocked = false; // true while feedback is showing — blocks new clicks
+let dailyReviewMode  = false; // true when navigating completed puzzles in review
+let dailyReviewIndex = 0;     // which puzzle is shown during review
+
+const DAILY_STATE_KEY = 'gomoku_daily_v2';
+const DAILY_STREAK_KEY = 'gomoku_daily_streak';
+
+function loadDailyState() { try { return JSON.parse(localStorage.getItem(DAILY_STATE_KEY)) || null; } catch { return null; } }
+function saveDailyState() {
+  // Flush current-puzzle state back into the puzzles array before saving
+  dailyPuzzles[dailyPuzzleIndex].guesses  = dailyGuesses.slice();
+  dailyPuzzles[dailyPuzzleIndex].solved   = dailySolved;
+  dailyPuzzles[dailyPuzzleIndex].complete = dailyComplete;
+  localStorage.setItem(DAILY_STATE_KEY, JSON.stringify({
+    date: getDailyKey(),
+    currentIndex: dailyPuzzleIndex,
+    puzzles: dailyPuzzles.map(p => ({ guesses: p.guesses, solved: p.solved, complete: p.complete }))
+  }));
+}
+
+function loadDailyStreak() { try { return JSON.parse(localStorage.getItem(DAILY_STREAK_KEY)) || {streak:0,best:0,lastDate:''}; } catch { return {streak:0,best:0,lastDate:''}; } }
+
+function getYesterdayKey() {
+  const d = new Date(); d.setDate(d.getDate()-1);
+  return `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
+}
+
+function recordStreakSolve() {
+  const s = loadDailyStreak();
+  const today = getDailyKey();
+  if (s.lastDate === today) return s; // already counted today
+  s.streak = (s.lastDate === getYesterdayKey()) ? s.streak + 1 : 1;
+  s.best = Math.max(s.best, s.streak);
+  s.lastDate = today;
+  localStorage.setItem(DAILY_STREAK_KEY, JSON.stringify(s));
+  return s;
+}
+
+function getCurrentStreak() {
+  const s = loadDailyStreak();
+  if (s.lastDate !== getDailyKey() && s.lastDate !== getYesterdayKey()) return 0;
+  return s.streak;
+}
+
+function renderDailyAttempts() {
+  ['dot0','dot1','dot2'].forEach((id, i) => {
+    const dot = document.getElementById(id);
+    if (!dot) return;
+    dot.className = 'attempt-dot';
+    if (i < dailyGuesses.length) {
+      dot.classList.add(dailySolved && i === dailyGuesses.length - 1 ? 'correct' : 'wrong');
+    }
+  });
+}
+
+function getOrdinalLabel(n) {
+  if (n === 1) return '1st'; if (n === 2) return '2nd'; if (n === 3) return '3rd';
+  return n + 'th';
+}
+
+function updateDailyProgress() {
+  document.querySelectorAll('.progress-sq').forEach((sq, i) => {
+    sq.className = 'progress-sq';
+    if (i >= dailyPuzzles.length) return;
+    const p = dailyPuzzles[i];
+    if (p.complete) {
+      if (p.solved) {
+        sq.classList.add('solved');
+      } else {
+        const best = p.guesses.length ? Math.min(...p.guesses.map(g => typeof g === 'object' ? g.rank : g)) : 99;
+        sq.classList.add(best === 2 ? 'close' : 'failed');
+      }
+    } else if (i === dailyPuzzleIndex) {
+      sq.classList.add('active');
+    }
+  });
+}
+
+function getPuzzleSquare(i) {
+  const p = dailyPuzzles[i];
+  if (!p || !p.complete) return '⬜';
+  if (p.solved) return '🟩';
+  const best = p.guesses.length ? Math.min(...p.guesses.map(g => typeof g === 'object' ? g.rank : g)) : 99;
+  return best === 2 ? '🟨' : '🟥';
+}
+
+function buildShareText() {
+  const pNum    = getPuzzleNumber();
+  const squares = Array.from({length: DAILY_PUZZLE_COUNT}, (_, i) => getPuzzleSquare(i)).join('');
+  const solved  = dailyPuzzles.filter(p => p.solved).length;
+  return `Gomoku Daily #${pNum}\n${squares}\n${solved}/${DAILY_PUZZLE_COUNT} solved · gomokuarena.com`;
+}
+
+// Show the correct answer stone on the board (for failed puzzles)
+function revealBestMove() {
+  const bestIdx = dailyRankedMoves[0] ? dailyRankedMoves[0].i : -1;
+  if (bestIdx < 0) return;
+  const cell = boardEl.children[bestIdx];
+  if (!cell.querySelector('.daily-reveal')) {
+    const stone = document.createElement('div');
+    stone.className = 'stone ' + (dailyTurn === 'X' ? 'black' : 'white') + ' daily-reveal';
+    cell.appendChild(stone);
+  }
+}
+
+// Load puzzle at index into current-puzzle state variables and refresh UI
+function activatePuzzle(index) {
+  dailyPuzzleIndex = index;
+  const p = dailyPuzzles[index];
+  dailyBoard       = p.board;
+  dailyTurn        = p.turn;
+  dailyRankedMoves = p.rankedMoves;
+  dailyGuesses     = p.guesses.slice();
+  dailyAttempts    = dailyGuesses.length;
+  dailySolved      = p.solved;
+  dailyComplete    = p.complete;
+  dailyLocked      = p.complete; // already-done puzzles stay locked
+
+  setupDailyBoardDisplay();
+  renderDailyAttempts();
+  updateDailyProgress();
+
+  document.getElementById('dailyPuzzleLabel').textContent = `Puzzle ${index + 1} of ${DAILY_PUZZLE_COUNT}`;
+  document.getElementById('dailyTurnLabel').textContent   = dailyTurn === 'X' ? '⚫ Black to play' : '⚪ White to play';
+  document.getElementById('dailyNextBtn').classList.add('hidden');
+  document.getElementById('dailyResultPanel').classList.add('hidden');
+
+  if (p.complete) {
+    const bestIdx = dailyRankedMoves[0] ? dailyRankedMoves[0].i : -1;
+    if (p.solved) {
+      const explanation = bestIdx >= 0 ? ' ' + describeMove(dailyBoard, bestIdx, dailyTurn) : '';
+      statusEl.textContent = '⭐ Solved!' + explanation;
+      statusEl.className   = 'status win';
+    } else {
+      statusEl.textContent = bestIdx >= 0 ? describeMove(dailyBoard, bestIdx, dailyTurn) : '';
+      statusEl.className   = 'status';
+      revealBestMove();
+    }
+    // Don't show next/result buttons when in review mode — review nav handles navigation
+    if (!dailyReviewMode) {
+      if (index < DAILY_PUZZLE_COUNT - 1) {
+        document.getElementById('dailyNextBtn').classList.remove('hidden');
+      } else {
+        showDailyResult();
+      }
+    }
+  } else {
+    statusEl.textContent = dailyTurn === 'X' ? '⚫ Find the best move for Black' : '⚪ Find the best move for White';
+    statusEl.className   = 'status';
+  }
+}
+
+function getTimeUntilMidnight() {
+  const now = new Date();
+  const midnight = new Date(now); midnight.setHours(24, 0, 0, 0);
+  const ms = midnight - now;
+  const h = Math.floor(ms / 3600000);
+  const m = Math.floor((ms % 3600000) / 60000);
+  return `${h}h ${m}m`;
+}
+
+function showDailyResult() {
+  const panel   = document.getElementById('dailyResultPanel');
+  const icon    = document.getElementById('dailyResultIcon');
+  const title   = document.getElementById('dailyResultTitle');
+  const sub     = document.getElementById('dailyResultSub');
+  const shareEl = document.getElementById('dailyShareText');
+  const nextEl  = document.getElementById('dailyNextLabel');
+
+  const solved = dailyPuzzles.filter(p => p.solved).length;
+  if (solved === DAILY_PUZZLE_COUNT) {
+    icon.textContent  = '⭐';
+    title.textContent = 'Perfect round!';
+  } else if (solved > 0) {
+    icon.textContent  = solved >= 3 ? '👍' : '🤔';
+    title.textContent = `${solved} of ${DAILY_PUZZLE_COUNT} solved`;
+  } else {
+    icon.textContent  = '😔';
+    title.textContent = 'Better luck tomorrow!';
+  }
+
+  const streak = getCurrentStreak();
+  sub.textContent = streak > 1 ? `🔥 ${streak} day streak` : '';
+  shareEl.textContent = buildShareText();
+  nextEl.textContent  = `New puzzles in ${getTimeUntilMidnight()}`;
+  panel.classList.remove('hidden');
+}
+
+function handleDailyClick(i) {
+  // Block if complete, locked, or already guessed this cell
+  if (dailyComplete || dailyLocked) return;
+  if (dailyGuesses.some(g => (typeof g === 'object' ? g.cell : -1) === i)) return;
+
+  // Find this cell's rank among all candidate moves
+  const rankIdx = dailyRankedMoves.findIndex(m => m.i === i);
+  if (rankIdx === -1) {
+    statusEl.textContent = 'Try a move closer to the action';
+    statusEl.className = 'status';
+    return;
+  }
+
+  // Lock immediately so no further clicks land while feedback is showing
+  dailyLocked = true;
+
+  const rank = rankIdx + 1; // 1-indexed
+  dailyAttempts++;
+  dailyGuesses.push({ rank, cell: i });
+
+  // Place the guess stone with a rank label
+  const cell  = boardEl.children[i];
+  const stone = document.createElement('div');
+  stone.className = 'stone ' + (dailyTurn === 'X' ? 'black' : 'white');
+  const rankLabel = document.createElement('span');
+  rankLabel.className = 'guess-rank-label';
+  rankLabel.textContent = rank;
+  stone.appendChild(rankLabel);
+  cell.appendChild(stone);
+  playSound('stone');
+  renderDailyAttempts();
+
+  const isLastPuzzle = dailyPuzzleIndex === DAILY_PUZZLE_COUNT - 1;
+  const bestIdx = dailyRankedMoves[0] ? dailyRankedMoves[0].i : -1;
+
+  if (rank === 1) {
+    // ✅ Correct!
+    stone.classList.add('daily-correct');
+    dailySolved   = true;
+    dailyComplete = true;
+    const explanation = bestIdx >= 0 ? ' ' + describeMove(dailyBoard, bestIdx, dailyTurn) : '';
+    statusEl.textContent = (dailyAttempts === 1 ? '⭐ Perfect! ' : '✅ Best move! ') + explanation;
+    statusEl.className = 'status win';
+    saveDailyState();
+    updateDailyProgress();
+    setTimeout(() => {
+      if (isLastPuzzle) { recordStreakSolve(); showDailyResult(); }
+      else { document.getElementById('dailyNextBtn').classList.remove('hidden'); }
+    }, 1200);
+
+  } else if (dailyAttempts >= 3) {
+    // ❌ Out of attempts — stone stays, reveal the best move
+    stone.classList.add('daily-wrong');
+    dailyComplete = true;
+    statusEl.textContent = `${getOrdinalLabel(rank)} best move`;
+    statusEl.className = 'status lose';
+    saveDailyState();
+    updateDailyProgress();
+    setTimeout(() => {
+      revealBestMove();
+      if (bestIdx >= 0) {
+        statusEl.textContent = describeMove(dailyBoard, bestIdx, dailyTurn);
+        statusEl.className = 'status';
+      }
+      if (isLastPuzzle) {
+        if (dailyPuzzles.some(p => p.solved)) recordStreakSolve();
+        showDailyResult();
+      } else {
+        document.getElementById('dailyNextBtn').classList.remove('hidden');
+      }
+    }, 1400);
+
+  } else {
+    // Wrong, but tries remain — stone stays on board, brief pause then unlock
+    stone.classList.add('daily-wrong');
+    const triesLeft = 3 - dailyAttempts;
+    statusEl.textContent = `${getOrdinalLabel(rank)} best move — ${triesLeft} ${triesLeft === 1 ? 'try' : 'tries'} left`;
+    statusEl.className = 'status';
+    saveDailyState();
+    setTimeout(() => {
+      dailyLocked = false; // unlock without removing the stone
+    }, 900);
+  }
+}
+
+// Re-draw guess stones on the board (used when restoring saved state)
+function renderDailyGuesses() {
+  dailyGuesses.forEach((g, idx) => {
+    const gRank = typeof g === 'object' ? g.rank : g;
+    const gCell = typeof g === 'object' ? g.cell : -1;
+    if (gCell < 0) return;
+    const cell  = boardEl.children[gCell];
+    if (!cell) return;
+    const stone = document.createElement('div');
+    stone.className = 'stone ' + (dailyTurn === 'X' ? 'black' : 'white');
+    stone.classList.add(gRank === 1 ? 'daily-correct' : 'daily-wrong');
+    const label = document.createElement('span');
+    label.className = 'guess-rank-label';
+    label.textContent = gRank;
+    stone.appendChild(label);
+    cell.appendChild(stone);
+  });
+}
+
+function setupDailyBoardDisplay() {
+  // Sync global board array to puzzle position so occupied cells block clicks in handleClick
+  board       = dailyBoard.slice();
+  gameOver    = false;
+  lastMove    = -1;
+  moveHistory = [];
+  // Clear all visual stones and cell classes
+  for (let i = 0; i < TOTAL; i++) {
+    const cell = boardEl.children[i];
+    cell.querySelectorAll('.stone').forEach(s => s.remove());
+    cell.classList.remove('black-cell','white-cell','win-cell','disabled');
+  }
+  // Place puzzle stones
+  for (let i = 0; i < TOTAL; i++) {
+    if (dailyBoard[i] !== null) {
+      const cell  = boardEl.children[i];
+      const stone = document.createElement('div');
+      stone.className = 'stone ' + (dailyBoard[i] === 'X' ? 'black' : 'white');
+      cell.appendChild(stone);
+    }
+  }
+  // Re-draw any guess stones (for restored puzzles)
+  renderDailyGuesses();
+}
+
+function enterDailyMode() {
+  document.getElementById('startOverlay').classList.remove('open');
+  closeEndgame();
+
+  gameMode = 'daily';
+  splash.classList.add('hidden');
+  document.body.classList.remove('pvp-mode');
+  document.body.classList.add('daily-mode');
+  initAudio();
+  if (audioPrefs.music) playMusic();
+
+  const key  = getDailyKey();
+  const base = parseInt(key, 10);
+
+  // Generate all 5 puzzles — each gets a unique deterministic seed, quality-filtered
+  dailyPuzzles = Array.from({length: DAILY_PUZZLE_COUNT}, (_, i) => {
+    const puzzle = generateQualityPuzzle(base * 10 + i);
+    return {
+      board:       puzzle.board,
+      turn:        puzzle.turn,
+      rankedMoves: puzzle.rankedMoves,
+      guesses:     [],
+      solved:      false,
+      complete:    false
+    };
+  });
+
+  // Overlay any saved progress from today
+  const saved = loadDailyState();
+  if (saved && saved.date === key && Array.isArray(saved.puzzles)) {
+    saved.puzzles.forEach((sp, i) => {
+      if (i < DAILY_PUZZLE_COUNT) {
+        dailyPuzzles[i].guesses  = sp.guesses  || [];
+        dailyPuzzles[i].solved   = sp.solved   || false;
+        dailyPuzzles[i].complete = sp.complete || false;
+      }
+    });
+  }
+
+  // Header labels
+  document.getElementById('dailyNum').textContent         = `Daily #${getPuzzleNumber()}`;
+  const streak = getCurrentStreak();
+  document.getElementById('dailyStreakBadge').textContent  = streak > 0 ? `🔥 ${streak}` : '';
+  document.getElementById('dailyPanel').classList.remove('hidden');
+
+  // If all 5 already done, go straight to result on last puzzle's board
+  if (dailyPuzzles.every(p => p.complete)) {
+    activatePuzzle(DAILY_PUZZLE_COUNT - 1);
+  } else {
+    // Start at first incomplete puzzle
+    const firstIncomplete = dailyPuzzles.findIndex(p => !p.complete);
+    activatePuzzle(firstIncomplete);
+  }
+
+  trackEvent('game_started', { difficulty: 'daily' });
+}
+
+function exitDailyMode() {
+  dailyReviewMode = false;
+  document.body.classList.remove('daily-mode');
+  document.getElementById('dailyPanel').classList.add('hidden');
+  document.getElementById('dailyResultPanel').classList.add('hidden');
+  document.getElementById('dailyReviewNav').classList.add('hidden');
+  updateDailyCardBadge();
+}
+
+// ====== HOME SCREEN BADGE ======
+function updateDailyCardBadge() {
+  const el = document.getElementById('dailyCardSub');
+  if (!el) return;
+  const saved = loadDailyState();
+  const today = getDailyKey();
+  if (!saved || saved.date !== today || !Array.isArray(saved.puzzles)) {
+    el.textContent = 'Five puzzles, every day';
+    return;
+  }
+  const puzzles  = saved.puzzles;
+  const complete = puzzles.filter(p => p.complete).length;
+  const solved   = puzzles.filter(p => p.solved).length;
+  if (complete === 0) {
+    el.textContent = 'Five puzzles, every day';
+  } else if (complete === DAILY_PUZZLE_COUNT) {
+    const squares = Array.from({length: DAILY_PUZZLE_COUNT}, (_, i) => {
+      const p = puzzles[i];
+      if (!p || !p.complete) return '⬜';
+      if (p.solved) return '🟩';
+      const best = p.guesses.length
+        ? Math.min(...p.guesses.map(g => typeof g === 'object' ? g.rank : g))
+        : 99;
+      return best === 2 ? '🟨' : '🟥';
+    }).join('');
+    el.textContent = `${squares} · ${solved}/${DAILY_PUZZLE_COUNT} solved`;
+  } else {
+    el.textContent = `${complete}/${DAILY_PUZZLE_COUNT} done today`;
+  }
+}
+
+// ====== REVIEW MODE ======
+function enterReviewMode() {
+  dailyReviewMode = true;
+  document.getElementById('dailyResultPanel').classList.add('hidden');
+  document.getElementById('dailyNextBtn').classList.add('hidden');
+  document.getElementById('dailyReviewNav').classList.remove('hidden');
+  showReviewPuzzle(0);
+}
+
+function showReviewPuzzle(index) {
+  dailyReviewIndex = index;
+  activatePuzzle(index);
+  // activatePuzzle hides dailyNextBtn and dailyResultPanel; review nav takes over navigation
+  document.getElementById('reviewNavLabel').textContent = `Puzzle ${index + 1} of ${DAILY_PUZZLE_COUNT}`;
+  document.getElementById('reviewPrevBtn').disabled = (index === 0);
+  document.getElementById('reviewNextBtn').disabled = (index === DAILY_PUZZLE_COUNT - 1);
+}
+
+function exitReviewMode() {
+  dailyReviewMode = false;
+  document.getElementById('dailyReviewNav').classList.add('hidden');
+  showDailyResult();
+}
+
+// Wire up the Daily Challenge card
+document.getElementById('cardDaily').addEventListener('click', enterDailyMode);
+
+// Next Puzzle button
+document.getElementById('dailyNextBtn').addEventListener('click', () => {
+  document.getElementById('dailyNextBtn').classList.add('hidden');
+  activatePuzzle(dailyPuzzleIndex + 1);
+});
+
+// Review mode buttons
+document.getElementById('dailyReviewBtn').addEventListener('click', enterReviewMode);
+document.getElementById('reviewPrevBtn').addEventListener('click', () => {
+  if (dailyReviewIndex > 0) showReviewPuzzle(dailyReviewIndex - 1);
+});
+document.getElementById('reviewNextBtn').addEventListener('click', () => {
+  if (dailyReviewIndex < DAILY_PUZZLE_COUNT - 1) showReviewPuzzle(dailyReviewIndex + 1);
+});
+document.getElementById('reviewDoneBtn').addEventListener('click', exitReviewMode);
+
+// Copy-to-clipboard for share button
+document.getElementById('dailyShareBtn').addEventListener('click', function() {
+  const text = document.getElementById('dailyShareText').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    this.textContent = 'Copied!';
+    this.classList.add('copied');
+    setTimeout(() => { this.textContent = 'Copy Result'; this.classList.remove('copied'); }, 2000);
+  }).catch(() => {
+    // Fallback: select the text
+    const el = document.getElementById('dailyShareText');
+    const range = document.createRange(); range.selectNode(el);
+    window.getSelection().removeAllRanges();
+    window.getSelection().addRange(range);
+  });
+});
+
 restoreActiveGame();
+updateDailyCardBadge(); // show today's progress on the home card
 </script>
 
 <footer style="margin-top:auto;padding:20px 0 10px;text-align:center;font-size:0.72rem;color:#999;letter-spacing:1px;font-family:'Noto Serif',Georgia,serif;">
