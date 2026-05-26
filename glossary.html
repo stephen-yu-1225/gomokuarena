@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gomoku Glossary: Terms, Patterns & Definitions</title>
+<meta name="description" content="A complete Gomoku glossary. Definitions for open four, double-three, sente, overline, Renju, and every other term you'll encounter in five-in-a-row.">
+<link rel="canonical" href="https://gomokuarena.com/glossary.html">
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#2c2c2c">
+<link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://gomokuarena.com/glossary.html">
+<meta property="og:title" content="Gomoku Glossary: Terms, Patterns & Definitions">
+<meta property="og:description" content="Definitions for every Gomoku term you'll encounter, from open four and double-three to sente, overline, and Renju rules.">
+<meta property="og:image" content="https://gomokuarena.com/og-image.png">
+<!-- Google Analytics 4. Consent Mode v2 -->
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('consent', 'default', {
+    analytics_storage: 'denied',
+    ad_storage: 'denied',
+    ad_user_data: 'denied',
+    ad_personalization: 'denied',
+    wait_for_update: 500
+  });
+  if (localStorage.getItem('cookieConsent') === 'granted') {
+    gtag('consent', 'update', { analytics_storage: 'granted', ad_storage: 'granted', ad_user_data: 'granted', ad_personalization: 'granted' });
+  }
+</script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-JZBX2P4TD1"></script>
+<script>
+  gtag('js', new Date());
+  gtag('config', 'G-JZBX2P4TD1');
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Serif:ital,wght@0,400;0,700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Noto Serif', Georgia, serif; background: #f5f0e8; color: #2c2c2c; min-height: 100dvh; }
+  header { background: #2c2c2c; color: #f5f0e8; padding: 18px 24px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  header a { color: #c8a96e; text-decoration: none; font-size: 0.85rem; letter-spacing: 1px; }
+  header a:hover { text-decoration: underline; }
+  .header-title { font-family: 'Noto Serif SC', serif; font-size: 1.15rem; font-weight: 700; letter-spacing: 2px; }
+  .header-sep { color: #666; margin: 0 4px; }
+  main { max-width: 760px; margin: 48px auto; padding: 0 24px 80px; }
+  .breadcrumb { font-size: 0.78rem; color: #999; letter-spacing: 1px; margin-bottom: 32px; }
+  .breadcrumb a { color: #999; text-decoration: none; }
+  .breadcrumb a:hover { color: #666; }
+  h1 { font-family: 'Noto Serif SC', serif; font-size: 2.1rem; font-weight: 900; margin-bottom: 10px; letter-spacing: 1px; line-height: 1.2; }
+  .lede { font-size: 1.05rem; color: #555; line-height: 1.8; margin-bottom: 40px; font-style: italic; }
+  h2 { font-size: 1.15rem; font-weight: 700; margin: 40px 0 12px; letter-spacing: 0.5px; padding-bottom: 6px; border-bottom: 1px solid #e0d8cc; }
+  p { line-height: 1.85; margin-bottom: 14px; color: #3a3a3a; }
+  a { color: #8b5e1e; }
+
+  /* Alphabet jump nav */
+  .alpha-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 36px;
+  }
+  .alpha-nav a {
+    display: inline-block;
+    width: 28px;
+    height: 28px;
+    line-height: 28px;
+    text-align: center;
+    border: 1px solid #d4ccc0;
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-decoration: none;
+    color: #8b5e1e;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .alpha-nav a:hover { background: #e0d8cc; border-color: #8b7355; }
+  .alpha-nav span { display: inline-block; width: 28px; height: 28px; line-height: 28px; text-align: center; font-size: 0.78rem; color: #ccc; border: 1px solid #e8e2d8; }
+
+  /* Glossary entries */
+  .glossary-section { margin-top: 40px; }
+  .section-letter {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: #c8a96e;
+    letter-spacing: 2px;
+    margin-bottom: 12px;
+    padding-bottom: 6px;
+    border-bottom: 2px solid #e0d8cc;
+  }
+  .entry { margin-bottom: 24px; }
+  .entry-term {
+    font-weight: 700;
+    font-size: 1rem;
+    color: #2c2c2c;
+    margin-bottom: 4px;
+  }
+  .entry-term .cn {
+    font-family: 'Noto Serif SC', serif;
+    font-weight: 400;
+    color: #8b7355;
+    font-size: 0.88rem;
+    margin-left: 8px;
+  }
+  .entry-def { line-height: 1.85; color: #3a3a3a; font-size: 0.95rem; }
+  .entry-also { font-size: 0.82rem; color: #8b7355; margin-top: 4px; font-style: italic; }
+
+  /* Mini pattern diagrams */
+  .pattern-grid { display: inline-flex; flex-direction: column; background: #d4a96a; border: 2px solid #2c2c2c; padding: 8px; margin: 10px 14px 10px 0; vertical-align: top; }
+  .pattern-row { display: flex; }
+  .pcell { width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; position: relative; }
+  .pcell::before { content:''; position:absolute; top:50%; left:0; right:0; height:1px; background:#2c2c2c; opacity:0.5; }
+  .pcell::after  { content:''; position:absolute; left:50%; top:0; bottom:0; width:1px; background:#2c2c2c; opacity:0.5; }
+  .ps { width:16px; height:16px; border-radius:50%; position:relative; z-index:2; box-shadow:1px 1px 2px rgba(0,0,0,0.3); }
+  .ps.b { background: radial-gradient(circle at 35% 35%, #666, #1a1a14); }
+  .ps.w { background: radial-gradient(circle at 35% 35%, #fff, #d8d4c8); border:1px solid #aaa; }
+  .ps.win { outline: 2px solid #c8a96e; outline-offset: 1px; }
+  .diagrams { display: flex; flex-wrap: wrap; align-items: flex-start; margin: 12px 0 4px; }
+  .diagram-label { font-size: 0.75rem; color: #888; font-style: italic; margin-top: 3px; text-align: center; }
+
+  .tip-box {
+    background: #fdf6e3;
+    border-left: 3px solid #c8a96e;
+    padding: 12px 18px;
+    margin: 16px 0;
+    font-size: 0.91rem;
+    line-height: 1.7;
+    color: #5a4a2a;
+  }
+  .tip-box strong { color: #8b5e1e; }
+
+  .nav-links { display: flex; gap: 16px; margin-top: 56px; flex-wrap: wrap; }
+  .nav-link { flex: 1; min-width: 200px; border: 1px solid #d4ccc0; padding: 16px 20px; text-decoration: none; color: #2c2c2c; transition: border-color 0.2s, background 0.2s; }
+  .nav-link:hover { border-color: #2c2c2c; background: #fff; }
+  .nav-link-label { font-size: 0.72rem; letter-spacing: 2px; text-transform: uppercase; color: #999; margin-bottom: 4px; }
+  .nav-link-title { font-weight: 700; font-size: 0.95rem; }
+  .cta { margin: 48px 0 0; text-align: center; }
+  .cta a { display: inline-block; background: #2c2c2c; color: #f5f0e8; text-decoration: none; padding: 14px 36px; font-family: 'Noto Serif SC', serif; font-size: 1rem; letter-spacing: 3px; font-weight: 700; }
+  .cta a:hover { background: #444; }
+  footer { text-align: center; padding: 24px; color: #aaa; font-size: 0.8rem; border-top: 1px solid #e0d8cc; }
+</style>
+</head>
+<body>
+
+<header>
+  <span class="header-title">Gomoku Arena</span>
+  <span class="header-sep">·</span>
+  <a href="/">Play Gomoku</a>
+  <span class="header-sep">·</span>
+  <a href="/how-to-play.html">How to Play</a>
+  <span class="header-sep">·</span>
+  <a href="/strategy.html">Strategy</a>
+  <span class="header-sep">·</span>
+  <a href="/history.html">History</a>
+  <span class="header-sep">·</span>
+  <a href="/equipment.html">Equipment</a>
+  <span class="header-sep">·</span>
+  <a href="/glossary.html">Glossary</a>
+  <span class="header-sep">·</span>
+  <a href="/about.html">About</a>
+</header>
+
+<main>
+  <div class="breadcrumb"><a href="/">Gomoku Arena</a> › Glossary</div>
+
+  <h1>Gomoku Glossary</h1>
+  <p class="lede">Every term you'll encounter when reading about or discussing Gomoku, from basic patterns to advanced tactical concepts. Entries are alphabetical; Chinese names are included where they're commonly used.</p>
+
+  <nav class="alpha-nav" aria-label="Jump to letter">
+    <a href="#B">B</a>
+    <a href="#C">C</a>
+    <a href="#D">D</a>
+    <a href="#F">F</a>
+    <a href="#G">G</a>
+    <span>H</span>
+    <span>I</span>
+    <span>J</span>
+    <span>K</span>
+    <a href="#L">L</a>
+    <span>M</span>
+    <span>N</span>
+    <a href="#O">O</a>
+    <span>P</span>
+    <span>Q</span>
+    <a href="#R">R</a>
+    <a href="#S">S</a>
+    <span>T</span>
+    <span>U</span>
+    <span>V</span>
+    <span>W</span>
+    <span>X</span>
+    <span>Y</span>
+    <span>Z</span>
+  </nav>
+
+  <!-- B -->
+  <div class="glossary-section" id="B">
+    <div class="section-letter">B</div>
+
+    <div class="entry">
+      <div class="entry-term">Broken Four <span class="cn">跳四</span></div>
+      <div class="entry-def">Four stones of the same color in a line with a single gap in the sequence, for example ●●_●● or ●●●_●. Filling the gap completes five in a row. A broken four is often harder to spot than a straight four, making it a useful deception tool. Also called a <em>jump four</em> or <em>skip four</em>.</div>
+      <div class="diagrams"><div class="pattern-grid" id="broken-four"></div></div>
+    </div>
+
+    <div class="entry">
+      <div class="entry-term">Broken Three <span class="cn">跳三</span></div>
+      <div class="entry-def">Three stones with a single gap, such as ●●_● or ●_●●. Filling the gap produces four consecutive stones in a row, which is an immediate threat. (Note: filling the gap gives a solid four, not another broken pattern.) Broken threes are harder to spot than solid threes and are useful for disguising your intentions. Also called a <em>jump three</em>.</div>
+      <div class="diagrams"><div class="pattern-grid" id="broken-three"></div></div>
+    </div>
+  </div>
+
+  <!-- C -->
+  <div class="glossary-section" id="C">
+    <div class="section-letter">C</div>
+
+    <div class="entry">
+      <div class="entry-term">Caro</div>
+      <div class="entry-def">A Gomoku variant popular in Vietnam and Southeast Asia. The rules are identical to freestyle Gomoku except that six or more stones in a row does not count as a win for either player. Only exactly five in a row wins. This forces more precise play and removes the possibility of <em>overline</em> victories.</div>
+      <div class="entry-also">See also: <a href="#F">Freestyle</a>, <a href="#R">Renju</a>, <a href="#O">Overline</a></div>
+    </div>
+
+    <div class="entry">
+      <div class="entry-term">Closed Four <span class="cn">眠四</span></div>
+      <div class="entry-def">Four stones in a row with only one open end (the other end is blocked by an opponent stone or the board edge). Your opponent can stop the threat with a single stone. Weaker than an <em>open four</em>, but still a threat that requires a response. Also called a <em>sleeping four</em>.</div>
+      <div class="diagrams"><div class="pattern-grid" id="closed-four"></div></div>
+      <div class="entry-also">See also: <a href="#O">Open Four</a>, <a href="#S">Straight Four</a></div>
+    </div>
+
+    <div class="entry">
+      <div class="entry-term">Closed Three <span class="cn">眠三</span></div>
+      <div class="entry-def">Three stones in a row with one or both ends blocked by an opponent stone or the board edge. A closed three cannot be extended into an open four, so it poses no real threat. Often called a <em>dead three</em> or <em>sleeping three</em>. Beginners sometimes waste moves defending against closed threes that don't need to be blocked.</div>
+      <div class="diagrams"><div class="pattern-grid" id="closed-three"></div></div>
+      <div class="entry-also">See also: <a href="#L">Live Three</a></div>
+    </div>
+  </div>
+
+  <!-- D -->
+  <div class="glossary-section" id="D">
+    <div class="section-letter">D</div>
+
+    <div class="entry">
+      <div class="entry-term">Dead Stone</div>
+      <div class="entry-def">A stone or group of stones that cannot contribute to a winning line because all paths to five are blocked by opponent stones or the board edge. Recognizing dead stones helps you avoid wasting moves defending or extending them.</div>
+    </div>
+
+    <div class="entry">
+      <div class="entry-term">Double-Four <span class="cn">双四</span></div>
+      <div class="entry-def">A position where a single move creates two simultaneous <em>four</em> threats in different directions. The opponent can only block one, so the other wins immediately. A double-four is an unstoppable winning sequence in freestyle Gomoku. In <em>Renju</em>, black is forbidden from creating a double-four.</div>
+      <div class="diagrams"><div class="pattern-grid" id="double-four"></div></div>
+      <div class="entry-also">See also: <a href="#D">Double-Three</a>, <a href="#R">Renju</a></div>
+    </div>
+
+    <div class="entry">
+      <div class="entry-term">Double-Three <span class="cn">双三</span></div>
+      <div class="entry-def">A position where a single move creates two simultaneous <em>open three</em> threats. Neither can be fully contained by a single defensive stone. A double-three is a strong attacking formation and often leads to a forced win. In <em>Renju</em>, black is prohibited from playing a double-three.</div>
+      <div class="diagrams"><div class="pattern-grid" id="double-three"></div></div>
+      <div class="entry-also">See also: <a href="#D">Double-Four</a>, <a href="#F">Four-Three</a></div>
+    </div>
+  </div>
+
+  <!-- F -->
+  <div class="glossary-section" id="F">
+    <div class="section-letter">F</div>
+
+    <div class="entry">
+      <div class="entry-term">Five in a Row <span class="cn">五子棋</span></div>
+      <div class="entry-def">The winning condition in Gomoku: five consecutive stones of the same color in a horizontal, vertical, or diagonal line. In freestyle Gomoku, six or more also counts as a win. In Renju and Caro, only exactly five counts.</div>
+    </div>
+
+    <div class="entry">
+      <div class="entry-term">Forcing Move</div>
+      <div class="entry-def">A move that demands an immediate response from the opponent. If they ignore it, you achieve something decisive (usually a five or a double threat). Chains of forcing moves let you dictate the pace of the game, building your own position while your opponent spends moves reacting.</div>
+      <div class="entry-also">See also: <a href="#S">Sente</a></div>
+    </div>
+
+    <div class="entry">
+      <div class="entry-term">Four-Three <span class="cn">四三</span></div>
+      <div class="entry-def">A double-threat position combining a <em>four</em> (one move from winning) and a <em>live three</em> (two moves from winning) at the same time. Your opponent must block the four, which lets you convert the three into a four on your next turn. Unless your opponent has a five or their own four, the four-three wins.</div>
+      <div class="entry-also">See also: <a href="#D">Double-Four</a>, <a href="#D">Double-Three</a></div>
+    </div>
+
+    <div class="entry">
+      <div class="entry-term">Freestyle Gomoku</div>
+      <div class="entry-def">The standard, unrestricted form of Gomoku. Five or more consecutive stones of the same color wins. No additional rules apply to either player. Most casual and online play, including Gomoku Arena, uses freestyle rules.</div>
+      <div class="entry-also">See also: <a href="#R">Renju</a>, <a href="#C">Caro</a></div>
+    </div>
+  </div>
+
+  <!-- G -->
+  <div class="glossary-section" id="G">
+    <div class="section-letter">G</div>
+
+    <div class="entry">
+      <div class="entry-term">Gomoku <span class="cn">五子棋</span></div>
+      <div class="entry-def">A two-player abstract strategy game in which players alternate placing stones on a grid, aiming to be the first to form five consecutive stones in a line. The name comes from Japanese: <em>go</em> (five) and <em>moku</em> (pieces). The Chinese name 五子棋 (wǔzǐqí) means "five-piece chess." The game is also known as <em>Gobang</em>, <em>Five in a Row</em>, and <em>Amőba</em> in Hungarian-speaking regions.</div>
+    </div>
+
+    <div class="entry">
+      <div class="entry-term">Gote <span class="cn">後手</span></div>
+      <div class="entry-def">A move that does not demand an immediate response from the opponent, surrendering initiative. From the Japanese Go vocabulary, adopted into Gomoku. Playing gote is sometimes necessary (to consolidate a position or set up a future threat), but a pattern of gote play generally means you're reacting rather than leading. The opposite of <em>sente</em>.</div>
+      <div class="entry-also">See also: <a href="#S">Sente</a></div>
+    </div>
+  </div>
+
+  <!-- L -->
+  <div class="glossary-section" id="L">
+    <div class="section-letter">L</div>
+
+    <div class="entry">
+      <div class="entry-term">Live Three <span class="cn">活三</span></div>
+      <div class="entry-def">Three consecutive stones with both ends open, so that it can be extended to a four on either side next turn. A live three is not an immediate threat, but two live threes at the same time form a <em>double-three</em>, which is very difficult to stop. Also called an <em>open three</em>.</div>
+      <div class="diagrams"><div class="pattern-grid" id="live-three"></div></div>
+      <div class="entry-also">See also: <a href="#C">Closed Three</a>, <a href="#D">Double-Three</a></div>
+    </div>
+
+    <div class="entry">
+      <div class="entry-term">Live Four <span class="cn">活四</span></div>
+      <div class="entry-def">Four consecutive stones with both ends open. Also called a <em>straight four</em>. This is an immediate, unblockable winning threat: the opponent would need to play in two places simultaneously to stop it, which is impossible. A live four wins on the next move regardless of what the opponent does.</div>
+      <div class="entry-also">See also: <a href="#S">Straight Four</a>, <a href="#C">Closed Four</a></div>
+    </div>
+  </div>
+
+  <!-- O -->
+  <div class="glossary-section" id="O">
+    <div class="section-letter">O</div>
+
+    <div class="entry">
+      <div class="entry-term">Open Four</div>
+      <div class="entry-def">Four consecutive stones with at least one open end. If both ends are open, it is called a <em>straight four</em> and is completely unblockable. If only one end is open, your opponent can stop it with a single stone, but must do so immediately. Reaching an open four is usually decisive.</div>
+      <div class="entry-also">See also: <a href="#S">Straight Four</a>, <a href="#C">Closed Four</a>, <a href="#L">Live Four</a></div>
+    </div>
+
+    <div class="entry">
+      <div class="entry-term">Open Three</div>
+      <div class="entry-def">Three stones in a row with both ends open, equivalent to <em>live three</em>. Can be extended to a four on either side next turn. The term "open three" is common in English; "live three" is the direct translation of the Chinese 活三.</div>
+      <div class="entry-also">See also: <a href="#L">Live Three</a></div>
+    </div>
+
+    <div class="entry">
+      <div class="entry-term">Overline <span class="cn">长连</span></div>
+      <div class="entry-def">Six or more consecutive stones of the same color. In freestyle Gomoku, an overline still counts as a win. In <em>Renju</em>, an overline is a losing move for black (it does not count as a win and is treated as a forbidden move). In <em>Caro</em>, an overline counts as neither a win nor a loss for either player.</div>
+      <div class="entry-also">See also: <a href="#R">Renju</a>, <a href="#C">Caro</a></div>
+    </div>
+  </div>
+
+  <!-- R -->
+  <div class="glossary-section" id="R">
+    <div class="section-letter">R</div>
+
+    <div class="entry">
+      <div class="entry-term">Renju <span class="cn">連珠</span></div>
+      <div class="entry-def">The competitive variant of Gomoku, governed internationally by the Renju International Federation (RIF). Black faces three restrictions to offset the first-move advantage: black may not create a <em>double-three</em>, may not create a <em>double-four</em>, and must win with exactly five in a row (not an overline). White plays with no restrictions. Tournament Renju also uses <em>swap rules</em> to further balance play.</div>
+      <div class="entry-also">See also: <a href="#F">Freestyle Gomoku</a>, <a href="#C">Caro</a>, <a href="#S">Swap Rule</a></div>
+    </div>
+  </div>
+
+  <!-- S -->
+  <div class="glossary-section" id="S">
+    <div class="section-letter">S</div>
+
+    <div class="entry">
+      <div class="entry-term">Sente <span class="cn">先手</span></div>
+      <div class="entry-def">A move that demands an immediate response from the opponent, keeping the initiative. From Go vocabulary, widely used in Gomoku. A player in sente controls the pace of the game, forcing the opponent to spend moves reacting while you build your position. The goal is to chain sente moves together so your opponent never has a free turn to attack.</div>
+      <div class="entry-also">See also: <a href="#G">Gote</a>, <a href="#F">Forcing Move</a></div>
+    </div>
+
+    <div class="entry">
+      <div class="entry-term">Straight Four <span class="cn">活四</span></div>
+      <div class="entry-def">Four consecutive stones with both ends open. The strongest pre-winning position in Gomoku: your opponent cannot block it with a single stone and must concede the next move. Equivalent to <em>live four</em>. Any player who reaches a straight four wins the game on their next turn.</div>
+      <div class="diagrams"><div class="pattern-grid" id="straight-four"></div></div>
+      <div class="entry-also">See also: <a href="#O">Open Four</a>, <a href="#C">Closed Four</a></div>
+    </div>
+
+    <div class="entry">
+      <div class="entry-term">Swap Rule</div>
+      <div class="entry-def">A balancing mechanism used in competitive Renju and some freestyle tournaments. After the first player places the opening moves, the second player may choose to swap colors, taking over as black. This reduces the first-move advantage because the opening player cannot build an opening so strong that they'd refuse to swap. Variants include swap2, in which the second player can also place an additional stone before deciding.</div>
+    </div>
+  </div>
+
+  <div class="tip-box">
+    <strong>Using this glossary.</strong> The <a href="/strategy.html">Strategy Guide</a> uses these terms throughout. If you're new to Gomoku, start with <a href="/how-to-play.html">How to Play</a> and return here when you encounter an unfamiliar word.
+  </div>
+
+  <div class="cta">
+    <a href="/">Practice at Gomoku Arena →</a>
+  </div>
+
+  <div class="nav-links">
+    <a href="/equipment.html" class="nav-link">
+      <div class="nav-link-label">← Back</div>
+      <div class="nav-link-title">Gomoku Equipment Guide</div>
+    </a>
+    <a href="/strategy.html" class="nav-link">
+      <div class="nav-link-label">Related</div>
+      <div class="nav-link-title">Gomoku Strategy Guide</div>
+    </a>
+  </div>
+</main>
+
+<footer>
+  &copy; 2026 Gomoku Arena &nbsp;·&nbsp; <a href="/privacy.html">Privacy</a> &nbsp;·&nbsp; <a href="/about.html">About</a> &nbsp;·&nbsp; <a href="/contact.html">Contact</a>
+</footer>
+
+<script>
+  function makeGrid(id, rows) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    rows.forEach(row => {
+      const rowEl = document.createElement('div');
+      rowEl.className = 'pattern-row';
+      row.forEach(cell => {
+        const c = document.createElement('div');
+        c.className = 'pcell';
+        if (cell) { const s = document.createElement('div'); s.className = 'ps ' + cell; c.appendChild(s); }
+        rowEl.appendChild(c);
+      });
+      el.appendChild(rowEl);
+    });
+  }
+
+  // Live Three: _ ● ● ● _
+  makeGrid('live-three', [
+    [null,'b','b','b',null]
+  ]);
+
+  // Closed Four: ○ ● ● ● ● _
+  makeGrid('closed-four', [
+    ['w','b','b','b','b',null]
+  ]);
+
+  // Straight Four: _ ● ● ● ● _
+  makeGrid('straight-four', [
+    [null,'b','b','b','b',null]
+  ]);
+
+  // Broken Three: ● ● _ ●
+  makeGrid('broken-three', [
+    ['b','b',null,'b']
+  ]);
+
+  // Closed Three: ○ ● ● ● _  (one end blocked by opponent)
+  makeGrid('closed-three', [
+    ['w','b','b','b',null]
+  ]);
+
+  // Broken Four: ● ● _ ● ●
+  makeGrid('broken-four', [
+    ['b','b',null,'b','b']
+  ]);
+
+  // Double-Three: two open threes sharing a stone (clean cross, both ends open)
+  makeGrid('double-three', [
+    [null, 'b', null],
+    ['b',  'b', 'b' ],
+    [null, 'b', null],
+  ]);
+
+  // Double-Four: two fours sharing a stone (cross)
+  makeGrid('double-four', [
+    [null, 'b', null],
+    ['b',  'b', 'b', 'b'],
+    [null, 'b', null],
+    [null, 'b', null],
+  ]);
+
+  // Cookie consent
+  (async () => {
+    try {
+      const r = await fetch('https://ipapi.co/json/');
+      const d = await r.json();
+      const EU = ['AT','BE','BG','HR','CY','CZ','DK','EE','FI','FR','DE','GR','HU','IE','IT','LV','LT','LU','MT','NL','PL','PT','RO','SK','SI','ES','SE','GB','NO','IS','LI','CH'];
+      if (!EU.includes(d.country_code)) return;
+    } catch(e) {}
+    if (localStorage.getItem('cookieConsent')) return;
+    const b = document.createElement('div');
+    b.style.cssText = 'position:fixed;bottom:0;left:0;right:0;background:#2c2c2c;color:#f5f0e8;padding:16px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;z-index:999;flex-wrap:wrap;font-size:0.85rem;';
+    b.innerHTML = `<span>We use analytics cookies to understand how visitors use this site. <a href="/privacy.html" style="color:#c8a96e;">Privacy Policy</a></span><div style="display:flex;gap:8px;"><button onclick="setCookies('denied')" style="padding:8px 16px;background:transparent;color:#f5f0e8;border:1px solid #666;cursor:pointer;font-family:inherit;">Decline</button><button onclick="setCookies('granted')" style="padding:8px 16px;background:#c8a96e;color:#2c2c2c;border:none;cursor:pointer;font-family:inherit;font-weight:700;">Accept</button></div>`;
+    document.body.appendChild(b);
+    window.setCookies = v => { localStorage.setItem('cookieConsent', v); if (v==='granted') gtag('consent','update',{analytics_storage:'granted',ad_storage:'granted',ad_user_data:'granted',ad_personalization:'granted'}); b.remove(); };
+  })();
+</script>
+</body>
+</html>

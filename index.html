@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Gomoku Arena — 五子棋 | Free Online Gomoku Game</title>
+<title>Gomoku Arena: 五子棋 | Free Online Gomoku Game</title>
 
 <!-- SEO -->
 <meta name="description" content="Play Gomoku (五子棋) free online. Challenge our AI at Easy, Medium, or Hard difficulty. Classic five-in-a-row strategy game with an elegant Ink & Seal aesthetic.">
@@ -14,8 +14,8 @@
 <!-- Open Graph (Facebook, LinkedIn, iMessage previews) -->
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://gomokuarena.com/">
-<meta property="og:title" content="Gomoku Arena — 五子棋 | Free Online Gomoku">
-<meta property="og:description" content="Challenge our AI at Easy, Medium, or Hard. Classic five-in-a-row strategy — elegant, free, no sign-up.">
+<meta property="og:title" content="Gomoku Arena: 五子棋 | Free Online Gomoku">
+<meta property="og:description" content="Challenge our AI at Easy, Medium, or Hard. Classic five-in-a-row strategy. Elegant, free, no sign-up.">
 <meta property="og:image" content="https://gomokuarena.com/og-image.png">
 <meta property="og:site_name" content="Gomoku Arena">
 <meta property="og:locale" content="en_US">
@@ -23,8 +23,8 @@
 <!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:url" content="https://gomokuarena.com/">
-<meta name="twitter:title" content="Gomoku Arena — 五子棋 | Free Online Gomoku">
-<meta name="twitter:description" content="Challenge our AI at Easy, Medium, or Hard. Classic five-in-a-row strategy — elegant, free, no sign-up.">
+<meta name="twitter:title" content="Gomoku Arena: 五子棋 | Free Online Gomoku">
+<meta name="twitter:description" content="Challenge our AI at Easy, Medium, or Hard. Classic five-in-a-row strategy. Elegant, free, no sign-up.">
 <meta name="twitter:image" content="https://gomokuarena.com/og-image.png">
 
 <!-- PWA -->
@@ -356,20 +356,32 @@
 
   /* ===== GAME HEADER HOME BUTTON ===== */
   .btn-home {
-    position: absolute;
-    left: 0;
+    display: block;
+    margin: 14px auto 0;
     background: transparent;
-    border: none;
-    color: #c8a96e;
+    border: 1.5px solid #c8bda8;
+    border-radius: 4px;
+    color: #8b7355;
     font-family: 'Noto Serif', Georgia, serif;
     font-size: 0.78rem;
     letter-spacing: 1px;
     cursor: pointer;
-    padding: 4px 6px;
-    transition: color 0.2s;
-    flex-shrink: 0;
+    padding: 7px 22px;
+    transition: background 0.2s, color 0.2s, border-color 0.2s;
   }
-  .btn-home:hover { color: #f5f0e8; }
+  .btn-home:hover { background: #e0d8cc; color: #2c2c2c; border-color: #8b7355; }
+
+  .mode-label {
+    font-family: 'Noto Serif', Georgia, serif;
+    font-size: 0.62rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #8b7355;
+    text-align: center;
+    margin-bottom: 3px;
+    min-height: 1em;
+  }
+  body.daily-mode .mode-label { display: none; }
 
   /* ============ GAME ============ */
   #game {
@@ -673,14 +685,10 @@
   @keyframes turnCardOut { from { opacity:1; transform:scale(1); } to { opacity:0; transform:scale(0.94); } }
 
   /* ===== PVP MODE UI VISIBILITY ===== */
-  /* Elements hidden in pvp mode */
   body.pvp-mode .difficulty,
   body.pvp-mode .scoreboard,
   body.pvp-mode #openStats,
   body.pvp-mode #endgame-sp-actions { display: none !important; }
-  /* Elements shown only in pvp mode */
-  body:not(.pvp-mode) #btnSinglePlayer,
-  body:not(.pvp-mode) #endgameSinglePlayer { display: none !important; }
 
   /* ============ MODALS ============ */
   #confirmOverlay { z-index: 110; }
@@ -981,21 +989,12 @@
     color: #5c4a2a;
     letter-spacing: 0.5px;
   }
-  .daily-attempt-dots {
-    display: flex;
-    gap: 8px;
-    margin-top: 2px;
+  .daily-attempt-label {
+    font-size: 0.72rem;
+    color: #8b7355;
+    letter-spacing: 0.5px;
   }
-  .attempt-dot {
-    width: 11px;
-    height: 11px;
-    border-radius: 50%;
-    background: #e0d8cc;
-    border: 1.5px solid #c8bda8;
-    transition: background 0.3s, border-color 0.3s;
-  }
-  .attempt-dot.wrong   { background: #c23b22; border-color: #c23b22; }
-  .attempt-dot.correct { background: #4a7c59; border-color: #4a7c59; }
+  .daily-attempt-label.hidden { display: none !important; }
 
   /* Daily result panel */
   #dailyResultPanel {
@@ -1185,7 +1184,9 @@
     <a href="/strategy.html">Strategy</a> &nbsp;·&nbsp;
     <a href="/history.html">History</a> &nbsp;·&nbsp;
     <a href="/equipment.html">Equipment</a> &nbsp;·&nbsp;
-    <a href="/about.html">About</a> &nbsp;·&nbsp;
+    <a href="/about.html">About</a>
+  <span class="header-sep">·</span>
+  <a href="/glossary.html">Glossary</a> &nbsp;·&nbsp;
     <a href="/contact.html">Contact</a> &nbsp;·&nbsp;
     <a href="/privacy.html">Privacy</a>
   </div>
@@ -1220,12 +1221,11 @@
 <!-- ====== GAME ====== -->
 <div id="game">
   <div class="game-header">
-    <button class="btn-home" id="btnGoHome" title="Home">← Home</button>
     <div class="game-title-wrap">
       <div class="game-title-cn">Gomoku Arena</div>
       <div class="game-title-en">五子棋</div>
     </div>
-    <button class="btn-settings" id="openSettings" title="Settings">&#9881;&#65039;</button>
+    <button class="btn-settings" id="openSettings" title="Settings"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
   </div>
 
   <div class="difficulty">
@@ -1245,13 +1245,8 @@
       <span id="dailyNum" class="daily-num">Daily #1</span>
       <span id="dailyStreakBadge" class="daily-streak-badge"></span>
     </div>
-    <div id="dailyPuzzleLabel" class="daily-puzzle-label">Puzzle 1 of 5</div>
-    <div id="dailyTurnLabel" class="daily-turn-label">⚫ Black to play</div>
-    <div class="daily-attempt-dots">
-      <span class="attempt-dot" id="dot0"></span>
-      <span class="attempt-dot" id="dot1"></span>
-      <span class="attempt-dot" id="dot2"></span>
-    </div>
+    <div id="dailyPuzzleLabel" class="daily-puzzle-label">Puzzle 1 of 5 · ⚫ Black</div>
+    <div id="dailyAttemptLabel" class="daily-attempt-label">Attempt 1 of 3</div>
     <div id="dailyProgressRow" class="daily-progress-row">
       <span class="progress-sq" data-idx="0"></span>
       <span class="progress-sq" data-idx="1"></span>
@@ -1268,6 +1263,7 @@
     </div>
   </div>
 
+  <div id="modeLabel" class="mode-label"></div>
   <div class="status" id="status">Place your stone</div>
 
   <div class="board" id="board"></div>
@@ -1288,8 +1284,8 @@
     <button class="btn-undo" id="undoBtn" disabled>↩ Undo</button>
     <button class="btn-hint" id="hintBtn" disabled>Hint (2)</button>
     <button class="btn-stats" id="openStats">Stats</button>
-    <button class="btn-stats" id="btnSinglePlayer">Single Player</button>
   </div>
+  <button class="btn-home" id="btnGoHome">← Home</button>
 </div>
 
 <!-- ====== TURN OVERLAY (pass & play) ====== -->
@@ -1333,7 +1329,7 @@
         <button class="btn-change-diff" id="endgameStats">Stats</button>
         <button class="btn-change-diff" id="changeDiff">Close</button>
       </div>
-      <button class="btn-change-diff" id="endgameSinglePlayer">Single Player</button>
+      <button class="btn-change-diff" id="endgameHome">← Home</button>
     </div>
   </div>
 </div>
@@ -1684,14 +1680,14 @@ function restoreActiveGame() {
       enableBoard();
       if (gameMode === 'vs-human') {
         const p1Turn = currentPlayer === HUMAN;
-        statusEl.textContent = 'Welcome back — ' + (p1Turn ? '⚫ Player 1' : '⚪ Player 2') + ' your move';
+        statusEl.textContent = 'Welcome back. ' + (p1Turn ? '⚫ Player 1' : '⚪ Player 2') + ' to move';
         setTimeout(() => {
-          if (!gameOver) statusEl.textContent = (p1Turn ? '⚫ Player 1' : '⚪ Player 2') + ' — your move';
+          if (!gameOver) statusEl.textContent = (p1Turn ? '⚫ Player 1' : '⚪ Player 2') + ', your move';
         }, 2500);
       } else {
-        statusEl.textContent = 'Welcome back — ' + (humanIsBlack ? '⚫' : '⚪') + ' your move';
+        statusEl.textContent = 'Welcome back. ' + (humanIsBlack ? '⚫' : '⚪') + ' your move';
         setTimeout(() => {
-          if (!gameOver) statusEl.textContent = (humanIsBlack ? '⚫' : '⚪') + ' — your move';
+          if (!gameOver) statusEl.textContent = (humanIsBlack ? '⚫' : '⚪') + ', your move';
         }, 2500);
       }
     }, cumDelay + 400);
@@ -2007,7 +2003,7 @@ function botMove() {
   }
 
   makeMove(move, BOT);
-  if (!gameOver) { statusEl.textContent = humanIsBlack ? '⚫ — your move' : '⚪ — your move'; statusEl.className = 'status'; }
+  if (!gameOver) { statusEl.textContent = humanIsBlack ? '⚫, your move' : '⚪, your move'; statusEl.className = 'status'; }
 }
 
 function disableBoard() { boardEl.querySelectorAll('.cell').forEach(c => c.classList.add('disabled')); awaitingPlayerMove = false; updateHintButton(); }
@@ -2031,13 +2027,13 @@ const hintBtn = document.getElementById('hintBtn');
 
 function updateHintButton() {
   if (gameMode === 'vs-human') {
-    hintBtn.textContent = 'Hint —';
+    hintBtn.textContent = 'Hint...';
     hintBtn.disabled = true;
     return;
   }
   const limit = HINT_LIMITS[difficulty];
   if (limit === 0) {
-    hintBtn.textContent = 'Hint —';
+    hintBtn.textContent = 'Hint...';
     hintBtn.disabled = true;
     return;
   }
@@ -2106,7 +2102,7 @@ function handleUndo() {
     updateUndoButton();
     trackEvent('undo_used', { difficulty, undos_remaining: undosRemaining });
     if (gameOver) { gameOver = false; closeEndgame(); }
-    statusEl.textContent = 'Stone taken back — choose wisely';
+    statusEl.textContent = 'Stone taken back. Choose wisely.';
     statusEl.className = 'status';
     enableBoard();
   }
@@ -2114,9 +2110,18 @@ function handleUndo() {
 undoBtn.addEventListener('click', handleUndo);
 hintBtn.addEventListener('click', showHint);
 
-// ====== PVP MODE UI ======
+// ====== MODE UI ======
 function applyModeUI() {
   document.body.classList.toggle('pvp-mode', gameMode === 'vs-human');
+  const label = document.getElementById('modeLabel');
+  if (!label) return;
+  if (gameMode === 'vs-human') {
+    label.textContent = 'Pass & Play';
+  } else if (gameMode === 'vs-ai') {
+    label.textContent = 'VS AI · ' + difficulty.charAt(0).toUpperCase() + difficulty.slice(1);
+  } else {
+    label.textContent = '';
+  }
 }
 
 let turnOverlayTimer = null;
@@ -2139,7 +2144,7 @@ function dismissTurnOverlay() {
   if (!overlay.classList.contains('active')) return;
   overlay.classList.add('dismissing');
   const isP1 = currentPlayer === HUMAN;
-  statusEl.textContent = (isP1 ? '⚫ Player 1' : '⚪ Player 2') + ' — your move';
+  statusEl.textContent = (isP1 ? '⚫ Player 1' : '⚪ Player 2') + ', your move';
   setTimeout(() => {
     overlay.classList.remove('active', 'dismissing');
     if (!gameOver && gameMode === 'vs-human') enableBoard();
@@ -2236,6 +2241,7 @@ function closeEndgame() { endgameOverlay.classList.remove('open'); }
 document.getElementById('playNow').addEventListener('click', () => { closeEndgame(); newGame(); });
 document.getElementById('changeDiff').addEventListener('click', () => { closeEndgame(); });
 document.getElementById('endgameStats').addEventListener('click', () => { closeEndgame(); openStats(); });
+document.getElementById('endgameHome').addEventListener('click', () => { closeEndgame(); goHome(); });
 
 // Enter button — commit this game's color and flip for next time
 document.getElementById('startBegin').addEventListener('click', () => {
@@ -2252,10 +2258,10 @@ document.getElementById('startBegin').addEventListener('click', () => {
     trackEvent('game_started', { difficulty, color: humanIsBlack ? 'black' : 'white' });
     if (humanIsBlack) {
       enableBoard();
-      statusEl.textContent = '⚫ — your move';
+      statusEl.textContent = '⚫, your move';
     } else {
       statusEl.textContent = 'Opponent is thinking…';
-      setTimeout(() => { botMove(); enableBoard(); statusEl.textContent = '⚪ — your move'; }, 800);
+      setTimeout(() => { botMove(); enableBoard(); statusEl.textContent = '⚪, your move'; }, 800);
     }
   }
 });
@@ -2283,26 +2289,10 @@ document.querySelectorAll('.mode-btn').forEach(btn => {
   });
 });
 
-// "Single Player" button on board (visible only in pvp mode)
-document.getElementById('btnSinglePlayer').addEventListener('click', () => {
-  gameMode = 'vs-ai';
-  document.querySelectorAll('.mode-btn').forEach(b => b.classList.toggle('active', b.dataset.mode === 'vs-ai'));
-  clearActiveGame();
-  newGame();
-});
-
-// "Single Player" button in endgame modal (visible only in pvp mode)
-document.getElementById('endgameSinglePlayer').addEventListener('click', () => {
-  closeEndgame();
-  gameMode = 'vs-ai';
-  document.querySelectorAll('.mode-btn').forEach(b => b.classList.toggle('active', b.dataset.mode === 'vs-ai'));
-  newGame();
-});
-
 // Close button — dismiss prompt without starting; color is not consumed
 document.getElementById('startClose').addEventListener('click', () => {
   document.getElementById('startOverlay').classList.remove('open');
-  statusEl.textContent = 'Change difficulty or press New Game';
+  statusEl.textContent = gameMode === 'vs-human' ? 'Press New Game to start' : 'Change difficulty or press New Game';
   statusEl.className = 'status';
 });
 
@@ -2396,6 +2386,14 @@ function mulberry32(seed) {
 function getDailyKey() {
   const d = new Date();
   return `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
+}
+
+function getDailyDateLabel() {
+  const d = new Date();
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  const yy = String(d.getFullYear()).slice(2);
+  return `${mm}/${dd}/${yy}`;
 }
 
 function getPuzzleNumber() {
@@ -2530,12 +2528,20 @@ function rankAllPuzzleMoves(b, turn) {
 }
 
 // Returns true when a puzzle has a clear, non-trivial best move
+function isBlock5Move(board, i, turn) {
+  const against = turn === 'X' ? 'O' : 'X';
+  const t = board.slice(); t[i] = against;
+  return findWinOn(t, i, against);
+}
+
 function isGoodPuzzle(board, turn, ranked) {
   if (ranked.length < 3) return false;
   const rank1 = ranked[0], rank2 = ranked[1];
   // Reject if best move is an immediate win — too easy
   const winTest = board.slice(); winTest[rank1.i] = turn;
   if (findWinOn(winTest, rank1.i, turn)) return false;
+  // Reject if best move is simply blocking opponent's five — repetitive and obvious
+  if (isBlock5Move(board, rank1.i, turn)) return false;
   // Require a meaningful position
   if (rank1.s < 500) return false;
   // Require a clear best move (not interchangeable with rank #2)
@@ -2545,45 +2551,139 @@ function isGoodPuzzle(board, turn, ranked) {
   return true;
 }
 
-// Try up to 15 seeds (prime step 997) to find a quality puzzle; fall back gracefully
-function generateQualityPuzzle(baseSeed) {
-  let best = null, bestQuality = -1;
-  for (let attempt = 0; attempt < 15; attempt++) {
+// Classify a puzzle by its primary tactical theme
+function categorizePuzzle(ranked) {
+  const s = ranked[0].s;
+  if (s >= 10000) return 'double-four';
+  if (s >= 1000)  return 'four-threat';
+  if (s >= 100)   return 'multi-threat';
+  return 'strategic';
+}
+
+// Try up to 500 seeds to find a quality puzzle that also adds variety to the day's set.
+// usedTypes = { [type]: count } tracks what's already been selected for earlier slots.
+function generateQualityPuzzle(baseSeed, usedTypes) {
+  const MAX_TYPE   = 2; // no more than 2 puzzles of the same type per day
+  let bestDiverse  = null, bestDiverseQ  = -1; // passes isGoodPuzzle + adds variety
+  let bestAny      = null, bestAnyQ      = -1; // passes isGoodPuzzle but type is full
+
+  for (let attempt = 0; attempt < 500; attempt++) {
     const seed   = baseSeed + attempt * 997;
     const puzzle = generatePuzzleBoard(seed);
     const ranked = rankAllPuzzleMoves(puzzle.board, puzzle.turn);
     if (ranked.length < 2) continue;
-    const quality = (ranked[0].s - (ranked[1] ? ranked[1].s : 0)) *
-                    (ranked[0].s / Math.max(ranked[1] ? ranked[1].s : 1, 1));
-    if (isGoodPuzzle(puzzle.board, puzzle.turn, ranked)) {
-      return { board: puzzle.board, turn: puzzle.turn, rankedMoves: ranked };
+    if (!isGoodPuzzle(puzzle.board, puzzle.turn, ranked)) continue;
+
+    const type    = categorizePuzzle(ranked);
+    const quality = (ranked[0].s - ranked[1].s) * (ranked[0].s / Math.max(ranked[1].s, 1));
+    const result  = { board: puzzle.board, turn: puzzle.turn, rankedMoves: ranked, type };
+
+    if ((usedTypes[type] || 0) < MAX_TYPE) {
+      // Diverse and quality — take it immediately
+      return result;
     }
-    // Keep track of best non-win fallback
-    const winTest2 = puzzle.board.slice(); winTest2[ranked[0].i] = puzzle.turn;
-    if (!findWinOn(winTest2, ranked[0].i, puzzle.turn) && quality > bestQuality) {
-      bestQuality = quality;
-      best = { board: puzzle.board, turn: puzzle.turn, rankedMoves: ranked };
+    // Quality but type already saturated — keep as fallback
+    if (quality > bestAnyQ) { bestAny = result; bestAnyQ = quality; }
+  }
+
+  // All 500 seeds produced only saturated types — use best quality found
+  if (bestAny) return bestAny;
+
+  // Absolute last resort: first passing seed ignoring diversity (extremely unlikely)
+  for (let attempt = 0; attempt < 500; attempt++) {
+    const seed   = baseSeed + attempt * 997;
+    const puzzle = generatePuzzleBoard(seed);
+    const ranked = rankAllPuzzleMoves(puzzle.board, puzzle.turn);
+    if (ranked.length < 2) continue;
+    if (isGoodPuzzle(puzzle.board, puzzle.turn, ranked)) {
+      return { board: puzzle.board, turn: puzzle.turn, rankedMoves: ranked, type: categorizePuzzle(ranked) };
     }
   }
-  if (best) return best;
+
+  // If literally nothing qualifies, return the base seed as-is
   const puzzle = generatePuzzleBoard(baseSeed);
-  return { board: puzzle.board, turn: puzzle.turn, rankedMoves: rankAllPuzzleMoves(puzzle.board, puzzle.turn) };
+  const ranked = rankAllPuzzleMoves(puzzle.board, puzzle.turn);
+  return { board: puzzle.board, turn: puzzle.turn, rankedMoves: ranked, type: categorizePuzzle(ranked) };
 }
 
-// Generate a human-readable explanation for the best move
+// Generate a human-readable explanation for the best move using geometric board analysis
 function describeMove(b, i, turn) {
   const against = turn === 'X' ? 'O' : 'X';
-  // Check if this is our own immediate win (must come before score check)
+  const DIRS4 = [[1,0],[0,1],[1,1],[1,-1]];
+  const col = i % GRID, row = Math.floor(i / GRID);
+
+  // 1. Own immediate win
   const ownTest = b.slice(); ownTest[i] = turn;
-  if (findWinOn(ownTest, i, turn)) return "This move completes five in a row — an immediate win!";
-  // Check if it blocks opponent win
-  const t = b.slice(); t[i] = against;
-  if (findWinOn(t, i, against)) return "This blocks the opponent's five in a row — without it, they win immediately!";
-  const s = evalCellOn(b, i, turn, against);
-  if (s >= 10000) return "This creates an open double-four — two winning threats the opponent can't both block.";
-  if (s >= 1000) return "This builds a four-in-a-row with an open end, threatening a win next move.";
-  if (s >= 100) return "This creates multiple threats at once, putting serious pressure on the opponent.";
-  return "This is the strongest strategic move — it builds toward multiple threats while limiting the opponent.";
+  if (findWinOn(ownTest, i, turn)) return "Five in a row. An immediate win!";
+
+  // 2. Block opponent's immediate five
+  const oppFiveTest = b.slice(); oppFiveTest[i] = against;
+  if (findWinOn(oppFiveTest, i, against)) return "This blocks the opponent's five in a row. Without it, they win immediately.";
+
+  // Count consecutive stones through position i in one direction pair, and detect open ends
+  function analyzeDir(board, player, dc, dr) {
+    let count = 1, openEnds = 0;
+    for (let d = 1; d < WIN_LEN; d++) {
+      const c2 = col + dc*d, r2 = row + dr*d;
+      if (c2 < 0 || c2 >= GRID || r2 < 0 || r2 >= GRID) break;
+      const v = board[r2*GRID + c2];
+      if (v === player) count++;
+      else { if (v === null) openEnds++; break; }
+    }
+    for (let d = 1; d < WIN_LEN; d++) {
+      const c2 = col - dc*d, r2 = row - dr*d;
+      if (c2 < 0 || c2 >= GRID || r2 < 0 || r2 >= GRID) break;
+      const v = board[r2*GRID + c2];
+      if (v === player) count++;
+      else { if (v === null) openEnds++; break; }
+    }
+    return { count, openEnds };
+  }
+
+  // Classify patterns created when player places at i
+  function getPatterns(player) {
+    const test = b.slice(); test[i] = player;
+    let openFours = 0, closedFours = 0, openThrees = 0;
+    for (const [dc, dr] of DIRS4) {
+      const { count, openEnds } = analyzeDir(test, player, dc, dr);
+      if (count >= 4) {
+        if (openEnds >= 1) openFours++;
+        else closedFours++;
+      } else if (count === 3 && openEnds >= 2) {
+        openThrees++;
+      }
+    }
+    return { openFours, closedFours, openThrees };
+  }
+
+  const opp = getPatterns(against); // what opponent would get if they played here
+  const own = getPatterns(turn);    // what we get by playing here
+
+  // 3–4. Double-four check: defensive first, then offensive
+  if (opp.openFours >= 2 || (opp.openFours >= 1 && opp.closedFours >= 1))
+    return "This shuts down the opponent's double-four. Left open, they'd have two unstoppable threats.";
+  if (own.openFours >= 2 || (own.openFours >= 1 && own.closedFours >= 1))
+    return "This creates a double-four, two simultaneous threats the opponent can't both block.";
+
+  // 5–6. Open four
+  if (opp.openFours >= 1)
+    return "This cuts off the opponent's open four, taking away their immediate winning threat.";
+  if (own.openFours >= 1)
+    return "This creates an open four, threatening to win from either end next move.";
+
+  // 7–8. Closed four
+  if (opp.closedFours >= 1)
+    return "This blocks the opponent's four-in-a-row before they can extend it.";
+  if (own.closedFours >= 1)
+    return "This builds a four-in-a-row, a direct threat that forces a response.";
+
+  // 9–10. Open three
+  if (own.openThrees >= 2)
+    return "This creates a double-three, two open threats the opponent can't easily contain.";
+  if (own.openThrees >= 1)
+    return "This extends to an open three, setting up a strong sequence of threats.";
+
+  return "The strongest positional move here, building toward multiple threats while limiting the opponent.";
 }
 
 // ====== DAILY PUZZLE STATE ======
@@ -2644,14 +2744,11 @@ function getCurrentStreak() {
 }
 
 function renderDailyAttempts() {
-  ['dot0','dot1','dot2'].forEach((id, i) => {
-    const dot = document.getElementById(id);
-    if (!dot) return;
-    dot.className = 'attempt-dot';
-    if (i < dailyGuesses.length) {
-      dot.classList.add(dailySolved && i === dailyGuesses.length - 1 ? 'correct' : 'wrong');
-    }
-  });
+  const el = document.getElementById('dailyAttemptLabel');
+  if (!el) return;
+  if (dailyComplete) { el.classList.add('hidden'); return; }
+  el.classList.remove('hidden');
+  el.textContent = `Attempt ${dailyGuesses.length + 1} of 3`;
 }
 
 function getOrdinalLabel(n) {
@@ -2721,8 +2818,7 @@ function activatePuzzle(index) {
   renderDailyAttempts();
   updateDailyProgress();
 
-  document.getElementById('dailyPuzzleLabel').textContent = `Puzzle ${index + 1} of ${DAILY_PUZZLE_COUNT}`;
-  document.getElementById('dailyTurnLabel').textContent   = dailyTurn === 'X' ? '⚫ Black to play' : '⚪ White to play';
+  document.getElementById('dailyPuzzleLabel').textContent = `Puzzle ${index + 1} of ${DAILY_PUZZLE_COUNT} · ${dailyTurn === 'X' ? '⚫ Black' : '⚪ White'}`;
   document.getElementById('dailyNextBtn').classList.add('hidden');
   document.getElementById('dailyResultPanel').classList.add('hidden');
 
@@ -2863,7 +2959,7 @@ function handleDailyClick(i) {
     // Wrong, but tries remain — stone stays on board, brief pause then unlock
     stone.classList.add('daily-wrong');
     const triesLeft = 3 - dailyAttempts;
-    statusEl.textContent = `${getOrdinalLabel(rank)} best move — ${triesLeft} ${triesLeft === 1 ? 'try' : 'tries'} left`;
+    statusEl.textContent = `${getOrdinalLabel(rank)} best move. ${triesLeft} ${triesLeft === 1 ? 'try' : 'tries'} left.`;
     statusEl.className = 'status';
     saveDailyState();
     setTimeout(() => {
@@ -2931,8 +3027,12 @@ function enterDailyMode() {
   const base = parseInt(key, 10);
 
   // Generate all 5 puzzles — each gets a unique deterministic seed, quality-filtered
+  // usedTypes tracks how many of each tactical category have been selected,
+  // so each slot can prefer a type that hasn't been overrepresented yet.
+  const usedTypes = {};
   dailyPuzzles = Array.from({length: DAILY_PUZZLE_COUNT}, (_, i) => {
-    const puzzle = generateQualityPuzzle(base * 10 + i);
+    const puzzle = generateQualityPuzzle(base * 10 + i, usedTypes);
+    usedTypes[puzzle.type] = (usedTypes[puzzle.type] || 0) + 1;
     return {
       board:       puzzle.board,
       turn:        puzzle.turn,
@@ -2956,9 +3056,9 @@ function enterDailyMode() {
   }
 
   // Header labels
-  document.getElementById('dailyNum').textContent         = `Daily #${getPuzzleNumber()}`;
+  document.getElementById('dailyNum').textContent         = `Daily · ${getDailyDateLabel()}`;
   const streak = getCurrentStreak();
-  document.getElementById('dailyStreakBadge').textContent  = streak > 0 ? `🔥 ${streak}` : '';
+  document.getElementById('dailyStreakBadge').textContent  = streak > 0 ? `🔥 ${streak}-day streak` : '';
   document.getElementById('dailyPanel').classList.remove('hidden');
 
   // If all 5 already done, go straight to result on last puzzle's board
