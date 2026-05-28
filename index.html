@@ -477,7 +477,9 @@
   .score-draws { color: #8b6914; }
 
   .status {
-    font-size: 0.9rem;
+    font-family: 'Noto Serif SC', serif;
+    font-size: 0.8rem;
+    letter-spacing: 0.5px;
     margin-bottom: 6px;
     min-height: 1.3em;
     transition: color 0.3s;
@@ -693,9 +695,10 @@
   body.pvp-mode .scoreboard,
   body.pvp-mode #openStats,
   body.pvp-mode #endgame-sp-actions { display: none !important; }
+  body.bot-mode #hintBtn { display: none !important; }
 
   /* ============ MODALS ============ */
-  #confirmOverlay { z-index: 110; }
+  #confirmOverlay { z-index: 500; }
   .modal-overlay {
     display: none;
     position: fixed;
@@ -914,6 +917,283 @@
     cursor: pointer;
   }
   .btn-change-diff:hover { border-color: #2c2c2c; color: #2c2c2c; }
+
+  /* ===== BOT PRE-GAME OVERLAY ===== */
+  #botPregameOverlay { z-index: 200; }
+  .bot-pregame-inner {
+    position: relative; display: flex; flex-direction: column; align-items: center;
+    padding: 48px 28px 24px; width: min(300px, 86vw);
+  }
+  .bot-pregame-back {
+    position: absolute; top: 14px; left: 14px;
+    font-family: 'Noto Serif', serif; font-size: 0.75rem; color: #8b7355;
+    border: 1px solid #d4ccc0; background: none; padding: 4px 10px;
+    border-radius: 2px; cursor: pointer;
+  }
+  .bot-pregame-back:hover { border-color: #2c2c2c; color: #2c2c2c; }
+  .bot-pregame-avatar-wrap { position: relative; margin-bottom: 12px; }
+  .bot-pregame-avatar {
+    width: 72px; height: 72px; border-radius: 50%;
+    border: 2px solid #d4ccc0; background: #ede8df; display: block;
+  }
+  .bot-pregame-flag { position: absolute; bottom: 0; right: -4px; font-size: 20px; line-height: 1; }
+  .bot-pregame-name {
+    font-family: 'Noto Serif SC', serif; font-size: 1.15rem; font-weight: 700;
+    color: #2c2c2c; margin-bottom: 3px;
+  }
+  .bot-pregame-meta { font-size: 0.72rem; color: #8b7355; margin-bottom: 10px; }
+  .bot-pregame-style {
+    font-size: 0.58rem; letter-spacing: 1.5px; text-transform: uppercase;
+    padding: 3px 10px; border-radius: 2px; margin-bottom: 16px;
+  }
+  .bot-pregame-divider { width: 100%; border: none; border-top: 0.5px solid #d4ccc0; margin-bottom: 16px; }
+  .bot-pregame-colors { display: flex; gap: 10px; width: 100%; margin-bottom: 20px; }
+  .bot-color-card {
+    flex: 1; border: 0.5px solid #d4ccc0; border-radius: 6px;
+    padding: 10px 6px; text-align: center; background: rgba(255,255,255,0.55);
+  }
+  .bot-color-card.you { border-color: #2c2c2c; border-width: 1.5px; background: rgba(255,255,255,0.85); }
+  .bot-color-stone { font-size: 22px; display: block; margin-bottom: 4px; }
+  .bot-color-who { font-size: 0.58rem; color: #8b7355; margin-bottom: 1px; }
+  .bot-color-name { font-size: 0.68rem; font-weight: 700; color: #2c2c2c; }
+  .bot-color-first { font-size: 0.56rem; color: #c8a96e; margin-top: 2px; min-height: 0.8em; }
+  .bot-pregame-start {
+    width: 100%; background: #2c2c2c; color: #f5f0e8; border: none;
+    padding: 13px; font-family: 'Noto Serif SC', serif; font-size: 0.85rem;
+    font-weight: 700; letter-spacing: 2px; border-radius: 3px; cursor: pointer;
+  }
+  .bot-pregame-start:hover { background: #444; }
+
+  /* Pregame matchup layout */
+  .pregame-matchup {
+    display: flex; align-items: center; gap: 12px; width: 100%;
+    margin-bottom: 14px;
+  }
+  .pregame-side {
+    flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px;
+  }
+  .pregame-avatar-wrap {
+    position: relative; width: 56px; height: 56px; flex-shrink: 0;
+  }
+  .pregame-side-avatar {
+    width: 56px; height: 56px; border-radius: 50%;
+    border: 2px solid #d4ccc0; background: #ede8df;
+    display: block; cursor: pointer;
+  }
+  .player-side .pregame-side-avatar { border-color: #c8a96e; }
+  .bot-pregame-flag {
+    position: absolute; bottom: -4px; right: -4px;
+    font-size: 1rem; line-height: 1; pointer-events: none;
+  }
+  .pregame-side-name {
+    font-family: 'Noto Serif SC', serif; font-size: 0.82rem; font-weight: 700;
+    color: #2c2c2c; text-align: center; max-width: 90px;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .pregame-side-elo { font-size: 0.65rem; color: #8b7355; }
+  .pregame-vs-label {
+    font-family: 'Noto Serif SC', serif; font-size: 0.9rem; font-weight: 700;
+    color: #c8a96e; letter-spacing: 2px; flex-shrink: 0;
+  }
+  /* Profile setup modal */
+  .profile-setup-modal { max-width: 300px; }
+  .profile-setup-sub { font-size: 0.8rem; color: #8b7355; margin: -8px 0 18px; text-align: center; }
+  .profile-avatar-section {
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    margin-bottom: 16px;
+  }
+  .profile-avatar-preview {
+    width: 72px; height: 72px; border-radius: 50%;
+    border: 2px solid #d4ccc0; background: #ede8df;
+  }
+  .profile-shuffle-btn {
+    background: none; border: 1px solid #d4ccc0; padding: 4px 12px;
+    font-family: 'Noto Serif', serif; font-size: 0.75rem; color: #8b7355;
+    border-radius: 2px; cursor: pointer;
+  }
+  .profile-shuffle-btn:hover { border-color: #2c2c2c; color: #2c2c2c; }
+  .profile-name-input {
+    width: 100%; box-sizing: border-box; padding: 9px 12px; margin-bottom: 14px;
+    border: 1px solid #d4ccc0; border-radius: 3px; font-family: 'Noto Serif', serif;
+    font-size: 0.9rem; background: #fff; color: #2c2c2c; outline: none;
+  }
+  .profile-name-input:focus { border-color: #2c2c2c; }
+  .profile-setup-actions { display: flex; gap: 8px; }
+  /* Settings danger zone */
+  .settings-danger { margin-top: 16px; padding-top: 14px; border-top: 0.5px solid #e0d8cc; }
+  .btn-danger-small {
+    background: none; border: 1px solid #e0ccc0; padding: 5px 12px;
+    font-family: 'Noto Serif', serif; font-size: 0.75rem; color: #c0392b;
+    border-radius: 2px; cursor: pointer;
+  }
+  .btn-danger-small:hover { border-color: #c0392b; background: #fdf0ee; }
+
+  /* ===== BOT GAME HEADER ===== */
+  #botGameHeader {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 7px 14px; border-bottom: 0.5px solid #e0d8cc;
+    background: rgba(245,240,232,0.95); gap: 6px;
+  }
+  #botGameHeader.hidden { display: none !important; }
+  .bgh-player, .bgh-bot { display: flex; align-items: center; gap: 7px; flex: 1; min-width: 0; }
+  .bgh-bot { flex-direction: row-reverse; }
+  .bgh-player-avatar, .bgh-avatar {
+    width: 30px; height: 30px; border-radius: 50%;
+    border: 1.5px solid #d4ccc0; background: #ede8df; flex-shrink: 0;
+  }
+  .bgh-player-name, .bgh-name {
+    font-family: 'Noto Serif SC', serif; font-size: 0.75rem; font-weight: 700;
+    color: #2c2c2c; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .bgh-bot .bgh-name { text-align: right; }
+  .bgh-bot-info { display: flex; flex-direction: column; align-items: flex-end; }
+  .bgh-style-badge {
+    display: inline-block; font-size: 0.5rem; letter-spacing: 1px;
+    text-transform: uppercase; padding: 1px 5px; border-radius: 2px;
+  }
+  .bgh-style-badge.Aggressive { background: #fdebd0; color: #784212; }
+  .bgh-style-badge.Balanced   { background: #eaf2ff; color: #1a5276; }
+  .bgh-style-badge.Defensive  { background: #e8f8f5; color: #0e6655; }
+  .bgh-player-elo, .bgh-bot-elo {
+    font-size: 0.6rem; color: #8b7355; margin-top: 1px;
+    font-family: 'Noto Serif', serif;
+  }
+  .bgh-vs-label {
+    font-family: 'Noto Serif SC', serif; font-size: 0.65rem; color: #c8a96e;
+    font-weight: 700; letter-spacing: 1px; flex-shrink: 0; padding: 0 4px;
+  }
+  #profileSetupOverlay { z-index: 300; }
+
+  /* Board header — style tooltip */
+  .bgh-avatar-wrap { position: relative; display: inline-block; cursor: pointer; }
+  .bgh-style-dot {
+    position: absolute; bottom: 0; left: 0;
+    width: 7px; height: 7px; border-radius: 50%;
+    border: 1.5px solid #f5f0e8;
+  }
+  .bgh-style-dot.Aggressive { background: #e67e22; }
+  .bgh-style-dot.Balanced   { background: #2980b9; }
+  .bgh-style-dot.Defensive  { background: #27ae60; }
+  .bgh-style-tooltip {
+    position: absolute; bottom: 36px; right: 0;
+    font-size: 0.55rem; letter-spacing: 1.5px; text-transform: uppercase;
+    background: #2c2c2c; color: #f5f0e8; padding: 3px 7px;
+    border-radius: 2px; white-space: nowrap; display: none; pointer-events: none;
+    font-family: 'Noto Serif', serif;
+  }
+  .bgh-avatar-wrap:hover .bgh-style-tooltip { display: block; }
+  .bgh-player-avatar { cursor: pointer; }
+
+  /* Profile avatar grid */
+  .profile-avatar-selected-wrap { margin: 8px 0 6px; text-align: center; }
+  .profile-avatar-grid {
+    display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px;
+    width: 100%; margin-bottom: 12px; max-height: 140px; overflow-y: auto;
+    padding-right: 2px;
+  }
+  .profile-avatar-grid-item {
+    width: 100%; aspect-ratio: 1; border-radius: 50%;
+    border: 2px solid transparent; cursor: pointer;
+    background: #ede8df; overflow: hidden;
+    transition: border-color 0.12s; display: block;
+  }
+  .profile-avatar-grid-item:hover { border-color: #c8a96e; }
+  .profile-avatar-grid-item.selected { border-color: #2c2c2c; }
+  .profile-avatar-grid-item img { width: 100%; height: 100%; display: block; }
+
+  /* Stats profile card */
+  .stats-profile-card {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 0 14px; margin-bottom: 14px;
+    border-bottom: 0.5px solid #e0d8cc;
+  }
+  .stats-profile-avatar {
+    width: 48px; height: 48px; border-radius: 50%;
+    border: 2px solid #d4ccc0; background: #ede8df; flex-shrink: 0; cursor: pointer;
+  }
+  .stats-profile-info { flex: 1; }
+  .stats-profile-name {
+    font-family: 'Noto Serif SC', serif; font-size: 0.9rem; font-weight: 700; color: #2c2c2c;
+  }
+  .stats-profile-tier { font-size: 0.65rem; color: #8b7355; margin-top: 1px; }
+  .stats-edit-btn {
+    background: none; border: 1px solid #d4ccc0; padding: 4px 10px;
+    font-family: 'Noto Serif', serif; font-size: 0.72rem; color: #8b7355;
+    border-radius: 2px; cursor: pointer; white-space: nowrap; flex-shrink: 0;
+  }
+  .stats-edit-btn:hover { border-color: #2c2c2c; color: #2c2c2c; }
+
+  /* ===== BOT ENDGAME OVERLAY ===== */
+  #botEndgameOverlay { z-index: 200; }
+  .bot-end-inner {
+    display: flex; flex-direction: column; align-items: center;
+    padding: 28px 28px 24px; width: min(300px, 86vw);
+  }
+  @keyframes popInBig {
+    0% { transform: scale(0.5); opacity: 0; }
+    60% { transform: scale(1.1); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  @keyframes slideUp {
+    0% { transform: translateY(16px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+  }
+  .bot-end-icon { font-size: 3.2rem; margin-bottom: 6px; animation: popInBig 0.5s ease-out; }
+  .bot-end-result {
+    font-family: 'Noto Serif SC', serif; font-size: 1.6rem; font-weight: 700;
+    margin-bottom: 3px; animation: slideUp 0.35s 0.15s both ease-out;
+  }
+  .bot-end-result.win { color: #2a7a3f; }
+  .bot-end-result.lose { color: #c23b22; }
+  .bot-end-result.draw { color: #8b6914; }
+  .bot-end-vs {
+    font-size: 0.72rem; color: #8b7355; margin-bottom: 18px;
+    animation: slideUp 0.35s 0.25s both ease-out;
+  }
+  .bot-elo-box {
+    background: rgba(255,255,255,0.7); border: 0.5px solid #d4ccc0; border-radius: 6px;
+    padding: 12px 20px; margin-bottom: 18px; text-align: center; width: 100%;
+    animation: slideUp 0.35s 0.35s both ease-out;
+  }
+  .bot-elo-box-label {
+    font-size: 0.6rem; color: #8b7355; letter-spacing: 1.5px;
+    text-transform: uppercase; margin-bottom: 8px;
+  }
+  .bot-elo-row { display: flex; align-items: center; justify-content: center; gap: 10px; }
+  .bot-elo-old { font-size: 1.2rem; color: #bbb; font-weight: 700; }
+  .bot-elo-arr { font-size: 0.85rem; color: #bbb; }
+  .bot-elo-new { font-size: 1.9rem; font-weight: 700; color: #2c2c2c; transition: transform 0.15s ease-out; }
+  @keyframes eloSettle {
+    0%   { transform: scale(1.35); }
+    60%  { transform: scale(0.95); }
+    100% { transform: scale(1); }
+  }
+  .bot-elo-new.settled { animation: eloSettle 0.4s ease-out forwards; }
+  .bot-elo-delta { font-size: 0.78rem; font-weight: 700; padding: 2px 8px; border-radius: 3px; }
+  .bot-elo-delta.pos { background: #eaf3de; color: #3b6d11; }
+  .bot-elo-delta.neg { background: #fcebeb; color: #a32d2d; }
+  .bot-elo-delta.zero { background: #f0ece4; color: #8b7355; }
+  .bot-end-actions {
+    display: flex; flex-direction: column; gap: 8px; width: 100%;
+    animation: slideUp 0.35s 0.45s both ease-out;
+  }
+  .bot-btn-primary {
+    width: 100%; background: #2c2c2c; color: #f5f0e8; border: none;
+    padding: 13px; font-family: 'Noto Serif SC', serif; font-size: 0.85rem;
+    font-weight: 700; letter-spacing: 1px; border-radius: 3px; cursor: pointer;
+  }
+  .bot-btn-primary:hover { background: #444; }
+  .bot-btn-secondary {
+    width: 100%; background: none; border: 0.5px solid #d4ccc0; color: #2c2c2c;
+    padding: 11px; font-family: 'Noto Serif', serif; font-size: 0.82rem;
+    border-radius: 3px; cursor: pointer;
+  }
+  .bot-btn-secondary:hover { border-color: #2c2c2c; }
+  .bot-btn-ghost {
+    width: 100%; background: none; border: none; color: #8b7355;
+    padding: 8px; font-family: 'Noto Serif', serif; font-size: 0.78rem; cursor: pointer;
+  }
+  .bot-btn-ghost:hover { color: #2c2c2c; }
 
   /* ====== DAILY PUZZLE MODE ====== */
   body.daily-mode .difficulty,
@@ -1139,6 +1419,234 @@
     transition: background 0.2s, color 0.2s;
   }
   .daily-review-btn:hover { background: #e0d8cc; color: #2c2c2c; }
+
+  /* ===== BOT SELECT SCREEN ===== */
+  /* ===== BOT SELECT SCREEN ===== */
+  #botSelectScreen {
+    position: fixed; inset: 0; z-index: 210; background: #f5f0e8;
+    display: flex; flex-direction: column; overflow-y: auto;
+  }
+  #botSelectScreen.hidden { display: none; }
+  .bot-select-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 16px; border-bottom: 1px solid #e0d8cc;
+    background: #f5f0e8; position: sticky; top: 0; z-index: 2; gap: 8px;
+  }
+  .bot-select-nav-group { display: flex; gap: 6px; }
+  .bot-select-title-section {
+    text-align: center; padding: 20px 16px 6px;
+  }
+  .bot-select-title-heading {
+    font-family: 'Noto Serif SC', serif; font-size: 1.05rem; font-weight: 700;
+    color: #2c2c2c; letter-spacing: 1px; margin-bottom: 10px;
+  }
+  .bot-select-elo-pill {
+    display: inline-block;
+    font-family: 'Noto Serif SC', serif; font-size: 0.72rem; font-weight: 700;
+    background: #2c2c2c; color: #f5f0e8; padding: 3px 10px; border-radius: 20px;
+    white-space: nowrap;
+  }
+  .bot-select-back {
+    background: none; border: 1px solid #d4ccc0; padding: 5px 12px;
+    font-family: 'Noto Serif', serif; font-size: 0.78rem; cursor: pointer;
+    color: #2c2c2c; border-radius: 2px; white-space: nowrap;
+  }
+  .bot-select-back:hover { border-color: #2c2c2c; }
+
+  .bot-select-elo-pill {
+    font-family: 'Noto Serif SC', serif; font-size: 0.72rem; font-weight: 700;
+    background: #2c2c2c; color: #f5f0e8; padding: 3px 10px; border-radius: 20px;
+    white-space: nowrap;
+  }
+  .bot-select-stats-btn {
+    background: none; border: 1px solid #d4ccc0; padding: 5px 10px;
+    font-family: 'Noto Serif', serif; font-size: 0.78rem; cursor: pointer;
+    color: #8b7355; border-radius: 2px; white-space: nowrap;
+  }
+  .bot-select-stats-btn:hover { border-color: #8b7355; color: #2c2c2c; }
+
+  /* Tier sections */
+  #botSelectBody { display: flex; flex-direction: column; align-items: center; }
+  .bot-tier-section { padding: 12px 12px 0; width: 100%; max-width: 320px; }
+  .bot-tier-label {
+    font-family: 'Noto Serif SC', serif; font-size: 0.82rem; font-weight: 700;
+    letter-spacing: 2px; text-transform: uppercase; color: #2c2c2c;
+    margin-bottom: 8px; padding-bottom: 4px; border-bottom: 1.5px solid #d4ccc0;
+  }
+  .bot-elo-group { margin-bottom: 10px; }
+  .bot-elo-row-grid {
+    display: grid; grid-template-columns: repeat(3, 82px); gap: 6px;
+  }
+
+  /* Compact card */
+  .bot-card {
+    display: flex; flex-direction: column; align-items: center;
+    padding: 8px 4px 6px; background: rgba(255,255,255,0.75);
+    border: 1.5px solid #d4ccc0; border-radius: 4px; cursor: pointer;
+    transition: border-color 0.15s, background 0.15s; position: relative;
+    text-align: center; overflow: visible;
+  }
+  .bot-card:hover:not(.bot-locked) { border-color: #2c2c2c; background: #fff; }
+  .bot-card.bot-locked { cursor: default; border-color: #e8e2d8; }
+  .bot-avatar {
+    width: 40px; height: 40px; border-radius: 50%;
+    border: 1.5px solid #e0d8cc; margin-bottom: 4px; background: #ede8df;
+    display: block;
+  }
+  .bot-card.bot-locked .bot-avatar { filter: grayscale(1); opacity: 0.45; }
+  .bot-card.bot-locked .bot-name { opacity: 0.45; }
+  .bot-name {
+    font-family: 'Noto Serif SC', serif; font-size: 0.68rem;
+    font-weight: 700; color: #2c2c2c; line-height: 1.2;
+  }
+  .bot-flag { font-size: 0.72rem; }
+  .bot-beaten-pip {
+    position: absolute; top: 3px; right: 4px;
+    width: 6px; height: 6px; border-radius: 50%;
+    background: #c8a96e;
+  }
+  .bot-lock-pip {
+    position: absolute; top: 3px; right: 4px;
+    font-size: 0.55rem; color: #ccc; line-height: 1;
+  }
+
+  /* Tooltip (desktop hover) */
+  .bot-tooltip {
+    display: none; position: absolute;
+    bottom: calc(100% + 7px); left: 50%; transform: translateX(-50%);
+    background: #2c2c2c; color: #f5f0e8;
+    padding: 7px 10px; border-radius: 4px;
+    font-size: 0.68rem; line-height: 1.5;
+    white-space: nowrap; z-index: 20; pointer-events: none;
+    text-align: center;
+  }
+  .bot-tooltip::after {
+    content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
+    border: 5px solid transparent; border-top-color: #2c2c2c;
+  }
+  .bot-card:not(.bot-locked):hover .bot-tooltip { display: block; }
+  .bot-card.bot-locked:hover .bot-locked-tooltip { display: block; }
+  .bot-tooltip-style { font-size: 0.6rem; opacity: 0.7; margin-top: 1px; }
+
+  /* Bot challenge panel (mobile tap / all click) */
+  #botPanel {
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 300;
+    background: #f5f0e8; border-top: 1.5px solid #d4ccc0;
+    padding: 20px 20px 28px;
+    display: flex; flex-direction: column; align-items: center; gap: 10px;
+    transform: translateY(100%); transition: transform 0.25s ease;
+  }
+  #botPanel.open { transform: translateY(0); }
+  .bot-panel-avatar {
+    width: 64px; height: 64px; border-radius: 50%;
+    border: 2px solid #d4ccc0; background: #ede8df;
+  }
+  .bot-panel-name {
+    font-family: 'Noto Serif SC', serif; font-size: 1.1rem; font-weight: 700;
+  }
+  .bot-panel-meta { font-size: 0.75rem; color: #8b7355; }
+  .bot-panel-record { font-size: 0.72rem; color: #999; }
+  .bot-panel-style-badge {
+    font-size: 0.62rem; letter-spacing: 1px; text-transform: uppercase;
+    padding: 2px 8px; border-radius: 2px;
+  }
+  .bot-panel-style-badge.Aggressive { background: #fdebd0; color: #784212; }
+  .bot-panel-style-badge.Balanced   { background: #eaf2ff; color: #1a5276; }
+  .bot-panel-style-badge.Defensive  { background: #e8f8f5; color: #0e6655; }
+  .bot-panel-actions { display: flex; gap: 10px; margin-top: 4px; width: 100%; max-width: 280px; }
+  .bot-panel-challenge {
+    flex: 1; background: #2c2c2c; color: #f5f0e8; border: none;
+    padding: 12px; font-family: 'Noto Serif SC', serif; font-size: 0.85rem;
+    font-weight: 700; letter-spacing: 2px; cursor: pointer; border-radius: 2px;
+  }
+  .bot-panel-challenge:hover { background: #444; }
+  .bot-panel-cancel {
+    background: none; border: 1px solid #d4ccc0; padding: 12px 16px;
+    font-family: 'Noto Serif', serif; font-size: 0.8rem; cursor: pointer;
+    color: #999; border-radius: 2px;
+  }
+  .bot-panel-cancel:hover { border-color: #999; color: #2c2c2c; }
+
+  /* Bot stats modal */
+  #botStatsOverlay {
+    display: none; position: fixed; inset: 0; z-index: 400;
+    background: rgba(0,0,0,0.45); align-items: center; justify-content: center;
+  }
+  #botStatsOverlay.open { display: flex; }
+  .bot-stats-modal {
+    background: #f5f0e8; padding: 24px 20px; max-width: 380px; width: 90%;
+    max-height: 85vh; overflow-y: auto; border-radius: 2px;
+    font-family: 'Noto Serif', Georgia, serif;
+  }
+  .bot-stats-modal h3 {
+    font-family: 'Noto Serif SC', serif; font-size: 0.9rem; font-weight: 700;
+    letter-spacing: 2px; text-transform: uppercase; color: #999;
+    margin: 16px 0 8px; border-top: 1px solid #e0d8cc; padding-top: 12px;
+  }
+  .bot-stats-modal h3:first-child { border-top: none; padding-top: 0; margin-top: 0; }
+  .bot-elo-display {
+    text-align: center; margin-bottom: 4px;
+  }
+  .bot-elo-number {
+    font-size: 2.6rem; font-weight: 900; color: #2c2c2c;
+    font-family: 'Noto Serif SC', serif; line-height: 1;
+  }
+  .bot-elo-label { font-size: 0.68rem; color: #999; letter-spacing: 2px; text-transform: uppercase; }
+  .elo-track {
+    position: relative; height: 6px; background: #e0d8cc; border-radius: 3px;
+    margin: 12px 0 4px;
+  }
+  .elo-track-fill {
+    height: 100%; background: #2c2c2c; border-radius: 3px; transition: width 0.6s ease;
+  }
+  .elo-track-marker {
+    position: absolute; top: -3px; width: 12px; height: 12px;
+    background: #c8a96e; border-radius: 50%; transform: translateX(-50%);
+    border: 2px solid #f5f0e8;
+  }
+  .elo-track-labels {
+    display: flex; justify-content: space-between;
+    font-size: 0.58rem; color: #bbb; margin-top: 2px;
+  }
+  .tier-bar-row {
+    display: flex; align-items: center; gap: 8px; margin-bottom: 7px;
+  }
+  .tier-bar-label { font-size: 0.7rem; color: #8b7355; width: 90px; flex-shrink: 0; }
+  .tier-bar-track {
+    flex: 1; height: 8px; background: #e0d8cc; border-radius: 4px; overflow: hidden;
+  }
+  .tier-bar-fill { height: 100%; background: #2c2c2c; border-radius: 4px; }
+  .tier-bar-pct { font-size: 0.68rem; color: #999; width: 30px; text-align: right; flex-shrink: 0; }
+  .tier-bar-games { font-size: 0.62rem; color: #bbb; }
+  .bot-stats-close-btn {
+    display: block; width: 100%; margin-top: 20px;
+    background: #2c2c2c; color: #f5f0e8; border: none;
+    padding: 11px; font-family: 'Noto Serif SC', serif; font-size: 0.82rem;
+    font-weight: 700; letter-spacing: 2px; cursor: pointer; border-radius: 2px;
+  }
+  .bot-stats-close-btn:hover { background: #444; }
+  .bot-stats-reset-btn {
+    margin-top: 20px; background: none; border: 1px solid #d4ccc0;
+    padding: 11px 14px; font-family: 'Noto Serif', serif; font-size: 0.78rem;
+    color: #c0392b; cursor: pointer; border-radius: 2px; white-space: nowrap;
+  }
+  .bot-stats-reset-btn:hover { border-color: #c0392b; background: #fdf0ee; }
+  .bots-unlocked-row {
+    display: flex; align-items: center; gap: 10px; margin: 6px 0;
+  }
+  .bots-unlocked-track {
+    flex: 1; height: 6px; background: #e0d8cc; border-radius: 3px; overflow: hidden;
+  }
+  .bots-unlocked-fill { height: 100%; background: #c8a96e; border-radius: 3px; }
+  .bots-unlocked-label { font-size: 0.72rem; color: #8b7355; white-space: nowrap; }
+  /* Splash settings button */
+  .splash-settings-row { margin: 14px 0 6px; }
+  .splash-settings-btn {
+    background: none; border: 1px solid #d4ccc0; padding: 5px 14px;
+    font-family: 'Noto Serif', serif; font-size: 0.75rem; color: #8b7355;
+    border-radius: 2px; cursor: pointer;
+  }
+  .splash-settings-btn:hover { border-color: #2c2c2c; color: #2c2c2c; }
 </style>
 </head>
 <body>
@@ -1150,11 +1658,11 @@
   <div class="splash-en">五子棋</div>
   <div class="splash-line"></div>
   <div class="splash-cards">
-    <button class="splash-card" id="cardSinglePlayer">
+    <button class="splash-card" id="cardBots">
       <div class="splash-card-icon">人</div>
       <div class="splash-card-body">
-        <div class="splash-card-title">Single Player</div>
-        <div class="splash-card-sub">Challenge the AI</div>
+        <div class="splash-card-title">Play Bots</div>
+        <div class="splash-card-sub">Challenge rated opponents</div>
       </div>
       <div class="splash-card-arrow">›</div>
     </button>
@@ -1182,6 +1690,9 @@
       </div>
       <div class="splash-soon-badge">SOON</div>
     </button>
+  </div>
+  <div class="splash-settings-row">
+    <button class="splash-settings-btn" id="splashSettingsBtn">⚙ Settings</button>
   </div>
   <div class="splash-footer-links">
     <a href="/how-to-play.html">How to Play</a> &nbsp;·&nbsp;
@@ -1221,6 +1732,42 @@
   </div>
 </div>
 
+<!-- ====== BOT SELECT SCREEN ====== -->
+<div id="botSelectScreen" class="hidden">
+  <div class="bot-select-header">
+    <div class="bot-select-nav-group">
+      <button class="bot-select-back" id="botSelectHome">← Home</button>
+    </div>
+    <div class="bot-select-nav-group">
+      <button class="bot-select-stats-btn" id="botSelectStatsBtn">Stats</button>
+      <button class="bot-select-back" id="botSelectSettings" style="color:#8b7355;">⚙</button>
+    </div>
+  </div>
+  <div class="bot-select-title-section">
+    <div class="bot-select-title-heading">Select Your Opponent</div>
+    <span class="bot-select-elo-pill">Your Rating: <span id="botSelectEloDisplay">800</span></span>
+  </div>
+  <div id="botSelectBody"></div>
+
+  <!-- Bot challenge panel (slides up on card click) -->
+  <div id="botPanel">
+    <img class="bot-panel-avatar" id="botPanelAvatar" src="" alt="">
+    <div class="bot-panel-name" id="botPanelName"></div>
+    <div class="bot-panel-meta" id="botPanelMeta"></div>
+    <div class="bot-panel-style-badge" id="botPanelStyle"></div>
+    <div class="bot-panel-record" id="botPanelRecord"></div>
+    <div class="bot-panel-actions">
+      <button class="bot-panel-challenge" id="botPanelChallenge">Challenge</button>
+      <button class="bot-panel-cancel" id="botPanelCancel">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Bot stats modal -->
+<div id="botStatsOverlay">
+  <div class="bot-stats-modal" id="botStatsContent"></div>
+</div>
+
 <!-- ====== GAME ====== -->
 <div id="game">
   <div class="game-header">
@@ -1240,6 +1787,7 @@
   <div class="scoreboard">
     <span class="score-wins">Wins: <span id="wins">0</span></span>
     <span class="score-losses">Losses: <span id="losses">0</span></span>
+    <span class="score-draws">Draws: <span id="draws">0</span></span>
   </div>
 
   <!-- Daily puzzle info panel -->
@@ -1263,6 +1811,29 @@
       <span id="reviewNavLabel" class="review-nav-label">Puzzle 1 of 5</span>
       <button id="reviewNextBtn" class="review-nav-btn">Next →</button>
       <button id="reviewDoneBtn" class="review-done-btn">Done</button>
+    </div>
+  </div>
+
+  <!-- Bot opponent header strip (vs-bot mode only) -->
+  <div id="botGameHeader" class="hidden">
+    <div class="bgh-player">
+      <img class="bgh-player-avatar" id="bghPlayerAvatar" src="" alt="You" title="Click to edit profile">
+      <div>
+        <div class="bgh-player-name" id="bghPlayerName">You</div>
+        <div class="bgh-player-elo" id="bghPlayerElo"></div>
+      </div>
+    </div>
+    <div class="bgh-vs-label">VS</div>
+    <div class="bgh-bot">
+      <div style="text-align:right;">
+        <div class="bgh-name" id="bghName"></div>
+        <div class="bgh-bot-elo" id="bghBotElo"></div>
+      </div>
+      <div class="bgh-avatar-wrap">
+        <img class="bgh-avatar" id="bghAvatar" src="" alt="">
+        <span class="bgh-style-dot" id="bghStyleDot"></span>
+        <div class="bgh-style-tooltip" id="bghStyleTooltip"></div>
+      </div>
     </div>
   </div>
 
@@ -1304,7 +1875,7 @@
 <!-- ====== START PROMPT ====== -->
 <div class="endgame-overlay" id="startOverlay">
   <div class="endgame">
-    <div class="endgame-sub" style="letter-spacing:4px;text-transform:uppercase;margin-bottom:16px;">Enter the Arena</div>
+    <div class="endgame-sub" id="startArenaLabel" style="letter-spacing:4px;text-transform:uppercase;margin-bottom:16px;">Enter the Arena</div>
     <div id="startDiffRow" style="display:flex;gap:6px;justify-content:center;margin-bottom:18px;">
       <button class="difficulty-start-btn" data-diff="easy">Easy</button>
       <button class="difficulty-start-btn" data-diff="medium">Medium</button>
@@ -1314,8 +1885,78 @@
     <div class="endgame-result" id="startColor"></div>
     <div class="endgame-sub" id="startSub"></div>
     <div class="endgame-actions">
-      <button class="btn-play-now" id="startBegin">Enter</button>
+      <button class="btn-play-now" id="startBegin">Start</button>
       <button class="btn-change-diff" id="startClose">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- ====== BOT PRE-GAME OVERLAY ====== -->
+<div class="endgame-overlay" id="botPregameOverlay">
+  <div class="endgame bot-pregame-inner">
+    <button class="bot-pregame-back" id="botPregameBack">← Back</button>
+    <div class="pregame-matchup">
+      <div class="pregame-side player-side">
+        <div class="pregame-avatar-wrap">
+          <img class="pregame-side-avatar" id="pregamePlayerAvatar" src="" alt="You" title="Click to set up profile">
+        </div>
+        <div class="pregame-side-name" id="pregamePlayerName">You</div>
+        <div class="pregame-side-elo" id="pregamePlayerElo"></div>
+      </div>
+      <div class="pregame-vs-label">VS</div>
+      <div class="pregame-side bot-side">
+        <div class="pregame-avatar-wrap">
+          <img class="pregame-side-avatar" id="botPregameAvatar" src="" alt="">
+          <span class="bot-pregame-flag" id="botPregameFlag"></span>
+        </div>
+        <div class="pregame-side-name" id="botPregameName"></div>
+        <div class="pregame-side-elo" id="botPregameMeta"></div>
+      </div>
+    </div>
+    <div class="bot-pregame-style" id="botPregameStyle"></div>
+    <hr class="bot-pregame-divider">
+    <div class="bot-pregame-colors" id="botPregameColors"></div>
+    <button class="bot-pregame-start" id="botPregameStart">Start Game</button>
+  </div>
+</div>
+
+
+<!-- ====== PROFILE SETUP OVERLAY ====== -->
+<div class="endgame-overlay" id="profileSetupOverlay">
+  <div class="endgame profile-setup-modal">
+    <div class="bot-pregame-name" style="margin-bottom:4px;">Your Profile</div>
+    <div class="profile-setup-sub">Choose an avatar and enter your name</div>
+    <div class="profile-avatar-selected-wrap">
+      <img class="profile-avatar-preview" id="profileAvatarPreview" src="" alt="Your avatar">
+    </div>
+    <div class="profile-avatar-grid" id="profileAvatarGrid"></div>
+    <input class="profile-name-input" id="profileNameInput" type="text" maxlength="16" placeholder="Enter your name…">
+    <div class="profile-setup-actions">
+      <button class="bot-btn-primary" id="profileSaveBtn">Save Profile</button>
+      <button class="bot-btn-ghost" id="profileSkipBtn">Skip for now</button>
+    </div>
+  </div>
+</div>
+
+<!-- ====== BOT ENDGAME OVERLAY ====== -->
+<div class="endgame-overlay" id="botEndgameOverlay">
+  <div class="endgame bot-end-inner">
+    <div class="bot-end-icon" id="botEndIcon"></div>
+    <div class="bot-end-result" id="botEndResult"></div>
+    <div class="bot-end-vs" id="botEndVs"></div>
+    <div class="bot-elo-box">
+      <div class="bot-elo-box-label">Your rating</div>
+      <div class="bot-elo-row">
+        <span class="bot-elo-old" id="botEloOld"></span>
+        <span class="bot-elo-arr">→</span>
+        <span class="bot-elo-new" id="botEloNew"></span>
+        <span class="bot-elo-delta" id="botEloDelta"></span>
+      </div>
+    </div>
+    <div class="bot-end-actions">
+      <button class="bot-btn-primary" id="botRematch">Rematch</button>
+      <button class="bot-btn-secondary" id="botChallengeNew">Challenge New Bot</button>
+      <button class="bot-btn-ghost" id="botEndHome">Home</button>
     </div>
   </div>
 </div>
@@ -1369,6 +2010,9 @@
         <span class="toggle-track"></span>
         <span class="toggle-thumb"></span>
       </label>
+    </div>
+    <div class="settings-danger">
+      <button class="btn-danger-small" id="deleteProfileBtn">Delete Profile</button>
     </div>
     <div class="settings-close-wrap">
       <button class="btn-settings-close" id="settingsCloseBtn">Close</button>
@@ -1560,14 +2204,293 @@ function goHome() {
   } else if (gameInProgress) {
     showConfirm('Leave Game?', 'This counts as a loss.', 'Leave', () => {
       recordForfeit();
+      currentBot = null; gameMode = 'vs-ai';
       splash.classList.remove('hidden');
     });
   } else {
+    currentBot = null; gameMode = 'vs-ai';
     splash.classList.remove('hidden');
   }
 }
 
-document.getElementById('cardSinglePlayer').addEventListener('click', () => enterMode('vs-ai'));
+let _panelBot = null;
+
+function renderBotSelectScreen() {
+  document.getElementById('botSelectEloDisplay').textContent = playerElo;
+  const tiers = ['Beginner', 'Intermediate', 'Expert', 'Master'];
+  const body = document.getElementById('botSelectBody');
+  body.innerHTML = '';
+
+  for (const tier of tiers) {
+    const section = document.createElement('div');
+    section.className = 'bot-tier-section';
+    section.innerHTML = `<div class="bot-tier-label">${tier}</div>`;
+
+    // Group by ELO within tier — no ELO sub-label shown, ratings visible in tooltip
+    const elosInTier = [...new Set(BOTS.filter(b => b.tier === tier).map(b => b.elo))];
+    for (const elo of elosInTier) {
+      const group = document.createElement('div');
+      group.className = 'bot-elo-group';
+      const rowGrid = document.createElement('div');
+      rowGrid.className = 'bot-elo-row-grid';
+
+      // Find prev ELO for unlock message
+      const prevEloIdx = BOT_ELO_SEQUENCE.indexOf(elo) - 1;
+      const prevElo = prevEloIdx >= 0 ? BOT_ELO_SEQUENCE[prevEloIdx] : null;
+
+      const rowBots = BOTS.filter(b => b.elo === elo);
+      for (const bot of rowBots) {
+        const unlocked = isEloUnlocked(bot.elo);
+        const stat = getBotStat(bot.id);
+        const beaten = stat.w >= 1;
+        const card = document.createElement('div');
+        card.className = 'bot-card' + (unlocked ? '' : ' bot-locked');
+        if (unlocked) {
+          card.innerHTML = `
+            ${beaten ? '<span class="bot-beaten-pip"></span>' : ''}
+            <img class="bot-avatar" src="${avatarUrl(bot.seed)}" alt="${bot.name}" loading="lazy">
+            <div class="bot-name">${bot.name} <span class="bot-flag">${bot.flag || ''}</span></div>
+            <div class="bot-tooltip">
+              <div><strong>${bot.elo} Rating</strong></div>
+              <div class="bot-tooltip-style">${bot.style}</div>
+              <div>${stat.w}W · ${stat.l}L · ${stat.d}D</div>
+            </div>
+          `;
+          card.addEventListener('click', (e) => { e.stopPropagation(); showBotPanel(bot); });
+        } else {
+          const unlockMsg = prevElo ? `Beat all ${prevElo} Rating bots to unlock` : 'Locked';
+          card.innerHTML = `
+            <span class="bot-lock-pip">🔒</span>
+            <img class="bot-avatar" src="${avatarUrl(bot.seed)}" alt="${bot.name}" loading="lazy">
+            <div class="bot-name">${bot.name} <span class="bot-flag">${bot.flag || ''}</span></div>
+            <div class="bot-tooltip bot-locked-tooltip">${unlockMsg}</div>
+          `;
+        }
+        rowGrid.appendChild(card);
+      }
+      group.appendChild(rowGrid);
+      section.appendChild(group);
+    }
+    body.appendChild(section);
+  }
+}
+
+function showBotPanel(bot) {
+  _panelBot = bot;
+  const stat = getBotStat(bot.id);
+  document.getElementById('botPanelAvatar').src = avatarUrl(bot.seed);
+  document.getElementById('botPanelAvatar').alt = bot.name;
+  document.getElementById('botPanelName').textContent = bot.name;
+  document.getElementById('botPanelMeta').textContent = `ELO ${bot.elo} · ${bot.tier}`;
+  const styleEl = document.getElementById('botPanelStyle');
+  styleEl.textContent = bot.style;
+  styleEl.className = `bot-panel-style-badge ${bot.style}`;
+  const gp = stat.w + stat.l + stat.d;
+  document.getElementById('botPanelRecord').textContent = gp === 0 ? 'No games yet' : `${stat.w}W · ${stat.l}L · ${stat.d}D`;
+  document.getElementById('botPanel').classList.add('open');
+}
+
+function hideBotPanel() {
+  document.getElementById('botPanel').classList.remove('open');
+  _panelBot = null;
+}
+
+function openBotStats() {
+  const tiers = ['Beginner', 'Intermediate', 'Expert', 'Master'];
+  const tierTotals = {};
+  for (const t of tiers) tierTotals[t] = {w:0,l:0,d:0};
+  for (const bot of BOTS) {
+    const s = getBotStat(bot.id);
+    tierTotals[bot.tier].w += s.w;
+    tierTotals[bot.tier].l += s.l;
+    tierTotals[bot.tier].d += s.d;
+  }
+  const pctFn = (w, gp) => gp === 0 ? null : Math.round(w / gp * 100);
+  const gp = s => s.w + s.l + s.d;
+
+  const unlockedCount = BOTS.filter(b => isEloUnlocked(b.elo)).length;
+  const beatenCount   = BOTS.filter(b => isBotBeaten(b.id)).length;
+
+  // ELO track: range 100–2400, marker at playerElo
+  const eloMin = 100, eloMax = 2400;
+  const eloFillPct  = Math.min(100, Math.max(0, (playerElo - eloMin) / (eloMax - eloMin) * 100)).toFixed(1);
+  const eloMarkerPct = eloFillPct;
+
+  const tierRows = tiers.map(t => {
+    const s = tierTotals[t];
+    const games = gp(s);
+    const p = pctFn(s.w, games);
+    const barW = p === null ? 0 : p;
+    return `
+      <div class="tier-bar-row">
+        <div class="tier-bar-label">${t}</div>
+        <div class="tier-bar-track"><div class="tier-bar-fill" style="width:${barW}%"></div></div>
+        <div class="tier-bar-pct">${p === null ? '—' : p + '%'}</div>
+      </div>
+      <div class="tier-bar-games" style="text-align:right;margin:-4px 0 6px;font-size:0.6rem;color:#bbb">${games === 0 ? 'No games' : games + ' game' + (games===1?'':'s') + ' · ' + s.w + 'W ' + s.l + 'L ' + s.d + 'D'}</div>`;
+  }).join('');
+
+  const profileCard = playerProfile
+    ? `<div class="stats-profile-card">
+        <img class="stats-profile-avatar" id="statsProfileAvatar" src="${avatarUrl(playerProfile.avatarSeed)}" alt="${playerProfile.name}">
+        <div class="stats-profile-info">
+          <div class="stats-profile-name">${playerProfile.name}</div>
+          <div class="stats-profile-tier">${getPlayerTier(playerElo)}</div>
+        </div>
+        <button class="stats-edit-btn" id="statsEditProfileBtn">Edit Profile</button>
+      </div>`
+    : `<div class="stats-profile-card">
+        <img class="stats-profile-avatar" id="statsProfileAvatar" src="${PLAYER_AVATAR_PLACEHOLDER}" alt="No profile" style="opacity:0.6;">
+        <div class="stats-profile-info">
+          <div class="stats-profile-name" style="color:#8b7355;font-style:italic;">Anonymous</div>
+          <div class="stats-profile-tier">${getPlayerTier(playerElo)}</div>
+        </div>
+        <button class="stats-edit-btn" id="statsEditProfileBtn">Set Up Profile</button>
+      </div>`;
+
+  document.getElementById('botStatsContent').innerHTML = profileCard + `
+    <h3>Your Rating</h3>
+    <div class="bot-elo-display">
+      <div class="bot-elo-number">${playerElo}</div>
+      <div class="bot-elo-label">Estimated ELO</div>
+    </div>
+    <div class="elo-track">
+      <div class="elo-track-fill" style="width:${eloFillPct}%"></div>
+      <div class="elo-track-marker" style="left:${eloMarkerPct}%"></div>
+    </div>
+    <div class="elo-track-labels">
+      <span>100</span><span>Beg</span><span>Int</span><span>Exp</span><span>Master</span><span>2400</span>
+    </div>
+
+    <h3>Win Rate by Tier</h3>
+    ${tierRows}
+
+    <h3>Progress</h3>
+    <div class="bots-unlocked-row">
+      <div class="bots-unlocked-track">
+        <div class="bots-unlocked-fill" style="width:${Math.round(beatenCount/36*100)}%"></div>
+      </div>
+      <div class="bots-unlocked-label">${beatenCount} / 36 beaten</div>
+    </div>
+    <div class="bots-unlocked-row">
+      <div class="bots-unlocked-track">
+        <div class="bots-unlocked-fill" style="width:${Math.round(unlockedCount/36*100)}%;background:#d4ccc0"></div>
+      </div>
+      <div class="bots-unlocked-label">${unlockedCount} / 36 unlocked</div>
+    </div>
+
+    <div style="display:flex;gap:8px;margin-top:4px;">
+      <button class="bot-stats-close-btn" id="botStatsCloseBtn" style="flex:1">Done</button>
+      <button class="bot-stats-reset-btn" id="botStatsResetBtn">Reset Stats</button>
+    </div>
+  `;
+  document.getElementById('botStatsCloseBtn').addEventListener('click', closeBotStats);
+  document.getElementById('statsEditProfileBtn').addEventListener('click', () => {
+    closeBotStats();
+    showProfileSetup(() => { openBotStats(); });
+  });
+  document.getElementById('statsProfileAvatar').addEventListener('click', () => {
+    closeBotStats();
+    showProfileSetup(() => { openBotStats(); });
+  });
+  document.getElementById('botStatsResetBtn').addEventListener('click', () => {
+    showConfirm('Reset All Stats?', 'This will clear all bot W/L records and reset your ELO to ' + PLAYER_ELO_START + '.', 'Reset', () => {
+      localStorage.removeItem(BOT_STATS_KEY);
+      localStorage.removeItem(PLAYER_ELO_KEY);
+      localStorage.removeItem(NEXT_BLACK_KEY);
+      botStats = {};
+      playerElo = PLAYER_ELO_START;
+      Object.keys(nextIsBlack).forEach(k => { if (!['easy','medium','hard'].includes(k)) delete nextIsBlack[k]; });
+      closeBotStats();
+      renderBotSelectScreen();
+    }, true);
+  });
+  document.getElementById('botStatsOverlay').classList.add('open');
+}
+
+function closeBotStats() {
+  document.getElementById('botStatsOverlay').classList.remove('open');
+}
+
+function openBotSelect() {
+  botStats = loadBotStats();
+  playerElo = loadPlayerElo();
+  renderBotSelectScreen();
+  document.getElementById('botSelectScreen').classList.remove('hidden');
+}
+
+function closeBotSelect() {
+  document.getElementById('botSelectScreen').classList.add('hidden');
+}
+
+function showBotPregame(bot) {
+  // Determine color for this game (don't flip yet — flip happens on Start)
+  if (nextIsBlack[bot.id] === undefined) nextIsBlack[bot.id] = true;
+  const youBlack = nextIsBlack[bot.id];
+
+  // Player side
+  document.getElementById('pregamePlayerAvatar').src = getPlayerAvatarSrc();
+  document.getElementById('pregamePlayerName').textContent = getPlayerDisplayName();
+  document.getElementById('pregamePlayerElo').textContent = playerElo + ' Rating · ' + getPlayerTier(playerElo);
+  // Bot side
+  document.getElementById('botPregameAvatar').src = avatarUrl(bot.seed);
+  document.getElementById('botPregameAvatar').alt = bot.name;
+  document.getElementById('botPregameFlag').textContent = bot.flag || '';
+  document.getElementById('botPregameName').textContent = bot.name;
+  document.getElementById('botPregameMeta').textContent = bot.elo + ' Rating · ' + bot.tier;
+  const styleEl = document.getElementById('botPregameStyle');
+  styleEl.textContent = bot.style;
+  styleEl.className = 'bot-pregame-style ' + bot.style;
+
+  const colorsEl = document.getElementById('botPregameColors');
+  colorsEl.innerHTML = `
+    <div class="bot-color-card ${youBlack ? 'you' : ''}">
+      <span class="bot-color-stone">⚫</span>
+      <div class="bot-color-who">${youBlack ? 'You' : bot.name}</div>
+      <div class="bot-color-name">Black</div>
+      <div class="bot-color-first">Opens first</div>
+    </div>
+    <div class="bot-color-card ${!youBlack ? 'you' : ''}">
+      <span class="bot-color-stone">⚪</span>
+      <div class="bot-color-who">${!youBlack ? 'You' : bot.name}</div>
+      <div class="bot-color-name">White</div>
+      <div class="bot-color-first">&nbsp;</div>
+    </div>
+  `;
+
+  document.getElementById('botPregameOverlay').classList.add('open');
+}
+
+function startBotGame(bot) {
+  currentBot = bot;
+  gameMode = 'vs-bot';
+  closeBotSelect();
+  splash.classList.add('hidden');
+  initAudio();
+  if (audioPrefs.music) playMusic();
+  showBotPregame(bot);
+}
+
+document.getElementById('cardBots').addEventListener('click', openBotSelect);
+document.getElementById('botSelectHome').addEventListener('click', () => {
+  hideBotPanel();
+  closeBotSelect();
+  splash.classList.remove('hidden');
+});
+document.getElementById('botSelectSettings').addEventListener('click', () => settingsOverlay.classList.add('open'));
+document.getElementById('botPregameBack').addEventListener('click', () => {
+  document.getElementById('botPregameOverlay').classList.remove('open');
+  openBotSelect();
+});
+document.getElementById('botPregameStart').addEventListener('click', () => {
+  document.getElementById('botPregameOverlay').classList.remove('open');
+  newGame();
+});
+document.getElementById('botSelectStatsBtn').addEventListener('click', openBotStats);
+document.getElementById('botPanelChallenge').addEventListener('click', () => { if (_panelBot) { const bot = _panelBot; hideBotPanel(); startBotGame(bot); } });
+document.getElementById('botPanelCancel').addEventListener('click', hideBotPanel);
+document.getElementById('botSelectBody').addEventListener('click', () => hideBotPanel());
+document.getElementById('botStatsOverlay').addEventListener('click', e => { if (e.target === document.getElementById('botStatsOverlay')) closeBotStats(); });
 document.getElementById('cardPassPlay').addEventListener('click', () => enterMode('vs-human'));
 document.getElementById('cardOnline').addEventListener('click', () => {
   document.getElementById('onlineScreen').classList.remove('hidden');
@@ -1594,9 +2517,213 @@ function saveNextBlack() { localStorage.setItem(NEXT_BLACK_KEY, JSON.stringify(n
 const nextIsBlack = loadNextBlack();
 const DIRS = [[0,1],[1,0],[1,1],[1,-1]];
 
+// ====== BOT DATA ======
+const STYLE_WEIGHTS = {
+  Aggressive: { attackW: 1.4, defenseW: 0.8 },
+  Balanced:   { attackW: 1.0, defenseW: 1.0 },
+  Defensive:  { attackW: 0.8, defenseW: 1.4 },
+};
+
+// COMPLY_TABLE: probability bot follows each tactical rule when situation arises
+// Rules: [0]take-win [1]block-5 [2]play-open4 [3]block-open4 [4]block-closed4
+//        [5]create-double4 [6]block-double4 [7]create-open3 [8]block-open3 [9]broken-patterns
+const COMPLY_TABLE = {
+  550:  [0.80, 0.65, 0.30, 0.25, 0.15, 0.05, 0.05, 0.00, 0.33, 0.00],
+  700:  [0.90, 0.80, 0.45, 0.40, 0.30, 0.15, 0.15, 0.05, 0.37, 0.05],
+  850:  [0.97, 0.93, 0.60, 0.60, 0.50, 0.30, 0.30, 0.15, 0.40, 0.10],
+  1000: [1.00, 0.99, 0.75, 0.80, 0.70, 0.55, 0.55, 0.35, 0.50, 0.20],
+  1150: [1.00, 1.00, 0.88, 0.93, 0.88, 0.75, 0.75, 0.55, 0.63, 0.40],
+  1300: [1.00, 1.00, 0.95, 0.98, 0.96, 0.88, 0.88, 0.72, 0.75, 0.60],
+  1450: [1.00, 1.00, 0.99, 1.00, 1.00, 0.95, 0.95, 0.85, 0.83, 0.75],
+  1600: [1.00, 1.00, 1.00, 1.00, 1.00, 0.98, 0.98, 0.92, 0.90, 0.85],
+  1750: [1.00, 1.00, 1.00, 1.00, 1.00, 0.99, 0.99, 0.96, 0.95, 0.92],
+  1900: [1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 0.98, 0.97, 0.96],
+  2050: [1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 0.99, 0.99, 0.98],
+  2200: [1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 0.99],
+};
+
+const BOT_MOVE_WEIGHTS = {
+  550:  [0.12,0.13,0.13,0.12,0.12,0.10,0.09,0.08,0.06,0.05],
+  700:  [0.18,0.17,0.15,0.13,0.11,0.08,0.07,0.05,0.04,0.02],
+  850:  [0.26,0.20,0.16,0.12,0.09,0.07,0.04,0.03,0.02,0.01],
+  1000: [0.36,0.22,0.15,0.10,0.07,0.04,0.03,0.01,0.01,0.01],
+  1150: [0.46,0.23,0.13,0.08,0.05,0.02,0.01,0.01,0.005,0.005],
+  1300: [0.56,0.21,0.11,0.06,0.03,0.01,0.01,0.005,0.0025,0.0025],
+  1450: [0.64,0.19,0.09,0.04,0.02,0.01,0.005,0.003,0.001,0.001],
+  1600: [0.71,0.16,0.07,0.03,0.015,0.005,0.003,0.002,0.002,0.002],
+  1750: [0.78,0.12,0.05,0.025,0.01,0.005,0.003,0.002,0.002,0.001],
+  1900: [0.83,0.10,0.04,0.015,0.008,0.003,0.002,0.001,0.0005,0.0005],
+  2050: [0.87,0.08,0.03,0.01,0.006,0.002,0.001,0.0005,0.0002,0.0003],
+  2200: [0.91,0.06,0.02,0.006,0.003,0.0005,0.0002,0.0001,0.0001,0.0001],
+};
+
+const BOTS = [
+  {id:'kofi',    tier:'Beginner',    elo:550,  style:'Aggressive', name:'Kofi',    seed:'Kofi',    flag:'🇬🇭'},
+  {id:'lily',    tier:'Beginner',    elo:550,  style:'Balanced',   name:'Lily',    seed:'Lily',    flag:'🇦🇺'},
+  {id:'ravi',    tier:'Beginner',    elo:550,  style:'Defensive',  name:'Ravi',    seed:'Ravi',    flag:'🇮🇳'},
+  {id:'carlos',  tier:'Beginner',    elo:700,  style:'Aggressive', name:'Carlos',  seed:'Carlos',  flag:'🇲🇽'},
+  {id:'sofia',   tier:'Beginner',    elo:700,  style:'Balanced',   name:'Sofia',   seed:'Sofia',   flag:'🇮🇹'},
+  {id:'yuki',    tier:'Beginner',    elo:700,  style:'Defensive',  name:'Yuki',    seed:'Yuki',    flag:'🇯🇵'},
+  {id:'tariq',   tier:'Beginner',    elo:850,  style:'Aggressive', name:'Tariq',   seed:'Tariq',   flag:'🇲🇦'},
+  {id:'emma',    tier:'Beginner',    elo:850,  style:'Balanced',   name:'Emma',    seed:'Emma',    flag:'🇩🇪'},
+  {id:'soojin',  tier:'Beginner',    elo:850,  style:'Defensive',  name:'Soo-Jin', seed:'SooJin',  flag:'🇰🇷'},
+  {id:'aisha',   tier:'Intermediate',elo:1000, style:'Aggressive', name:'Aisha',   seed:'Aisha',   flag:'🇳🇬'},
+  {id:'tom',     tier:'Intermediate',elo:1000, style:'Balanced',   name:'Tom',     seed:'Tom',     flag:'🇺🇸'},
+  {id:'lin',     tier:'Intermediate',elo:1000, style:'Defensive',  name:'Lin',     seed:'Lin',     flag:'🇨🇳'},
+  {id:'diego',   tier:'Intermediate',elo:1150, style:'Aggressive', name:'Diego',   seed:'Diego',   flag:'🇦🇷'},
+  {id:'priya',   tier:'Intermediate',elo:1150, style:'Balanced',   name:'Priya',   seed:'Priya',   flag:'🇮🇳'},
+  {id:'erik',    tier:'Intermediate',elo:1150, style:'Defensive',  name:'Erik',    seed:'Erik',    flag:'🇸🇪'},
+  {id:'nia',     tier:'Intermediate',elo:1300, style:'Aggressive', name:'Nia',     seed:'Nia',     flag:'🇰🇪'},
+  {id:'kenji',   tier:'Intermediate',elo:1300, style:'Balanced',   name:'Kenji',   seed:'Kenji',   flag:'🇯🇵'},
+  {id:'amara',   tier:'Intermediate',elo:1300, style:'Defensive',  name:'Amara',   seed:'Amara',   flag:'🇸🇳'},
+  {id:'jin',     tier:'Expert',      elo:1450, style:'Aggressive', name:'Jin',     seed:'Jin',     flag:'🇨🇳'},
+  {id:'fatima',  tier:'Expert',      elo:1450, style:'Balanced',   name:'Fatima',  seed:'Fatima',  flag:'🇩🇿'},
+  {id:'luca',    tier:'Expert',      elo:1450, style:'Defensive',  name:'Luca',    seed:'Luca',    flag:'🇮🇹'},
+  {id:'omar',    tier:'Expert',      elo:1600, style:'Aggressive', name:'Omar',    seed:'Omar',    flag:'🇪🇬'},
+  {id:'elena',   tier:'Expert',      elo:1600, style:'Balanced',   name:'Elena',   seed:'Elena',   flag:'🇷🇺'},
+  {id:'yui',     tier:'Expert',      elo:1600, style:'Defensive',  name:'Yui',     seed:'Yui',     flag:'🇯🇵'},
+  {id:'marco',   tier:'Expert',      elo:1750, style:'Aggressive', name:'Marco',   seed:'Marco',   flag:'🇧🇷'},
+  {id:'mei',     tier:'Expert',      elo:1750, style:'Balanced',   name:'Mei',     seed:'Mei',     flag:'🇨🇳'},
+  {id:'leila',   tier:'Expert',      elo:1750, style:'Defensive',  name:'Leila',   seed:'Leila',   flag:'🇮🇷'},
+  {id:'arjun',   tier:'Master',      elo:1900, style:'Aggressive', name:'Arjun',   seed:'Arjun',   flag:'🇮🇳'},
+  {id:'sakura',  tier:'Master',      elo:1900, style:'Balanced',   name:'Sakura',  seed:'Sakura',  flag:'🇯🇵'},
+  {id:'nikolai', tier:'Master',      elo:1900, style:'Defensive',  name:'Nikolai', seed:'Nikolai', flag:'🇷🇺'},
+  {id:'yuna',    tier:'Master',      elo:2050, style:'Aggressive', name:'Yuna',    seed:'Yuna',    flag:'🇰🇷'},
+  {id:'chen',    tier:'Master',      elo:2050, style:'Balanced',   name:'Chen',    seed:'Chen',    flag:'🇨🇳'},
+  {id:'ingrid',  tier:'Master',      elo:2050, style:'Defensive',  name:'Ingrid',  seed:'Ingrid',  flag:'🇸🇪'},
+  {id:'hiro',    tier:'Master',      elo:2200, style:'Aggressive', name:'Hiro',    seed:'Hiro',    flag:'🇯🇵'},
+  {id:'wei',     tier:'Master',      elo:2200, style:'Balanced',   name:'Wei',     seed:'Wei',     flag:'🇨🇳'},
+  {id:'zara',    tier:'Master',      elo:2200, style:'Defensive',  name:'Zara',    seed:'Zara',    flag:'🇵🇰'},
+];
+
+const BOT_ELO_SEQUENCE = [550, 700, 850, 1000, 1150, 1300, 1450, 1600, 1750, 1900, 2050, 2200];
+const BOT_UNLOCKED_DEFAULT_ELOS = new Set([550, 700, 850, 1000]);
+const BOT_STATS_KEY = 'gomoku_bot_stats';
+const PLAYER_ELO_KEY = 'gomoku_player_elo';
+const PLAYER_ELO_START = 800;
+const ELO_K = 32;
+
+let currentBot = null;
+let playerElo = PLAYER_ELO_START;
+let botStats = {};
+let lastEloDelta = 0;
+
+function loadBotStats() {
+  try { return JSON.parse(localStorage.getItem(BOT_STATS_KEY)) || {}; } catch { return {}; }
+}
+function saveBotStats() { localStorage.setItem(BOT_STATS_KEY, JSON.stringify(botStats)); }
+function loadPlayerElo() {
+  try { const v = JSON.parse(localStorage.getItem(PLAYER_ELO_KEY)); return (typeof v === 'number') ? v : PLAYER_ELO_START; } catch { return PLAYER_ELO_START; }
+}
+function savePlayerElo() { localStorage.setItem(PLAYER_ELO_KEY, JSON.stringify(playerElo)); }
+
+function getBotStat(id) { return botStats[id] || {w:0, l:0, d:0}; }
+function isBotBeaten(id) { return getBotStat(id).w >= 1; }
+
+function isEloUnlocked(elo) {
+  if (BOT_UNLOCKED_DEFAULT_ELOS.has(elo)) return true;
+  const idx2 = BOT_ELO_SEQUENCE.indexOf(elo);
+  if (idx2 <= 0) return true;
+  const prevElo = BOT_ELO_SEQUENCE[idx2 - 1];
+  return BOTS.filter(b => b.elo === prevElo).every(b => isBotBeaten(b.id));
+}
+
+function calcEloChange(result) {
+  if (!currentBot) return 0;
+  const expected = 1 / (1 + Math.pow(10, (currentBot.elo - playerElo) / 400));
+  return Math.round(ELO_K * (result - expected));
+}
+
+function avatarUrl(seed) {
+  return `https://api.dicebear.com/9.x/avataaars/svg?seed=${seed}`;
+}
+
+// ====== PLAYER PROFILE ======
+const PLAYER_PROFILE_KEY = 'gomoku_player_profile';
+const AVATAR_SHUFFLE_SEEDS = [
+  'Alex','Jordan','Sam','Morgan','Casey','Riley','Avery','Quinn',
+  'Blake','Skyler','Drew','Reese','Finley','Sage','Harley','Dakota',
+  'Phoenix','River','Emerson','Hayden','Kendall','Logan','Marlowe','Noel',
+  'Claude','Iris','Leo','Mia','Owen','Piper','Rowan','Stella'
+];
+
+let playerProfile = null; // { name: string, avatarSeed: string }
+
+function loadPlayerProfile() {
+  try {
+    const v = JSON.parse(localStorage.getItem(PLAYER_PROFILE_KEY));
+    return (v && v.name) ? v : null;
+  } catch { return null; }
+}
+function savePlayerProfile() {
+  localStorage.setItem(PLAYER_PROFILE_KEY, JSON.stringify(playerProfile));
+}
+function deletePlayerProfile() {
+  localStorage.removeItem(PLAYER_PROFILE_KEY);
+  playerProfile = null;
+}
+
+playerProfile = loadPlayerProfile();
+
+let _profileShuffleSeed = AVATAR_SHUFFLE_SEEDS[Math.floor(Math.random() * AVATAR_SHUFFLE_SEEDS.length)];
+
+function showProfileSetup(onDone) {
+  _profileShuffleSeed = playerProfile ? playerProfile.avatarSeed : AVATAR_SHUFFLE_SEEDS[0];
+  document.getElementById('profileAvatarPreview').src = avatarUrl(_profileShuffleSeed);
+  document.getElementById('profileNameInput').value = playerProfile ? playerProfile.name : '';
+
+  // Build avatar grid
+  const grid = document.getElementById('profileAvatarGrid');
+  grid.innerHTML = AVATAR_SHUFFLE_SEEDS.map(seed => `
+    <div class="profile-avatar-grid-item${seed === _profileShuffleSeed ? ' selected' : ''}" data-seed="${seed}">
+      <img src="${avatarUrl(seed)}" alt="${seed}" loading="lazy">
+    </div>
+  `).join('');
+  grid.querySelectorAll('.profile-avatar-grid-item').forEach(item => {
+    item.addEventListener('click', () => {
+      _profileShuffleSeed = item.dataset.seed;
+      document.getElementById('profileAvatarPreview').src = avatarUrl(_profileShuffleSeed);
+      grid.querySelectorAll('.profile-avatar-grid-item').forEach(i => i.classList.remove('selected'));
+      item.classList.add('selected');
+    });
+  });
+
+  const overlay = document.getElementById('profileSetupOverlay');
+  overlay.classList.add('open');
+  overlay._onDone = onDone || null;
+}
+
+function hideProfileSetup() {
+  document.getElementById('profileSetupOverlay').classList.remove('open');
+}
+
+function getPlayerDisplayName() {
+  return playerProfile ? playerProfile.name : 'You';
+}
+function getPlayerAvatarSeed() {
+  return playerProfile ? playerProfile.avatarSeed : null;
+}
+
+const PLAYER_AVATAR_PLACEHOLDER = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='47' fill='%23ede8df' stroke='%23c8b89a' stroke-width='3' stroke-dasharray='8 5'/><text x='50' y='66' text-anchor='middle' font-size='46' fill='%23c8b89a' font-family='Georgia%2C serif'>?</text></svg>";
+
+function getPlayerAvatarSrc() {
+  return playerProfile ? avatarUrl(playerProfile.avatarSeed) : PLAYER_AVATAR_PLACEHOLDER;
+}
+
+function getPlayerTier(elo) {
+  if (elo < 1000) return 'Beginner';
+  if (elo < 1450) return 'Intermediate';
+  if (elo < 1900) return 'Expert';
+  return 'Master';
+}
+
+// Init bot stats and player elo from localStorage
+botStats = loadBotStats();
+playerElo = loadPlayerElo();
+
 let board = Array(TOTAL).fill(null);
 let gameOver = false;
-let gameMode = 'vs-ai'; // 'vs-ai' | 'vs-human'
+let gameMode = 'vs-ai'; // 'vs-ai' | 'vs-human' | 'vs-bot'
 let currentPlayer = HUMAN; // used in pass-and-play to track whose turn
 let difficulty = 'easy';
 let scores = { wins: 0, losses: 0, draws: 0 };
@@ -1620,6 +2747,7 @@ function saveActiveGame() {
   localStorage.setItem(GAME_STATE_KEY, JSON.stringify({
     board: board.slice(), difficulty, humanIsBlack, gameMode, currentPlayer,
     moveHistory: moveHistory.slice(), undosRemaining, hintsRemaining,
+    currentBotId: currentBot ? currentBot.id : null,
   }));
 }
 function clearActiveGame() { localStorage.removeItem(GAME_STATE_KEY); }
@@ -1636,6 +2764,7 @@ function restoreActiveGame() {
     moveHistory    = saved.moveHistory || [];
     undosRemaining = saved.undosRemaining !== undefined ? saved.undosRemaining : MAX_UNDOS;
     hintsRemaining = saved.hintsRemaining !== undefined ? saved.hintsRemaining : HINT_LIMITS[difficulty];
+    currentBot     = saved.currentBotId ? (BOTS.find(b => b.id === saved.currentBotId) || null) : null;
     gameOver = false;
 
     // Sync difficulty buttons
@@ -1683,14 +2812,14 @@ function restoreActiveGame() {
       enableBoard();
       if (gameMode === 'vs-human') {
         const p1Turn = currentPlayer === HUMAN;
-        statusEl.textContent = 'Welcome back. ' + (p1Turn ? '⚫ Player 1' : '⚪ Player 2') + ' to move';
+        statusEl.textContent = 'Welcome back. ' + (p1Turn ? '⚫ Player 1' : '⚪ Player 2') + ' · Your Move';
         setTimeout(() => {
-          if (!gameOver) statusEl.textContent = (p1Turn ? '⚫ Player 1' : '⚪ Player 2') + ', your move';
+          if (!gameOver) statusEl.textContent = (p1Turn ? '⚫ Player 1' : '⚪ Player 2') + ' · Your Move';
         }, 2500);
       } else {
         statusEl.textContent = 'Welcome back. ' + (humanIsBlack ? '⚫' : '⚪') + ' your move';
         setTimeout(() => {
-          if (!gameOver) statusEl.textContent = (humanIsBlack ? '⚫' : '⚪') + ', your move';
+          if (!gameOver) statusEl.textContent = (humanIsBlack ? '⚫' : '⚪') + ' · Your Move';
         }, 2500);
       }
     }, cumDelay + 400);
@@ -1780,8 +2909,18 @@ confirmOverlay.addEventListener('click', e => {
 
 function recordForfeit() {
   scores.losses++;
-  lifetime[difficulty].l++;
-  saveLifetime();
+  if (gameMode === 'vs-bot' && currentBot) {
+    const stat = getBotStat(currentBot.id);
+    stat.l++;
+    botStats[currentBot.id] = stat;
+    const delta = calcEloChange(0);
+    playerElo = Math.max(100, playerElo + delta);
+    lastEloDelta = delta;
+    saveBotStats(); savePlayerElo();
+  } else {
+    lifetime[difficulty].l++;
+    saveLifetime();
+  }
   clearActiveGame();
   updateScoreboard();
 }
@@ -1881,17 +3020,44 @@ function checkEnd(pos, player) {
       statusEl.textContent = 'Victory!';
       statusEl.className = 'status win';
       const humanMoveCount = humanIsBlack ? Math.ceil(moveHistory.length / 2) : Math.floor(moveHistory.length / 2);
-      scores.wins++; lifetime[difficulty].w++; lifetime[difficulty].mw += humanMoveCount;
-      trackEvent('game_completed', { difficulty, outcome: 'win', move_count: humanMoveCount });
-      saveLifetime(); clearActiveGame(); updateScoreboard(); disableBoard();
+      scores.wins++;
+      if (gameMode === 'vs-bot' && currentBot) {
+        const stat = getBotStat(currentBot.id);
+        stat.w++;
+        botStats[currentBot.id] = stat;
+        const delta = calcEloChange(1);
+        playerElo = Math.max(100, playerElo + delta);
+        lastEloDelta = delta;
+        saveBotStats(); savePlayerElo();
+        trackEvent('game_completed', { difficulty: 'bot-' + currentBot.elo, outcome: 'win', move_count: humanMoveCount });
+      } else {
+        lifetime[difficulty].w++; lifetime[difficulty].mw += humanMoveCount;
+        trackEvent('game_completed', { difficulty, outcome: 'win', move_count: humanMoveCount });
+        saveLifetime();
+      }
+      clearActiveGame(); updateScoreboard(); disableBoard();
       setTimeout(() => showEndgame('win'), 600);
     } else {
       statusEl.textContent = 'Defeat';
       statusEl.className = 'status lose';
-      scores.losses++; lifetime[difficulty].l++;
-      const humanMoveCount = humanIsBlack ? Math.ceil(moveHistory.length / 2) : Math.floor(moveHistory.length / 2);
-      trackEvent('game_completed', { difficulty, outcome: 'loss', move_count: humanMoveCount });
-      saveLifetime(); clearActiveGame(); updateScoreboard(); disableBoard();
+      scores.losses++;
+      if (gameMode === 'vs-bot' && currentBot) {
+        const stat = getBotStat(currentBot.id);
+        stat.l++;
+        botStats[currentBot.id] = stat;
+        const delta = calcEloChange(0);
+        playerElo = Math.max(100, playerElo + delta);
+        lastEloDelta = delta;
+        saveBotStats(); savePlayerElo();
+        const humanMoveCount2 = humanIsBlack ? Math.ceil(moveHistory.length / 2) : Math.floor(moveHistory.length / 2);
+        trackEvent('game_completed', { difficulty: 'bot-' + currentBot.elo, outcome: 'loss', move_count: humanMoveCount2 });
+      } else {
+        lifetime[difficulty].l++;
+        const humanMoveCount2 = humanIsBlack ? Math.ceil(moveHistory.length / 2) : Math.floor(moveHistory.length / 2);
+        trackEvent('game_completed', { difficulty, outcome: 'loss', move_count: humanMoveCount2 });
+        saveLifetime();
+      }
+      clearActiveGame(); updateScoreboard(); disableBoard();
       setTimeout(() => showEndgame('lose'), 600);
     }
     return;
@@ -1903,6 +3069,17 @@ function checkEnd(pos, player) {
     if (gameMode === 'vs-human') {
       trackEvent('game_completed', { difficulty: 'pass-and-play', outcome: 'draw', move_count: moveHistory.length });
       clearActiveGame(); disableBoard();
+    } else if (gameMode === 'vs-bot' && currentBot) {
+      scores.draws++;
+      const stat = getBotStat(currentBot.id);
+      stat.d++;
+      botStats[currentBot.id] = stat;
+      const delta = calcEloChange(0.5);
+      playerElo = Math.max(100, playerElo + delta);
+      lastEloDelta = delta;
+      saveBotStats(); savePlayerElo();
+      trackEvent('game_completed', { difficulty: 'bot-' + currentBot.elo, outcome: 'draw', move_count: moveHistory.length });
+      clearActiveGame(); updateScoreboard(); disableBoard();
     } else {
       scores.draws++; lifetime[difficulty].d++;
       trackEvent('game_completed', { difficulty, outcome: 'draw', move_count: moveHistory.length });
@@ -1984,34 +3161,167 @@ function findImmediateWins(player) {
   return wins;
 }
 
+function evalCellBot(i) {
+  if (board[i] !== null) return -1;
+  const [r, c] = rc(i);
+  let bs = 0, hs = 0;
+  const sw = currentBot ? STYLE_WEIGHTS[currentBot.style] : {attackW:1.1, defenseW:1.0};
+  for (const [dr, dc] of DIRS) { bs += scoreLine(r,c,dr,dc,BOT); hs += scoreLine(r,c,dr,dc,HUMAN); }
+  return bs * sw.attackW + hs * sw.defenseW + Math.max(0, 18 - Math.abs(r-9) - Math.abs(c-9));
+}
+
+function getTopMovesBot(n) {
+  const cands = new Set();
+  for (let i = 0; i < TOTAL; i++) {
+    if (board[i] === null) continue;
+    const [r, c] = rc(i);
+    for (let dr = -2; dr <= 2; dr++) for (let dc = -2; dc <= 2; dc++) {
+      const nr = r+dr, nc = c+dc;
+      if (inBounds(nr, nc) && board[idx(nr, nc)] === null) cands.add(idx(nr, nc));
+    }
+  }
+  if (cands.size === 0) return [idx(7,7)];
+  const scored = [];
+  for (const i of cands) scored.push({i, s: evalCellBot(i)});
+  scored.sort((a,b) => b.s - a.s);
+  return scored.slice(0, n).map(x => x.i);
+}
+
+// Find empty cells where placing `attacker` creates exactly `targetCount` in a row
+// with at least `minOpenEnds` open ends. Used for tactical rule checking.
+function findCreatesPattern(attacker, targetCount, minOpenEnds) {
+  const results = [];
+  for (let i = 0; i < TOTAL; i++) {
+    if (board[i] !== null) continue;
+    board[i] = attacker;
+    const [r, c] = rc(i);
+    let found = false;
+    for (const [dr, dc] of DIRS) {
+      let count = 1, openEnds = 0;
+      let fr = r + dr, fc = c + dc;
+      while (inBounds(fr, fc) && board[idx(fr, fc)] === attacker) { count++; fr += dr; fc += dc; }
+      if (inBounds(fr, fc) && board[idx(fr, fc)] === null) openEnds++;
+      let br = r - dr, bc = c - dc;
+      while (inBounds(br, bc) && board[idx(br, bc)] === attacker) { count++; br -= dr; bc -= dc; }
+      if (inBounds(br, bc) && board[idx(br, bc)] === null) openEnds++;
+      if (count === targetCount && openEnds >= minOpenEnds) { found = true; break; }
+    }
+    board[i] = null;
+    if (found) results.push(i);
+  }
+  return results;
+}
+
+// Find empty cells at open ends of an existing run of `targetCount` `attacker` stones
+// with at least `minOpenEnds` open ends — these are the blocker positions.
+function findExistingThreatBlockers(attacker, targetCount, minOpenEnds) {
+  const blockers = new Set();
+  for (let i = 0; i < TOTAL; i++) {
+    if (board[i] !== attacker) continue;
+    const [r, c] = rc(i);
+    for (const [dr, dc] of DIRS) {
+      // Only anchor at start of each run to avoid double-counting
+      const prevR = r - dr, prevC = c - dc;
+      if (inBounds(prevR, prevC) && board[idx(prevR, prevC)] === attacker) continue;
+      // Count the run
+      let count = 0, fr = r, fc = c;
+      while (inBounds(fr, fc) && board[idx(fr, fc)] === attacker) { count++; fr += dr; fc += dc; }
+      if (count !== targetCount) continue;
+      // Check open ends
+      const endR = fr, endC = fc;          // cell just after run
+      const startR = r - dr, startC = c - dc; // cell just before run
+      const afterOpen  = inBounds(endR, endC)   && board[idx(endR, endC)]   === null;
+      const beforeOpen = inBounds(startR, startC) && board[idx(startR, startC)] === null;
+      const openEnds = (afterOpen ? 1 : 0) + (beforeOpen ? 1 : 0);
+      if (openEnds >= minOpenEnds) {
+        if (afterOpen)  blockers.add(idx(endR, endC));
+        if (beforeOpen) blockers.add(idx(startR, startC));
+      }
+    }
+  }
+  return [...blockers];
+}
+
+function botComply(ruleIdx) {
+  if (!currentBot) return true;
+  const row = COMPLY_TABLE[currentBot.elo];
+  if (!row || ruleIdx >= row.length) return true;
+  return Math.random() < row[ruleIdx];
+}
+
 function botMove() {
   if (gameOver) return;
   let move;
+  const weights = currentBot ? BOT_MOVE_WEIGHTS[currentBot.elo] : DIFF_WEIGHTS[difficulty];
 
-  // Forced: take an immediate win
+  // 0: Take immediate win
   const botWins = findImmediateWins(BOT);
-  if (botWins.length > 0) {
+  if (botWins.length > 0 && botComply(0)) {
     move = botWins[0];
-  } else {
-    // Forced: block any human win — never skip this regardless of difficulty
+  }
+
+  // 1: Block human win
+  if (!move) {
     const humanWins = findImmediateWins(HUMAN);
-    if (humanWins.length > 0) {
-      // If multiple threats, pick the one scored highest (also best counter-attack)
-      humanWins.sort((a, b) => evalCell(b) - evalCell(a));
+    if (humanWins.length > 0 && botComply(1)) {
+      humanWins.sort((a, b) => evalCellBot(b) - evalCellBot(a));
       move = humanWins[0];
-    } else {
-      // No forced move — use difficulty weights across top 10 candidates
-      move = pickWeighted(getTopMoves(10), DIFF_WEIGHTS[difficulty]);
     }
   }
 
+  // Rule 2: Create own open-four (sets up unstoppable threat)
+  if (!move) {
+    const botFours = findCreatesPattern(BOT, 4, 1);
+    if (botFours.length > 0 && botComply(2)) {
+      botFours.sort((a, b) => evalCellBot(b) - evalCellBot(a));
+      move = botFours[0];
+    }
+  }
+
+  // Rule 3: Block opponent's open-four (live four — both ends open)
+  if (!move) {
+    const humanOpenFours = findExistingThreatBlockers(HUMAN, 4, 2);
+    if (humanOpenFours.length > 0 && botComply(3)) {
+      humanOpenFours.sort((a, b) => evalCellBot(b) - evalCellBot(a));
+      move = humanOpenFours[0];
+    }
+  }
+
+  // Rule 4: Block opponent's closed-four (one open end)
+  if (!move) {
+    const humanClosedFours = findExistingThreatBlockers(HUMAN, 4, 1);
+    if (humanClosedFours.length > 0 && botComply(4)) {
+      humanClosedFours.sort((a, b) => evalCellBot(b) - evalCellBot(a));
+      move = humanClosedFours[0];
+    }
+  }
+
+  // Rule 8: Block opponent's open-three — KEY defensive rule
+  if (!move) {
+    const humanThrees = findExistingThreatBlockers(HUMAN, 3, 2);
+    if (humanThrees.length > 0 && botComply(8)) {
+      humanThrees.sort((a, b) => evalCellBot(b) - evalCellBot(a));
+      move = humanThrees[0];
+    }
+  }
+
+  // Weighted random from top candidates
+  if (!move) {
+    move = pickWeighted(getTopMovesBot(10), weights);
+  }
+
   makeMove(move, BOT);
-  if (!gameOver) { statusEl.textContent = humanIsBlack ? '⚫, your move' : '⚪, your move'; statusEl.className = 'status'; }
+  if (!gameOver) { statusEl.textContent = humanIsBlack ? '⚫ Your Move' : '⚪ Your Move'; statusEl.className = 'status'; }
 }
 
 function disableBoard() { boardEl.querySelectorAll('.cell').forEach(c => c.classList.add('disabled')); awaitingPlayerMove = false; updateHintButton(); }
 function enableBoard()  { boardEl.querySelectorAll('.cell').forEach(c => c.classList.remove('disabled')); awaitingPlayerMove = true; updateHintButton(); }
-function updateScoreboard() { winsEl.textContent=scores.wins; lossesEl.textContent=scores.losses; }
+function updateScoreboard() {
+  winsEl.textContent = scores.wins;
+  lossesEl.textContent = scores.losses;
+  const drawsEl = document.getElementById('draws');
+  if (drawsEl) drawsEl.textContent = scores.draws;
+}
 
 // ====== UNDO ======
 const undoBtn = document.getElementById('undoBtn');
@@ -2029,7 +3339,7 @@ function updateUndoButton() {
 const hintBtn = document.getElementById('hintBtn');
 
 function updateHintButton() {
-  if (gameMode === 'vs-human') {
+  if (gameMode === 'vs-human' || gameMode === 'vs-bot') {
     hintBtn.textContent = 'Hint...';
     hintBtn.disabled = true;
     return;
@@ -2115,15 +3425,43 @@ hintBtn.addEventListener('click', showHint);
 
 // ====== MODE UI ======
 function applyModeUI() {
-  document.body.classList.toggle('pvp-mode', gameMode === 'vs-human');
+  const isBotMode = gameMode === 'vs-bot';
+  const isPvp = gameMode === 'vs-human';
+  document.body.classList.toggle('pvp-mode', isPvp || isBotMode);
+  document.body.classList.toggle('bot-mode', isBotMode);
   const label = document.getElementById('modeLabel');
   if (!label) return;
   if (gameMode === 'vs-human') {
     label.textContent = 'Pass & Play';
+  } else if (gameMode === 'vs-bot') {
+    label.textContent = '';
   } else if (gameMode === 'vs-ai') {
     label.textContent = 'VS AI · ' + difficulty.charAt(0).toUpperCase() + difficulty.slice(1);
   } else {
     label.textContent = '';
+  }
+
+  // Bot game header strip — matchup layout
+  const botHeader = document.getElementById('botGameHeader');
+  if (isBotMode && currentBot) {
+    // Player side
+    const playerAvatarEl = document.getElementById('bghPlayerAvatar');
+    playerAvatarEl.src = getPlayerAvatarSrc();
+    playerAvatarEl.alt = getPlayerDisplayName();
+    document.getElementById('bghPlayerName').textContent = getPlayerDisplayName();
+    document.getElementById('bghPlayerElo').textContent = playerElo;
+    // Bot side
+    document.getElementById('bghAvatar').src = avatarUrl(currentBot.seed);
+    document.getElementById('bghAvatar').alt = currentBot.name;
+    const nameEl = document.getElementById('bghName');
+    nameEl.textContent = currentBot.name + ' ' + (currentBot.flag || '');
+    document.getElementById('bghBotElo').textContent = currentBot.elo;
+    const dotEl = document.getElementById('bghStyleDot');
+    dotEl.className = 'bgh-style-dot ' + currentBot.style;
+    document.getElementById('bghStyleTooltip').textContent = currentBot.style;
+    botHeader.classList.remove('hidden');
+  } else {
+    botHeader.classList.add('hidden');
   }
 }
 
@@ -2147,7 +3485,7 @@ function dismissTurnOverlay() {
   if (!overlay.classList.contains('active')) return;
   overlay.classList.add('dismissing');
   const isP1 = currentPlayer === HUMAN;
-  statusEl.textContent = (isP1 ? '⚫ Player 1' : '⚪ Player 2') + ', your move';
+  statusEl.textContent = (isP1 ? '⚫ Player 1' : '⚪ Player 2') + ' · Your Move';
   setTimeout(() => {
     overlay.classList.remove('active', 'dismissing');
     if (!gameOver && gameMode === 'vs-human') enableBoard();
@@ -2184,6 +3522,11 @@ function newGame() {
   if (gameMode === 'vs-human') {
     humanIsBlack = true; // Player 1 always Black in pass-and-play
     currentPlayer = HUMAN;
+  } else if (gameMode === 'vs-bot' && currentBot) {
+    if (nextIsBlack[currentBot.id] === undefined) nextIsBlack[currentBot.id] = true;
+    humanIsBlack = nextIsBlack[currentBot.id];
+    nextIsBlack[currentBot.id] = !nextIsBlack[currentBot.id]; // flip for next game
+    saveNextBlack();
   } else {
     humanIsBlack = nextIsBlack[difficulty];
   }
@@ -2202,7 +3545,19 @@ function newGame() {
     document.getElementById('startIcon').textContent = '⚫';
     document.getElementById('startColor').textContent = 'Pass & Play';
     document.getElementById('startSub').textContent = 'Player 1 opens (Black)';
+  } else if (gameMode === 'vs-bot' && currentBot) {
+    applyModeUI();
+    if (humanIsBlack) {
+      enableBoard();
+      statusEl.textContent = '⚫ Your Move';
+    } else {
+      statusEl.textContent = currentBot.name + ' is Thinking…';
+      setTimeout(() => { botMove(); enableBoard(); statusEl.textContent = '⚪ Your Move'; }, 800);
+    }
+    return; // skip the start overlay
   } else {
+    document.getElementById('startArenaLabel').style.display = '';
+    document.getElementById('startClose').textContent = 'Close';
     startDiffRow.style.display = 'flex';
     document.getElementById('startIcon').textContent = humanIsBlack ? '⚫' : '⚪';
     document.getElementById('startColor').textContent = humanIsBlack ? 'You are Black' : 'You are White';
@@ -2217,29 +3572,135 @@ const endgameIcon = document.getElementById('endgameIcon');
 const endgameResult = document.getElementById('endgameResult');
 const endgameSub = document.getElementById('endgameSub');
 
-function showEndgame(result) {
+function showBotEndgame(result) {
+  const iconEl = document.getElementById('botEndIcon');
+  const resultEl = document.getElementById('botEndResult');
   if (result === 'win') {
-    endgameIcon.textContent = '\u26AB'; endgameResult.textContent = 'Victory!';
+    iconEl.textContent = '🏆'; resultEl.textContent = 'Victory';
+    resultEl.className = 'bot-end-result win'; playSound('win');
+  } else if (result === 'lose') {
+    iconEl.textContent = '💀'; resultEl.textContent = 'Defeat';
+    resultEl.className = 'bot-end-result lose'; playSound('lose');
+  } else {
+    iconEl.textContent = '🤝'; resultEl.textContent = 'Draw';
+    resultEl.className = 'bot-end-result draw'; playSound('draw');
+  }
+  document.getElementById('botEndVs').textContent =
+    `vs ${currentBot.name} · ${currentBot.elo} Rating · ${currentBot.tier} ${currentBot.flag || ''}`;
+  document.getElementById('botRematch').textContent = 'Rematch ' + currentBot.name;
+
+  const eloAfter = playerElo;
+  const eloBefore = eloAfter - lastEloDelta;
+  document.getElementById('botEloOld').textContent = eloBefore;
+  const deltaEl = document.getElementById('botEloDelta');
+  const sign = lastEloDelta > 0 ? '+' : '';
+  deltaEl.textContent = sign + lastEloDelta;
+  deltaEl.className = 'bot-elo-delta ' + (lastEloDelta > 0 ? 'pos' : lastEloDelta < 0 ? 'neg' : 'zero');
+
+  const newEl = document.getElementById('botEloNew');
+  newEl.textContent = eloBefore;
+  newEl.classList.remove('settled');
+  document.getElementById('botEndgameOverlay').classList.add('open');
+  const duration = 2200, steps = 55, diff = eloAfter - eloBefore;
+  let step = 0;
+  const interval = setInterval(() => {
+    step++;
+    // Ease-out cubic: progress slows toward the end
+    const t = step / steps;
+    const ease = 1 - Math.pow(1 - t, 3);
+    newEl.textContent = Math.round(eloBefore + diff * ease);
+    if (step >= steps) {
+      clearInterval(interval);
+      newEl.textContent = eloAfter;
+      newEl.classList.add('settled');
+      // After first bot win, prompt for profile setup
+      if (result === 'win' && !playerProfile) {
+        const totalWins = Object.values(botStats).reduce((s, v) => s + (v.w || 0), 0);
+        if (totalWins === 1) {
+          setTimeout(() => showProfileSetup(), 600);
+        }
+      }
+    }
+  }, duration / steps);
+}
+
+function closeBotEndgame() { document.getElementById('botEndgameOverlay').classList.remove('open'); }
+
+document.getElementById('botRematch').addEventListener('click', () => { closeBotEndgame(); newGame(); });
+document.getElementById('botChallengeNew').addEventListener('click', () => { closeBotEndgame(); openBotSelect(); });
+document.getElementById('botEndHome').addEventListener('click', () => { closeBotEndgame(); goHome(); });
+
+// ====== PROFILE SETUP LISTENERS ======
+// Avatar selection handled by grid clicks in showProfileSetup()
+// Clickable player avatars → open profile setup
+document.getElementById('pregamePlayerAvatar').addEventListener('click', () => showProfileSetup(() => {
+  // Refresh pregame if still open
+  if (document.getElementById('botPregameOverlay').classList.contains('open') && currentBot) {
+    showBotPregame(currentBot);
+    document.getElementById('botPregameOverlay').classList.add('open');
+  }
+}));
+document.getElementById('bghPlayerAvatar').addEventListener('click', () => showProfileSetup(() => {
+  if (gameMode === 'vs-bot') applyModeUI();
+}));
+
+document.getElementById('profileSaveBtn').addEventListener('click', () => {
+  const name = document.getElementById('profileNameInput').value.trim();
+  if (!name) { document.getElementById('profileNameInput').focus(); return; }
+  playerProfile = { name, avatarSeed: _profileShuffleSeed };
+  savePlayerProfile();
+  hideProfileSetup();
+  // Refresh header if in a bot game
+  if (gameMode === 'vs-bot') applyModeUI();
+  const cb = document.getElementById('profileSetupOverlay')._onDone;
+  if (cb) cb();
+});
+document.getElementById('profileSkipBtn').addEventListener('click', () => {
+  hideProfileSetup();
+  const cb = document.getElementById('profileSetupOverlay')._onDone;
+  if (cb) cb();
+});
+document.getElementById('deleteProfileBtn').addEventListener('click', () => {
+  if (!playerProfile) {
+    showConfirm('No Profile', "You don't have a profile set up yet.", 'OK', () => {});
+    return;
+  }
+  showConfirm('Delete Profile?', 'This will permanently delete your name and avatar. Your stats and ELO will be kept.', 'Delete', () => {
+    deletePlayerProfile();
+    if (gameMode === 'vs-bot') applyModeUI();
+  }, true);
+});
+
+function showEndgame(result) {
+  if (gameMode === 'vs-bot' && currentBot) { showBotEndgame(result); return; }
+  if (result === 'win') {
+    endgameIcon.textContent = '⚫'; endgameResult.textContent = 'Victory!';
     endgameResult.className = 'endgame-result win'; playSound('win');
   } else if (result === 'lose') {
-    endgameIcon.textContent = '\u26AA'; endgameResult.textContent = 'Defeat';
+    endgameIcon.textContent = '⚪'; endgameResult.textContent = 'Defeat';
     endgameResult.className = 'endgame-result lose'; playSound('lose');
   } else if (result === 'pvp-black') {
-    endgameIcon.textContent = '\u26AB'; endgameResult.textContent = 'Black Wins!';
+    endgameIcon.textContent = '⚫'; endgameResult.textContent = 'Black Wins!';
     endgameResult.className = 'endgame-result win'; playSound('win');
   } else if (result === 'pvp-white') {
-    endgameIcon.textContent = '\u26AA'; endgameResult.textContent = 'White Wins!';
+    endgameIcon.textContent = '⚪'; endgameResult.textContent = 'White Wins!';
     endgameResult.className = 'endgame-result win'; playSound('win');
   } else {
-    endgameIcon.textContent = '\u262F'; endgameResult.textContent = 'Draw';
+    endgameIcon.textContent = '☯'; endgameResult.textContent = 'Draw';
     endgameResult.className = 'endgame-result draw'; playSound('draw');
   }
-  endgameSub.textContent = gameMode === 'vs-human' ? 'Pass & Play' : `${difficulty.charAt(0).toUpperCase()+difficulty.slice(1)}`;
-
+  if (gameMode === 'vs-human') {
+    endgameSub.textContent = 'Pass & Play';
+  } else {
+    endgameSub.textContent = difficulty.charAt(0).toUpperCase() + difficulty.slice(1);
+  }
   endgameOverlay.classList.add('open');
 }
 
-function closeEndgame() { endgameOverlay.classList.remove('open'); }
+function closeEndgame() {
+  endgameOverlay.classList.remove('open');
+  closeBotEndgame();
+}
 
 document.getElementById('playNow').addEventListener('click', () => { closeEndgame(); newGame(); });
 document.getElementById('changeDiff').addEventListener('click', () => { closeEndgame(); });
@@ -2261,10 +3722,10 @@ document.getElementById('startBegin').addEventListener('click', () => {
     trackEvent('game_started', { difficulty, color: humanIsBlack ? 'black' : 'white' });
     if (humanIsBlack) {
       enableBoard();
-      statusEl.textContent = '⚫, your move';
+      statusEl.textContent = '⚫ Your Move';
     } else {
-      statusEl.textContent = 'Opponent is thinking…';
-      setTimeout(() => { botMove(); enableBoard(); statusEl.textContent = '⚪, your move'; }, 800);
+      statusEl.textContent = 'Opponent is Thinking…';
+      setTimeout(() => { botMove(); enableBoard(); statusEl.textContent = '⚪ Your Move'; }, 800);
     }
   }
 });
@@ -2292,11 +3753,15 @@ document.querySelectorAll('.mode-btn').forEach(btn => {
   });
 });
 
-// Close button — dismiss prompt without starting; color is not consumed
+// Close/Back button — dismiss prompt without starting
 document.getElementById('startClose').addEventListener('click', () => {
   document.getElementById('startOverlay').classList.remove('open');
-  statusEl.textContent = gameMode === 'vs-human' ? 'Press New Game to start' : 'Change difficulty or press New Game';
-  statusEl.className = 'status';
+  if (gameMode === 'vs-bot') {
+    openBotSelect();
+  } else {
+    statusEl.textContent = gameMode === 'vs-human' ? 'Press New Game to start' : 'Change difficulty or press New Game';
+    statusEl.className = 'status';
+  }
 });
 
 // Difficulty buttons inside the start overlay
@@ -2321,6 +3786,7 @@ document.querySelectorAll('.difficulty-start-btn').forEach(btn => {
 // ====== SETTINGS ======
 const settingsOverlay = document.getElementById('settingsOverlay');
 document.getElementById('openSettings').addEventListener('click', () => settingsOverlay.classList.add('open'));
+document.getElementById('splashSettingsBtn').addEventListener('click', () => settingsOverlay.classList.add('open'));
 document.getElementById('settingsClose').addEventListener('click', () => settingsOverlay.classList.remove('open'));
 document.getElementById('settingsCloseBtn').addEventListener('click', () => settingsOverlay.classList.remove('open'));
 settingsOverlay.addEventListener('click', e => { if (e.target === settingsOverlay) settingsOverlay.classList.remove('open'); });
@@ -2335,29 +3801,57 @@ function pct(w, total) { return total === 0 ? '—' : Math.round(w / total * 100
 function avgMoves(s) { return s.w === 0 ? '—' : (s.mw / s.w).toFixed(1); }
 
 function openStats() {
-  const diffs = ['easy', 'medium', 'hard'];
-  const tot = { w:0, l:0, d:0, mw:0 };
+  const tiers = ['Beginner', 'Intermediate', 'Expert', 'Master'];
+
+  // Compute per-tier totals from botStats
+  const tierTotals = {};
+  for (const tier of tiers) tierTotals[tier] = {w:0, l:0, d:0};
+  for (const bot of BOTS) {
+    const s = getBotStat(bot.id);
+    tierTotals[bot.tier].w += s.w;
+    tierTotals[bot.tier].l += s.l;
+    tierTotals[bot.tier].d += s.d;
+  }
+  const allBot = {w:0,l:0,d:0};
+  for (const t of tiers) { allBot.w+=tierTotals[t].w; allBot.l+=tierTotals[t].l; allBot.d+=tierTotals[t].d; }
+
+  // Legacy AI stats
+  const diffs = ['easy','medium','hard'];
+  const tot = {w:0,l:0,d:0,mw:0};
   for (const d of diffs) { tot.w+=lifetime[d].w; tot.l+=lifetime[d].l; tot.d+=lifetime[d].d; tot.mw+=lifetime[d].mw; }
 
-  const rows = [
-    ['Games Played', d => lifetime[d].w+lifetime[d].l+lifetime[d].d, () => tot.w+tot.l+tot.d],
-    ['Wins',         d => lifetime[d].w,  () => tot.w],
-    ['Losses',       d => lifetime[d].l,  () => tot.l],
-    ['Win %',        d => pct(lifetime[d].w, lifetime[d].w+lifetime[d].l+lifetime[d].d), () => pct(tot.w, tot.w+tot.l+tot.d)],
-    ['Avg Moves to Win', d => avgMoves(lifetime[d]), () => avgMoves(tot)],
-  ];
+  const pctFn = (w,total) => total===0?'—':Math.round(w/total*100)+'%';
+  const gp = s => s.w+s.l+s.d;
 
   statsContent.innerHTML = `
+    <div style="text-align:center;margin-bottom:16px;">
+      <div style="font-size:0.72rem;letter-spacing:2px;text-transform:uppercase;color:#999;margin-bottom:2px;">Your ELO</div>
+      <div style="font-size:2rem;font-weight:900;color:#2c2c2c;">${playerElo}</div>
+    </div>
+    <div style="font-size:0.72rem;letter-spacing:2px;text-transform:uppercase;color:#999;margin:12px 0 6px;">vs Bots</div>
+    <table class="stats-table">
+      <thead><tr>
+        <th>—</th>${tiers.map(t=>`<th>${t.slice(0,3)}</th>`).join('')}<th class="col-total">All</th>
+      </tr></thead>
+      <tbody>
+        <tr><td>Played</td>${tiers.map(t=>`<td>${gp(tierTotals[t])}</td>`).join('')}<td class="col-total">${gp(allBot)}</td></tr>
+        <tr><td>Wins</td>${tiers.map(t=>`<td>${tierTotals[t].w}</td>`).join('')}<td class="col-total">${allBot.w}</td></tr>
+        <tr><td>Losses</td>${tiers.map(t=>`<td>${tierTotals[t].l}</td>`).join('')}<td class="col-total">${allBot.l}</td></tr>
+        <tr><td>Draws</td>${tiers.map(t=>`<td>${tierTotals[t].d}</td>`).join('')}<td class="col-total">${allBot.d}</td></tr>
+        <tr><td>Win %</td>${tiers.map(t=>`<td>${pctFn(tierTotals[t].w,gp(tierTotals[t]))}</td>`).join('')}<td class="col-total">${pctFn(allBot.w,gp(allBot))}</td></tr>
+      </tbody>
+    </table>
+    <div style="font-size:0.72rem;letter-spacing:2px;text-transform:uppercase;color:#999;margin:16px 0 6px;">vs AI (Legacy)</div>
     <table class="stats-table">
       <thead><tr>
         <th>—</th><th>Easy</th><th>Med</th><th>Hard</th><th class="col-total">All</th>
       </tr></thead>
-      <tbody>${rows.map(([label, valFn, totFn]) => `
-        <tr>
-          <td>${label}</td>
-          ${diffs.map(d => `<td>${valFn(d)}</td>`).join('')}
-          <td class="col-total">${totFn()}</td>
-        </tr>`).join('')}
+      <tbody>
+        <tr><td>Games</td>${diffs.map(d=>`<td>${lifetime[d].w+lifetime[d].l+lifetime[d].d}</td>`).join('')}<td class="col-total">${tot.w+tot.l+tot.d}</td></tr>
+        <tr><td>Wins</td>${diffs.map(d=>`<td>${lifetime[d].w}</td>`).join('')}<td class="col-total">${tot.w}</td></tr>
+        <tr><td>Losses</td>${diffs.map(d=>`<td>${lifetime[d].l}</td>`).join('')}<td class="col-total">${tot.l}</td></tr>
+        <tr><td>Draws</td>${diffs.map(d=>`<td>${lifetime[d].d}</td>`).join('')}<td class="col-total">${tot.d}</td></tr>
+        <tr><td>Win %</td>${diffs.map(d=>`<td>${pctFn(lifetime[d].w,lifetime[d].w+lifetime[d].l+lifetime[d].d)}</td>`).join('')}<td class="col-total">${pctFn(tot.w,tot.w+tot.l+tot.d)}</td></tr>
       </tbody>
     </table>`;
 
@@ -2369,8 +3863,11 @@ document.getElementById('modalClose').addEventListener('click', closeStats);
 document.getElementById('statsClose').addEventListener('click', closeStats);
 modalOverlay.addEventListener('click', e => { if (e.target === modalOverlay) closeStats(); });
 document.getElementById('statsReset').addEventListener('click', () => {
-  showConfirm('Reset Stats?', 'All lifetime stats will be permanently deleted.', 'Reset', () => {
-    lifetime = defaultStats(); saveLifetime(); openStats();
+  showConfirm('Reset Stats?', 'All lifetime stats and bot records will be permanently deleted.', 'Reset', () => {
+    lifetime = defaultStats(); saveLifetime();
+    botStats = {}; saveBotStats();
+    playerElo = PLAYER_ELO_START; savePlayerElo();
+    openStats();
   }, true);
 });
 
