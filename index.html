@@ -374,6 +374,12 @@
     transition: background 0.2s, color 0.2s, border-color 0.2s;
   }
   .btn-home:hover { background: #e0d8cc; color: #2c2c2c; border-color: #8b7355; }
+  .game-header-home {
+    position: absolute; left: 0; margin: 0;
+    padding: 4px 10px; font-size: 0.75rem; letter-spacing: 0.5px;
+  }
+  /* Hide home button in VS-AI mode (no special body class) */
+  body:not(.bot-mode):not(.pvp-mode):not(.daily-mode) #btnGoHome { display: none !important; }
 
   .mode-label {
     font-family: 'Noto Serif', Georgia, serif;
@@ -695,10 +701,15 @@
   body.pvp-mode .scoreboard,
   body.pvp-mode #openStats,
   body.pvp-mode #endgame-sp-actions { display: none !important; }
+  body.bot-mode .difficulty,
+  body.bot-mode .scoreboard,
+  body.bot-mode #openStats,
+  body.bot-mode .btn-home { display: none !important; }
   body.bot-mode #hintBtn { display: none !important; }
 
   /* ============ MODALS ============ */
   #confirmOverlay { z-index: 500; }
+  #settingsOverlay { z-index: 250; }
   .modal-overlay {
     display: none;
     position: fixed;
@@ -1027,6 +1038,27 @@
     border-radius: 2px; cursor: pointer;
   }
   .btn-danger-small:hover { border-color: #c0392b; background: #fdf0ee; }
+  .settings-profile-row {
+    display: flex; align-items: center; gap: 10px; margin-top: 14px;
+    padding-top: 12px; border-top: 0.5px solid #e0d8cc;
+  }
+  .settings-profile-thumb {
+    width: 32px; height: 32px; border-radius: 50%; border: 1.5px solid #d4ccc0;
+    background: #ede8df; flex-shrink: 0;
+  }
+  .settings-profile-text {
+    flex: 1; font-size: 0.8rem; color: #2c2c2c; font-family: 'Noto Serif SC', serif;
+    font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .settings-profile-btns { display: flex; gap: 5px; flex-shrink: 0; }
+  .settings-profile-action {
+    background: none; border: 1px solid #d4ccc0; padding: 3px 9px;
+    font-family: 'Noto Serif', serif; font-size: 0.7rem; color: #8b7355;
+    border-radius: 2px; cursor: pointer;
+  }
+  .settings-profile-action:hover { border-color: #2c2c2c; color: #2c2c2c; }
+  .settings-profile-action.danger { color: #c0392b; border-color: #e0ccc0; }
+  .settings-profile-action.danger:hover { border-color: #c0392b; background: #fdf0ee; }
 
   /* ===== BOT GAME HEADER ===== */
   #botGameHeader {
@@ -1055,25 +1087,20 @@
   .bgh-style-badge.Balanced   { background: #eaf2ff; color: #1a5276; }
   .bgh-style-badge.Defensive  { background: #e8f8f5; color: #0e6655; }
   .bgh-player-elo, .bgh-bot-elo {
-    font-size: 0.6rem; color: #8b7355; margin-top: 1px;
-    font-family: 'Noto Serif', serif;
+    font-size: 0.58rem; color: #8b7355; margin-top: 1px;
+    font-family: 'Noto Serif', serif; white-space: nowrap;
   }
+  .bgh-info-col { min-width: 0; overflow: hidden; }
   .bgh-vs-label {
     font-family: 'Noto Serif SC', serif; font-size: 0.65rem; color: #c8a96e;
     font-weight: 700; letter-spacing: 1px; flex-shrink: 0; padding: 0 4px;
   }
   #profileSetupOverlay { z-index: 300; }
+  #profileSetupOverlay .endgame { max-height: 90vh; overflow-y: auto; }
 
   /* Board header — style tooltip */
   .bgh-avatar-wrap { position: relative; display: inline-block; cursor: pointer; }
-  .bgh-style-dot {
-    position: absolute; bottom: 0; left: 0;
-    width: 7px; height: 7px; border-radius: 50%;
-    border: 1.5px solid #f5f0e8;
-  }
-  .bgh-style-dot.Aggressive { background: #e67e22; }
-  .bgh-style-dot.Balanced   { background: #2980b9; }
-  .bgh-style-dot.Defensive  { background: #27ae60; }
+
   .bgh-style-tooltip {
     position: absolute; bottom: 36px; right: 0;
     font-size: 0.55rem; letter-spacing: 1.5px; text-transform: uppercase;
@@ -1088,8 +1115,7 @@
   .profile-avatar-selected-wrap { margin: 8px 0 6px; text-align: center; }
   .profile-avatar-grid {
     display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px;
-    width: 100%; margin-bottom: 12px; max-height: 140px; overflow-y: auto;
-    padding-right: 2px;
+    width: 100%; margin-bottom: 12px;
   }
   .profile-avatar-grid-item {
     width: 100%; aspect-ratio: 1; border-radius: 50%;
@@ -1125,6 +1151,34 @@
 
   /* ===== BOT ENDGAME OVERLAY ===== */
   #botEndgameOverlay { z-index: 200; }
+  .bot-end-close {
+    position: absolute; top: 10px; right: 12px;
+    background: none; border: none; font-size: 1.3rem; color: #b0a090;
+    cursor: pointer; line-height: 1; padding: 2px 6px;
+  }
+  .bot-end-close:hover { color: #2c2c2c; }
+  .bot-end-matchup {
+    display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px; width: 100%;
+  }
+  .bot-end-side {
+    flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; min-width: 0;
+  }
+  .bot-end-avatar {
+    width: 40px; height: 40px; border-radius: 50%;
+    border: 2px solid #d4ccc0; background: #ede8df; flex-shrink: 0;
+  }
+  .bot-end-avatar-player { border-color: #c8a96e; }
+  .bot-end-side-name {
+    font-family: 'Noto Serif SC', serif; font-size: 0.72rem; font-weight: 700;
+    color: #2c2c2c; text-align: center; max-width: 80px;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .bot-end-side-elo { font-size: 0.58rem; color: #8b7355; text-align: center; }
+  .bot-end-side-tier { font-size: 0.55rem; color: #aaa; text-align: center; margin-top: 1px; }
+  .bot-end-matchup-vs {
+    font-family: 'Noto Serif SC', serif; font-size: 0.6rem; font-weight: 700;
+    color: #c8a96e; letter-spacing: 1px; padding-top: 12px; flex-shrink: 0;
+  }
   .bot-end-inner {
     display: flex; flex-direction: column; align-items: center;
     padding: 28px 28px 24px; width: min(300px, 86vw);
@@ -1608,6 +1662,14 @@
     display: flex; justify-content: space-between;
     font-size: 0.58rem; color: #bbb; margin-top: 2px;
   }
+  .stats-filter-tabs { display: flex; gap: 6px; margin: 6px 0 10px; }
+  .stats-filter-tab {
+    flex: 1; padding: 5px 0; font-size: 0.68rem; font-family: 'Noto Serif', serif;
+    border: 1.5px solid #d0c8b8; border-radius: 4px; background: transparent;
+    color: #8b7355; cursor: pointer; transition: all 0.15s;
+  }
+  .stats-filter-tab.active { background: #2c2c2c; color: #f5f0e8; border-color: #2c2c2c; }
+  .stats-filter-tab:hover:not(.active) { border-color: #8b7355; color: #2c2c2c; }
   .tier-bar-row {
     display: flex; align-items: center; gap: 8px; margin-bottom: 7px;
   }
@@ -1639,12 +1701,14 @@
   }
   .bots-unlocked-fill { height: 100%; background: #c8a96e; border-radius: 3px; }
   .bots-unlocked-label { font-size: 0.72rem; color: #8b7355; white-space: nowrap; }
-  /* Splash settings button */
-  .splash-settings-row { margin: 14px 0 6px; }
+  /* Splash + bot-select settings buttons */
+  .splash-settings-corner {
+    position: absolute; top: 12px; right: 14px;
+  }
   .splash-settings-btn {
-    background: none; border: 1px solid #d4ccc0; padding: 5px 14px;
-    font-family: 'Noto Serif', serif; font-size: 0.75rem; color: #8b7355;
-    border-radius: 2px; cursor: pointer;
+    background: none; border: 1px solid #d4ccc0; padding: 6px 8px;
+    color: #8b7355; border-radius: 2px; cursor: pointer; line-height: 1;
+    display: inline-flex; align-items: center;
   }
   .splash-settings-btn:hover { border-color: #2c2c2c; color: #2c2c2c; }
 </style>
@@ -1653,6 +1717,9 @@
 
 <!-- ====== SPLASH ====== -->
 <div id="splash">
+  <div class="splash-settings-corner">
+    <button class="splash-settings-btn" id="splashSettingsBtn" title="Settings"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
+  </div>
   <div class="splash-seal">棋<br>场</div>
   <div class="splash-cn">Gomoku Arena</div>
   <div class="splash-en">五子棋</div>
@@ -1690,9 +1757,6 @@
       </div>
       <div class="splash-soon-badge">SOON</div>
     </button>
-  </div>
-  <div class="splash-settings-row">
-    <button class="splash-settings-btn" id="splashSettingsBtn">⚙ Settings</button>
   </div>
   <div class="splash-footer-links">
     <a href="/how-to-play.html">How to Play</a> &nbsp;·&nbsp;
@@ -1740,7 +1804,7 @@
     </div>
     <div class="bot-select-nav-group">
       <button class="bot-select-stats-btn" id="botSelectStatsBtn">Stats</button>
-      <button class="bot-select-back" id="botSelectSettings" style="color:#8b7355;">⚙</button>
+      <button class="splash-settings-btn" id="botSelectSettings" title="Settings"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
     </div>
   </div>
   <div class="bot-select-title-section">
@@ -1771,6 +1835,7 @@
 <!-- ====== GAME ====== -->
 <div id="game">
   <div class="game-header">
+    <button class="btn-home game-header-home" id="btnGoHome">← Home</button>
     <div class="game-title-wrap">
       <div class="game-title-cn">Gomoku Arena</div>
       <div class="game-title-en">五子棋</div>
@@ -1818,20 +1883,19 @@
   <div id="botGameHeader" class="hidden">
     <div class="bgh-player">
       <img class="bgh-player-avatar" id="bghPlayerAvatar" src="" alt="You" title="Click to edit profile">
-      <div>
+      <div class="bgh-info-col">
         <div class="bgh-player-name" id="bghPlayerName">You</div>
         <div class="bgh-player-elo" id="bghPlayerElo"></div>
       </div>
     </div>
     <div class="bgh-vs-label">VS</div>
     <div class="bgh-bot">
-      <div style="text-align:right;">
+      <div class="bgh-info-col" style="text-align:right;">
         <div class="bgh-name" id="bghName"></div>
         <div class="bgh-bot-elo" id="bghBotElo"></div>
       </div>
       <div class="bgh-avatar-wrap">
         <img class="bgh-avatar" id="bghAvatar" src="" alt="">
-        <span class="bgh-style-dot" id="bghStyleDot"></span>
         <div class="bgh-style-tooltip" id="bghStyleTooltip"></div>
       </div>
     </div>
@@ -1859,7 +1923,6 @@
     <button class="btn-hint" id="hintBtn" disabled>Hint (2)</button>
     <button class="btn-stats" id="openStats">Stats</button>
   </div>
-  <button class="btn-home" id="btnGoHome">← Home</button>
 </div>
 
 <!-- ====== TURN OVERLAY (pass & play) ====== -->
@@ -1941,9 +2004,23 @@
 <!-- ====== BOT ENDGAME OVERLAY ====== -->
 <div class="endgame-overlay" id="botEndgameOverlay">
   <div class="endgame bot-end-inner">
+    <button class="bot-end-close" id="botEndClose" title="Review game">&times;</button>
+    <div class="bot-end-matchup">
+      <div class="bot-end-side">
+        <img class="bot-end-avatar bot-end-avatar-player" id="botEndPlayerAvatar" src="" alt="You">
+        <div class="bot-end-side-name" id="botEndPlayerName">You</div>
+        <div class="bot-end-side-elo" id="botEndPlayerElo"></div>
+        <div class="bot-end-side-tier" id="botEndPlayerTier"></div>
+      </div>
+      <div class="bot-end-matchup-vs">VS</div>
+      <div class="bot-end-side">
+        <img class="bot-end-avatar bot-end-avatar-bot" id="botEndBotAvatar" src="" alt="">
+        <div class="bot-end-side-name" id="botEndBotName"></div>
+        <div class="bot-end-side-elo" id="botEndBotElo"></div>
+      </div>
+    </div>
     <div class="bot-end-icon" id="botEndIcon"></div>
     <div class="bot-end-result" id="botEndResult"></div>
-    <div class="bot-end-vs" id="botEndVs"></div>
     <div class="bot-elo-box">
       <div class="bot-elo-box-label">Your rating</div>
       <div class="bot-elo-row">
@@ -2011,8 +2088,13 @@
         <span class="toggle-thumb"></span>
       </label>
     </div>
-    <div class="settings-danger">
-      <button class="btn-danger-small" id="deleteProfileBtn">Delete Profile</button>
+    <div class="settings-profile-row" id="settingsProfileRow">
+      <img class="settings-profile-thumb" id="settingsProfileThumb" src="" alt="">
+      <div class="settings-profile-text" id="settingsProfileText"></div>
+      <div class="settings-profile-btns">
+        <button class="settings-profile-action" id="settingsEditProfileBtn">Edit</button>
+        <button class="settings-profile-action danger" id="deleteProfileBtn">Delete</button>
+      </div>
     </div>
     <div class="settings-close-wrap">
       <button class="btn-settings-close" id="settingsCloseBtn">Close</button>
@@ -2363,7 +2445,12 @@ function openBotStats() {
     </div>
 
     <h3>Win Rate by Tier</h3>
-    ${tierRows}
+    <div class="stats-filter-tabs" id="statsFilterTabs">
+      <button class="stats-filter-tab active" data-filter="total">Total</button>
+      <button class="stats-filter-tab" data-filter="black">As Black</button>
+      <button class="stats-filter-tab" data-filter="white">As White</button>
+    </div>
+    <div id="statsWinRateRows">${tierRows}</div>
 
     <h3>Progress</h3>
     <div class="bots-unlocked-row">
@@ -2385,6 +2472,34 @@ function openBotStats() {
     </div>
   `;
   document.getElementById('botStatsCloseBtn').addEventListener('click', closeBotStats);
+  // Filter tab logic
+  document.getElementById('statsFilterTabs').querySelectorAll('.stats-filter-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.getElementById('statsFilterTabs').querySelectorAll('.stats-filter-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      const filter = tab.dataset.filter;
+      const filteredRows = tiers.map(t => {
+        const raw = BOTS.filter(b => b.tier === t).reduce((acc, b) => {
+          const s = getBotStat(b.id);
+          if (filter === 'black') { acc.w += s.wb||0; acc.l += s.lb||0; acc.d += s.db||0; }
+          else if (filter === 'white') { acc.w += s.ww||0; acc.l += s.lw||0; acc.d += s.dw||0; }
+          else { acc.w += s.w; acc.l += s.l; acc.d += s.d; }
+          return acc;
+        }, {w:0,l:0,d:0});
+        const games = raw.w + raw.l + raw.d;
+        const p = games === 0 ? null : Math.round(raw.w / games * 100);
+        const barW = p === null ? 0 : p;
+        return `
+          <div class="tier-bar-row">
+            <div class="tier-bar-label">\${t}</div>
+            <div class="tier-bar-track"><div class="tier-bar-fill" style="width:\${barW}%"></div></div>
+            <div class="tier-bar-pct">\${p === null ? '—' : p + '%'}</div>
+          </div>
+          <div class="tier-bar-games" style="text-align:right;margin:-4px 0 6px;font-size:0.6rem;color:#bbb">\${games === 0 ? 'No games' : games + ' game' + (games===1?'':'s') + ' · ' + raw.w + 'W ' + raw.l + 'L ' + raw.d + 'D'}</div>`;
+      }).join('');
+      document.getElementById('statsWinRateRows').innerHTML = filteredRows;
+    });
+  });
   document.getElementById('statsEditProfileBtn').addEventListener('click', () => {
     closeBotStats();
     showProfileSetup(() => { openBotStats(); });
@@ -2424,6 +2539,9 @@ function closeBotSelect() {
 }
 
 function showBotPregame(bot) {
+  // Hide board header and clear status during pregame
+  document.getElementById('botGameHeader').classList.add('hidden');
+  statusEl.textContent = '';
   // Determine color for this game (don't flip yet — flip happens on Start)
   if (nextIsBlack[bot.id] === undefined) nextIsBlack[bot.id] = true;
   const youBlack = nextIsBlack[bot.id];
@@ -2617,7 +2735,7 @@ function loadPlayerElo() {
 }
 function savePlayerElo() { localStorage.setItem(PLAYER_ELO_KEY, JSON.stringify(playerElo)); }
 
-function getBotStat(id) { return botStats[id] || {w:0, l:0, d:0}; }
+function getBotStat(id) { const s = botStats[id]; if (!s) return {w:0,l:0,d:0,wb:0,ww:0,lb:0,lw:0,db:0,dw:0}; if (s.wb===undefined) { s.wb=0; s.ww=0; s.lb=0; s.lw=0; s.db=0; s.dw=0; } return s; }
 function isBotBeaten(id) { return getBotStat(id).w >= 1; }
 
 function isEloUnlocked(elo) {
@@ -2644,7 +2762,8 @@ const AVATAR_SHUFFLE_SEEDS = [
   'Alex','Jordan','Sam','Morgan','Casey','Riley','Avery','Quinn',
   'Blake','Skyler','Drew','Reese','Finley','Sage','Harley','Dakota',
   'Phoenix','River','Emerson','Hayden','Kendall','Logan','Marlowe','Noel',
-  'Claude','Iris','Leo','Mia','Owen','Piper','Rowan','Stella'
+  'Claude','Iris','Leo','Mia','Owen','Piper','Rowan','Stella',
+  'Zara','Felix','Nova'
 ];
 
 let playerProfile = null; // { name: string, avatarSeed: string }
@@ -2812,14 +2931,14 @@ function restoreActiveGame() {
       enableBoard();
       if (gameMode === 'vs-human') {
         const p1Turn = currentPlayer === HUMAN;
-        statusEl.textContent = 'Welcome back. ' + (p1Turn ? '⚫ Player 1' : '⚪ Player 2') + ' · Your Move';
+        statusEl.textContent = 'Welcome back. ' + (p1Turn ? '⚫ Player 1' : '⚪ Player 2') + ' · Your move';
         setTimeout(() => {
-          if (!gameOver) statusEl.textContent = (p1Turn ? '⚫ Player 1' : '⚪ Player 2') + ' · Your Move';
+          if (!gameOver) statusEl.textContent = (p1Turn ? '⚫ Player 1' : '⚪ Player 2') + ' · Your move';
         }, 2500);
       } else {
         statusEl.textContent = 'Welcome back. ' + (humanIsBlack ? '⚫' : '⚪') + ' your move';
         setTimeout(() => {
-          if (!gameOver) statusEl.textContent = (humanIsBlack ? '⚫' : '⚪') + ' · Your Move';
+          if (!gameOver) statusEl.textContent = (humanIsBlack ? '⚫' : '⚪') + ' · Your move';
         }, 2500);
       }
     }, cumDelay + 400);
@@ -2911,7 +3030,7 @@ function recordForfeit() {
   scores.losses++;
   if (gameMode === 'vs-bot' && currentBot) {
     const stat = getBotStat(currentBot.id);
-    stat.l++;
+    stat.l++; if(humanIsBlack) stat.lb++; else stat.lw++;
     botStats[currentBot.id] = stat;
     const delta = calcEloChange(0);
     playerElo = Math.max(100, playerElo + delta);
@@ -3023,7 +3142,7 @@ function checkEnd(pos, player) {
       scores.wins++;
       if (gameMode === 'vs-bot' && currentBot) {
         const stat = getBotStat(currentBot.id);
-        stat.w++;
+        stat.w++; if(humanIsBlack) stat.wb++; else stat.ww++;
         botStats[currentBot.id] = stat;
         const delta = calcEloChange(1);
         playerElo = Math.max(100, playerElo + delta);
@@ -3043,7 +3162,7 @@ function checkEnd(pos, player) {
       scores.losses++;
       if (gameMode === 'vs-bot' && currentBot) {
         const stat = getBotStat(currentBot.id);
-        stat.l++;
+        stat.l++; if(humanIsBlack) stat.lb++; else stat.lw++;
         botStats[currentBot.id] = stat;
         const delta = calcEloChange(0);
         playerElo = Math.max(100, playerElo + delta);
@@ -3072,7 +3191,7 @@ function checkEnd(pos, player) {
     } else if (gameMode === 'vs-bot' && currentBot) {
       scores.draws++;
       const stat = getBotStat(currentBot.id);
-      stat.d++;
+      stat.d++; if(humanIsBlack) stat.db++; else stat.dw++;
       botStats[currentBot.id] = stat;
       const delta = calcEloChange(0.5);
       playerElo = Math.max(100, playerElo + delta);
@@ -3311,7 +3430,7 @@ function botMove() {
   }
 
   makeMove(move, BOT);
-  if (!gameOver) { statusEl.textContent = humanIsBlack ? '⚫ Your Move' : '⚪ Your Move'; statusEl.className = 'status'; }
+  if (!gameOver) { statusEl.textContent = humanIsBlack ? '⚫ Your move' : '⚪ Your move'; statusEl.className = 'status'; }
 }
 
 function disableBoard() { boardEl.querySelectorAll('.cell').forEach(c => c.classList.add('disabled')); awaitingPlayerMove = false; updateHintButton(); }
@@ -3449,16 +3568,14 @@ function applyModeUI() {
     playerAvatarEl.src = getPlayerAvatarSrc();
     playerAvatarEl.alt = getPlayerDisplayName();
     document.getElementById('bghPlayerName').textContent = getPlayerDisplayName();
-    document.getElementById('bghPlayerElo').textContent = playerElo;
+    document.getElementById('bghPlayerElo').textContent = playerElo + ' Rating';
     // Bot side
     document.getElementById('bghAvatar').src = avatarUrl(currentBot.seed);
     document.getElementById('bghAvatar').alt = currentBot.name;
     const nameEl = document.getElementById('bghName');
     nameEl.textContent = currentBot.name + ' ' + (currentBot.flag || '');
-    document.getElementById('bghBotElo').textContent = currentBot.elo;
-    const dotEl = document.getElementById('bghStyleDot');
-    dotEl.className = 'bgh-style-dot ' + currentBot.style;
-    document.getElementById('bghStyleTooltip').textContent = currentBot.style;
+    document.getElementById('bghBotElo').textContent = currentBot.elo + ' Rating';
+    document.getElementById('bghStyleTooltip').textContent = 'Plays ' + currentBot.style.toLowerCase() + ' style';
     botHeader.classList.remove('hidden');
   } else {
     botHeader.classList.add('hidden');
@@ -3485,7 +3602,7 @@ function dismissTurnOverlay() {
   if (!overlay.classList.contains('active')) return;
   overlay.classList.add('dismissing');
   const isP1 = currentPlayer === HUMAN;
-  statusEl.textContent = (isP1 ? '⚫ Player 1' : '⚪ Player 2') + ' · Your Move';
+  statusEl.textContent = (isP1 ? '⚫ Player 1' : '⚪ Player 2') + ' · Your move';
   setTimeout(() => {
     overlay.classList.remove('active', 'dismissing');
     if (!gameOver && gameMode === 'vs-human') enableBoard();
@@ -3549,10 +3666,10 @@ function newGame() {
     applyModeUI();
     if (humanIsBlack) {
       enableBoard();
-      statusEl.textContent = '⚫ Your Move';
+      statusEl.textContent = '⚫ Your move';
     } else {
       statusEl.textContent = currentBot.name + ' is Thinking…';
-      setTimeout(() => { botMove(); enableBoard(); statusEl.textContent = '⚪ Your Move'; }, 800);
+      setTimeout(() => { botMove(); enableBoard(); statusEl.textContent = '⚪ Your move'; }, 800);
     }
     return; // skip the start overlay
   } else {
@@ -3585,8 +3702,14 @@ function showBotEndgame(result) {
     iconEl.textContent = '🤝'; resultEl.textContent = 'Draw';
     resultEl.className = 'bot-end-result draw'; playSound('draw');
   }
-  document.getElementById('botEndVs').textContent =
-    `vs ${currentBot.name} · ${currentBot.elo} Rating · ${currentBot.tier} ${currentBot.flag || ''}`;
+  document.getElementById('botEndPlayerAvatar').src = getPlayerAvatarSrc();
+  document.getElementById('botEndPlayerName').textContent = getPlayerDisplayName();
+  document.getElementById('botEndPlayerElo').textContent = eloBefore + ' Rating';
+  document.getElementById('botEndPlayerTier').textContent = getPlayerTier(eloBefore);
+  document.getElementById('botEndBotAvatar').src = avatarUrl(currentBot.seed);
+  document.getElementById('botEndBotAvatar').alt = currentBot.name;
+  document.getElementById('botEndBotName').textContent = currentBot.name + ' ' + (currentBot.flag || '');
+  document.getElementById('botEndBotElo').textContent = currentBot.elo + ' Rating · ' + currentBot.tier;
   document.getElementById('botRematch').textContent = 'Rematch ' + currentBot.name;
 
   const eloAfter = playerElo;
@@ -3626,6 +3749,7 @@ function showBotEndgame(result) {
 
 function closeBotEndgame() { document.getElementById('botEndgameOverlay').classList.remove('open'); }
 
+document.getElementById('botEndClose').addEventListener('click', () => { closeBotEndgame(); });
 document.getElementById('botRematch').addEventListener('click', () => { closeBotEndgame(); newGame(); });
 document.getElementById('botChallengeNew').addEventListener('click', () => { closeBotEndgame(); openBotSelect(); });
 document.getElementById('botEndHome').addEventListener('click', () => { closeBotEndgame(); goHome(); });
@@ -3722,10 +3846,10 @@ document.getElementById('startBegin').addEventListener('click', () => {
     trackEvent('game_started', { difficulty, color: humanIsBlack ? 'black' : 'white' });
     if (humanIsBlack) {
       enableBoard();
-      statusEl.textContent = '⚫ Your Move';
+      statusEl.textContent = '⚫ Your move';
     } else {
       statusEl.textContent = 'Opponent is Thinking…';
-      setTimeout(() => { botMove(); enableBoard(); statusEl.textContent = '⚪ Your Move'; }, 800);
+      setTimeout(() => { botMove(); enableBoard(); statusEl.textContent = '⚪ Your move'; }, 800);
     }
   }
 });
@@ -3788,8 +3912,31 @@ const settingsOverlay = document.getElementById('settingsOverlay');
 document.getElementById('openSettings').addEventListener('click', () => settingsOverlay.classList.add('open'));
 document.getElementById('splashSettingsBtn').addEventListener('click', () => settingsOverlay.classList.add('open'));
 document.getElementById('settingsClose').addEventListener('click', () => settingsOverlay.classList.remove('open'));
-document.getElementById('settingsCloseBtn').addEventListener('click', () => settingsOverlay.classList.remove('open'));
+function refreshSettingsProfile() {
+  const thumb = document.getElementById('settingsProfileThumb');
+  const text  = document.getElementById('settingsProfileText');
+  if (playerProfile) {
+    thumb.src = avatarUrl(playerProfile.avatarSeed);
+    thumb.style.opacity = '1';
+    text.textContent = playerProfile.name;
+  } else {
+    thumb.src = PLAYER_AVATAR_PLACEHOLDER;
+    thumb.style.opacity = '0.5';
+    text.textContent = 'No profile';
+    text.style.color = '#8b7355';
+  }
+}
 settingsOverlay.addEventListener('click', e => { if (e.target === settingsOverlay) settingsOverlay.classList.remove('open'); });
+// Refresh profile section each time settings opens
+document.getElementById('openSettings').addEventListener('click', refreshSettingsProfile);
+document.getElementById('splashSettingsBtn').addEventListener('click', refreshSettingsProfile);
+document.getElementById('botSelectSettings').addEventListener('click', refreshSettingsProfile);
+document.getElementById('settingsEditProfileBtn').addEventListener('click', () => {
+  settingsOverlay.classList.remove('open');
+  showProfileSetup(() => { refreshSettingsProfile(); settingsOverlay.classList.add('open'); });
+});
+document.getElementById('settingsCloseBtn').addEventListener('click', () => settingsOverlay.classList.remove('open'));
+
 document.getElementById('toggleMusic').addEventListener('change', function() { audioPrefs.music=this.checked; saveAudioPrefs(); if(audioPrefs.music)playMusic(); else stopMusic(); });
 document.getElementById('toggleSfx').addEventListener('change', function() { audioPrefs.sfx=this.checked; saveAudioPrefs(); });
 
@@ -4515,6 +4662,7 @@ function setupDailyBoardDisplay() {
 function enterDailyMode() {
   document.getElementById('startOverlay').classList.remove('open');
   closeEndgame();
+  document.getElementById('botGameHeader').classList.add('hidden');
 
   gameMode = 'daily';
   splash.classList.add('hidden');
