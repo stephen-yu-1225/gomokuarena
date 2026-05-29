@@ -89,8 +89,7 @@
     align-items: center;
     justify-content: center;
     transition: opacity 0.8s, visibility 0.8s;
-    overflow-y: auto;
-    padding: 32px 16px;
+    padding: 16px;
   }
   #splash.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
 
@@ -377,6 +376,19 @@
   .game-header-home {
     position: absolute; left: 0; margin: 0;
     padding: 4px 10px; font-size: 0.75rem; letter-spacing: 0.5px;
+  }
+  .game-header-right {
+    position: absolute; right: 0; display: flex; align-items: center; gap: 5px;
+  }
+  .game-header-stats-btn {
+    background: transparent; border: 1.5px solid #c8bda8; border-radius: 4px;
+    color: #8b7355; font-family: 'Noto Serif', serif; font-size: 0.72rem;
+    padding: 4px 9px; cursor: pointer; letter-spacing: 0.5px; white-space: nowrap;
+    transition: all 0.2s;
+  }
+  .game-header-stats-btn:hover { border-color: #2c2c2c; color: #2c2c2c; }
+  .game-header-right .btn-settings {
+    position: static; transform: none; top: auto; right: auto;
   }
   /* Hide home button in VS-AI mode (no special body class) */
   body:not(.bot-mode):not(.pvp-mode):not(.daily-mode) #btnGoHome { display: none !important; }
@@ -701,10 +713,11 @@
   body.pvp-mode .scoreboard,
   body.pvp-mode #openStats,
   body.pvp-mode #endgame-sp-actions { display: none !important; }
-  body.bot-mode .difficulty,
-  body.bot-mode .scoreboard,
-  body.bot-mode #openStats,
-  body.bot-mode .btn-home { display: none !important; }
+  /* Hide VS-AI controls by default; only show in ai-mode */
+  .difficulty, .scoreboard, #openStats { display: none !important; }
+  body.ai-mode .difficulty, body.ai-mode .scoreboard, body.ai-mode #openStats { display: flex !important; }
+  body.ai-mode .scoreboard { display: flex !important; }
+  body.ai-mode #openStats { display: inline-block !important; }
   body.bot-mode #hintBtn { display: none !important; }
 
   /* ============ MODALS ============ */
@@ -1073,10 +1086,16 @@
     width: 30px; height: 30px; border-radius: 50%;
     border: 1.5px solid #d4ccc0; background: #ede8df; flex-shrink: 0;
   }
-  .bgh-player-name, .bgh-name {
-    font-family: 'Noto Serif SC', serif; font-size: 0.75rem; font-weight: 700;
-    color: #2c2c2c; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  .bgh-name-row {
+    display: flex; align-items: center; gap: 3px; justify-content: flex-end; min-width: 0;
   }
+  .bgh-flag { font-size: 0.78rem; line-height: 1; flex-shrink: 0; }
+  .bgh-name { flex-shrink: 1; white-space: nowrap; overflow: hidden; text-overflow: clip; }
+  .bgh-player-name, .bgh-name {
+    font-family: 'Noto Serif SC', serif; font-size: 0.72rem; font-weight: 700;
+    color: #2c2c2c; min-width: 0; overflow: hidden;
+  }
+  .bgh-player-name { white-space: nowrap; }
   .bgh-bot .bgh-name { text-align: right; }
   .bgh-bot-info { display: flex; flex-direction: column; align-items: flex-end; }
   .bgh-style-badge {
@@ -1090,13 +1109,12 @@
     font-size: 0.58rem; color: #8b7355; margin-top: 1px;
     font-family: 'Noto Serif', serif; white-space: nowrap;
   }
-  .bgh-info-col { min-width: 0; overflow: hidden; }
+  .bgh-info-col { min-width: 0; overflow: hidden; display: flex; flex-direction: column; justify-content: center; }
   .bgh-vs-label {
     font-family: 'Noto Serif SC', serif; font-size: 0.65rem; color: #c8a96e;
     font-weight: 700; letter-spacing: 1px; flex-shrink: 0; padding: 0 4px;
   }
   #profileSetupOverlay { z-index: 300; }
-  #profileSetupOverlay .endgame { max-height: 90vh; overflow-y: auto; }
 
   /* Board header — style tooltip */
   .bgh-avatar-wrap { position: relative; display: inline-block; cursor: pointer; }
@@ -1114,8 +1132,8 @@
   /* Profile avatar grid */
   .profile-avatar-selected-wrap { margin: 8px 0 6px; text-align: center; }
   .profile-avatar-grid {
-    display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px;
-    width: 100%; margin-bottom: 12px;
+    display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px;
+    width: 100%; margin-bottom: 12px; max-height: 190px; overflow-y: auto; padding-right: 3px;
   }
   .profile-avatar-grid-item {
     width: 100%; aspect-ratio: 1; border-radius: 50%;
@@ -1173,8 +1191,8 @@
     color: #2c2c2c; text-align: center; max-width: 80px;
     overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
   }
-  .bot-end-side-elo { font-size: 0.58rem; color: #8b7355; text-align: center; }
-  .bot-end-side-tier { font-size: 0.55rem; color: #aaa; text-align: center; margin-top: 1px; }
+  .bot-end-side-elo { font-size: 0.58rem; color: #8b7355; text-align: center; font-family: 'Noto Serif', serif; }
+  .bot-end-side-tier { font-size: 0.55rem; color: #aaa; text-align: center; margin-top: 1px; font-family: 'Noto Serif', serif; }
   .bot-end-matchup-vs {
     font-family: 'Noto Serif SC', serif; font-size: 0.6rem; font-weight: 700;
     color: #c8a96e; letter-spacing: 1px; padding-top: 12px; flex-shrink: 0;
@@ -1704,7 +1722,16 @@
   /* Splash + bot-select settings buttons */
   .splash-settings-corner {
     position: absolute; top: 12px; right: 14px;
+    display: flex; align-items: center; gap: 6px;
   }
+  .splash-stats-btn {
+    background: transparent; border: 1px solid #d4ccc0; border-radius: 2px;
+    color: #8b7355; font-family: 'Noto Serif', serif; font-size: 0.72rem;
+    padding: 5px 9px; cursor: pointer; letter-spacing: 0.5px;
+    display: inline-flex; align-items: center; line-height: 1;
+    transition: all 0.2s;
+  }
+  .splash-stats-btn:hover { border-color: #2c2c2c; color: #2c2c2c; }
   .splash-settings-btn {
     background: none; border: 1px solid #d4ccc0; padding: 6px 8px;
     color: #8b7355; border-radius: 2px; cursor: pointer; line-height: 1;
@@ -1718,6 +1745,7 @@
 <!-- ====== SPLASH ====== -->
 <div id="splash">
   <div class="splash-settings-corner">
+    <button class="splash-stats-btn" id="splashStatsBtn" title="Stats">Stats</button>
     <button class="splash-settings-btn" id="splashSettingsBtn" title="Settings"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
   </div>
   <div class="splash-seal">棋<br>场</div>
@@ -1840,7 +1868,10 @@
       <div class="game-title-cn">Gomoku Arena</div>
       <div class="game-title-en">五子棋</div>
     </div>
+    <div class="game-header-right">
+    <button class="game-header-stats-btn" id="openStatsBtn" title="Stats">Stats</button>
     <button class="btn-settings" id="openSettings" title="Settings"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
+    </div>
   </div>
 
   <div class="difficulty">
@@ -1891,7 +1922,7 @@
     <div class="bgh-vs-label">VS</div>
     <div class="bgh-bot">
       <div class="bgh-info-col" style="text-align:right;">
-        <div class="bgh-name" id="bghName"></div>
+        <div class="bgh-name-row"><span class="bgh-name" id="bghName"></span><span class="bgh-flag" id="bghFlag"></span></div>
         <div class="bgh-bot-elo" id="bghBotElo"></div>
       </div>
       <div class="bgh-avatar-wrap">
@@ -2017,6 +2048,7 @@
         <img class="bot-end-avatar bot-end-avatar-bot" id="botEndBotAvatar" src="" alt="">
         <div class="bot-end-side-name" id="botEndBotName"></div>
         <div class="bot-end-side-elo" id="botEndBotElo"></div>
+        <div class="bot-end-side-tier" id="botEndBotTier"></div>
       </div>
     </div>
     <div class="bot-end-icon" id="botEndIcon"></div>
@@ -2281,16 +2313,19 @@ function goHome() {
   if (gameInProgress && gameMode === 'vs-human') {
     showConfirm('Leave Game?', 'This game will be abandoned.', 'Leave', () => {
       clearActiveGame();
+      document.body.classList.remove('pvp-mode','bot-mode','ai-mode');
       splash.classList.remove('hidden');
     });
   } else if (gameInProgress) {
     showConfirm('Leave Game?', 'This counts as a loss.', 'Leave', () => {
       recordForfeit();
       currentBot = null; gameMode = 'vs-ai';
+      document.body.classList.remove('pvp-mode','bot-mode','ai-mode');
       splash.classList.remove('hidden');
     });
   } else {
     currentBot = null; gameMode = 'vs-ai';
+    document.body.classList.remove('pvp-mode','bot-mode','ai-mode');
     splash.classList.remove('hidden');
   }
 }
@@ -2491,11 +2526,11 @@ function openBotStats() {
         const barW = p === null ? 0 : p;
         return `
           <div class="tier-bar-row">
-            <div class="tier-bar-label">\${t}</div>
-            <div class="tier-bar-track"><div class="tier-bar-fill" style="width:\${barW}%"></div></div>
-            <div class="tier-bar-pct">\${p === null ? '—' : p + '%'}</div>
+            <div class="tier-bar-label">${t}</div>
+            <div class="tier-bar-track"><div class="tier-bar-fill" style="width:${barW}%"></div></div>
+            <div class="tier-bar-pct">${p === null ? '—' : p + '%'}</div>
           </div>
-          <div class="tier-bar-games" style="text-align:right;margin:-4px 0 6px;font-size:0.6rem;color:#bbb">\${games === 0 ? 'No games' : games + ' game' + (games===1?'':'s') + ' · ' + raw.w + 'W ' + raw.l + 'L ' + raw.d + 'D'}</div>`;
+          <div class="tier-bar-games" style="text-align:right;margin:-4px 0 6px;font-size:0.6rem;color:#bbb">${games === 0 ? 'No games' : games + ' game' + (games===1?'':'s') + ' · ' + raw.w + 'W ' + raw.l + 'L ' + raw.d + 'D'}</div>`;
       }).join('');
       document.getElementById('statsWinRateRows').innerHTML = filteredRows;
     });
@@ -3098,7 +3133,7 @@ function handleClick(i) {
     if (gameOver) return;
     saveActiveGame();
     disableBoard();
-    statusEl.textContent = 'Opponent is thinking\u2026';
+    statusEl.textContent = (gameMode === 'vs-bot' && currentBot) ? currentBot.name + ' is Thinking…' : 'Opponent is thinking…';
     const delay = 1000 + Math.random() * 2000;
     setTimeout(() => {
       botMove();
@@ -3548,6 +3583,7 @@ function applyModeUI() {
   const isPvp = gameMode === 'vs-human';
   document.body.classList.toggle('pvp-mode', isPvp || isBotMode);
   document.body.classList.toggle('bot-mode', isBotMode);
+  document.body.classList.toggle('ai-mode', gameMode === 'vs-ai');
   const label = document.getElementById('modeLabel');
   if (!label) return;
   if (gameMode === 'vs-human') {
@@ -3573,7 +3609,8 @@ function applyModeUI() {
     document.getElementById('bghAvatar').src = avatarUrl(currentBot.seed);
     document.getElementById('bghAvatar').alt = currentBot.name;
     const nameEl = document.getElementById('bghName');
-    nameEl.textContent = currentBot.name + ' ' + (currentBot.flag || '');
+    nameEl.textContent = currentBot.name;
+    document.getElementById('bghFlag').textContent = currentBot.flag || '';
     document.getElementById('bghBotElo').textContent = currentBot.elo + ' Rating';
     document.getElementById('bghStyleTooltip').textContent = 'Plays ' + currentBot.style.toLowerCase() + ' style';
     botHeader.classList.remove('hidden');
@@ -3702,6 +3739,8 @@ function showBotEndgame(result) {
     iconEl.textContent = '🤝'; resultEl.textContent = 'Draw';
     resultEl.className = 'bot-end-result draw'; playSound('draw');
   }
+  const eloAfter = playerElo;
+  const eloBefore = eloAfter - lastEloDelta;
   document.getElementById('botEndPlayerAvatar').src = getPlayerAvatarSrc();
   document.getElementById('botEndPlayerName').textContent = getPlayerDisplayName();
   document.getElementById('botEndPlayerElo').textContent = eloBefore + ' Rating';
@@ -3709,11 +3748,9 @@ function showBotEndgame(result) {
   document.getElementById('botEndBotAvatar').src = avatarUrl(currentBot.seed);
   document.getElementById('botEndBotAvatar').alt = currentBot.name;
   document.getElementById('botEndBotName').textContent = currentBot.name + ' ' + (currentBot.flag || '');
-  document.getElementById('botEndBotElo').textContent = currentBot.elo + ' Rating · ' + currentBot.tier;
+  document.getElementById('botEndBotElo').textContent = currentBot.elo + ' Rating';
+  document.getElementById('botEndBotTier').textContent = currentBot.tier;
   document.getElementById('botRematch').textContent = 'Rematch ' + currentBot.name;
-
-  const eloAfter = playerElo;
-  const eloBefore = eloAfter - lastEloDelta;
   document.getElementById('botEloOld').textContent = eloBefore;
   const deltaEl = document.getElementById('botEloDelta');
   const sign = lastEloDelta > 0 ? '+' : '';
@@ -3911,6 +3948,8 @@ document.querySelectorAll('.difficulty-start-btn').forEach(btn => {
 const settingsOverlay = document.getElementById('settingsOverlay');
 document.getElementById('openSettings').addEventListener('click', () => settingsOverlay.classList.add('open'));
 document.getElementById('splashSettingsBtn').addEventListener('click', () => settingsOverlay.classList.add('open'));
+document.getElementById('splashStatsBtn').addEventListener('click', () => { openBotStats(); });
+document.getElementById('openStatsBtn').addEventListener('click', () => { openBotStats(); });
 document.getElementById('settingsClose').addEventListener('click', () => settingsOverlay.classList.remove('open'));
 function refreshSettingsProfile() {
   const thumb = document.getElementById('settingsProfileThumb');
